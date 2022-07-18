@@ -1,0 +1,9 @@
+name: ia-env
+dependencies:
+  - python=3.7
+  - numpy=1.20.*
+  - pip
+  - pip:
+    - PyQt5==5.15.4
+    - pyqtgraph==0.12.1
+    - xrayutilities
