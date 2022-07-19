@@ -11,6 +11,9 @@ from pyqtgraph.dockarea import Dock, DockArea
 # ==================================================================================
 
 class MainWindow(QtGui.QWidget):
+    """
+    Main window for application. Houses DockArea that contains child widgets.
+    """
     
     def __init__(self) -> None:
         super(MainWindow, self).__init__()
@@ -64,3 +67,5 @@ class MainWindow(QtGui.QWidget):
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.dock_area)
+
+# ==================================================================================
