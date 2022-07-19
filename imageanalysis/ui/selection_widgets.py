@@ -7,6 +7,8 @@ See LICENSE file.
 
 from pyqtgraph import QtGui
 
+from imageanalysis.io import isValidProjectPath
+
 # ==================================================================================
 
 class ProjectSelectionWidget(QtGui.QWidget):
@@ -60,18 +62,20 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.layout.addWidget(self.project_files_gbx, 1, 0, 1, 2)
 
         # Connections
-        self.project_btn.clicked.connect(self.select_project)
+        self.project_btn.clicked.connect(self.selectProject)
 
     # ------------------------------------------------------------------------------
 
-    def select_project(self):
+    def selectProject(self):
         """
         Allows user to select a directory with a file dialog and then validates the 
         selected directory.
         """
-        
+
         project_path = QtGui.QFileDialog.getExistingDirectory(self, "Select Project")
-        
+
+        if isValidProjectPath(project_path):
+            self.project_path = project_path
 
 # ==================================================================================
 
