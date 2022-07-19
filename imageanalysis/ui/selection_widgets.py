@@ -94,6 +94,28 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.instrument_cbx.addItems(xml_paths)
         self.detector_cbx.addItems(xml_paths)
 
+    # ------------------------------------------------------------------------------
+    
+
+    def enableLoadProjectButton(self):
+        """
+        Checks if all project file comboboxes are nonempty and enabled "Load Project"
+        option.
+        """
+        project_files = [
+            self.spec_cbx.currentText(),
+            self.instrument_cbx.currentText(),
+            self.detector_cbx.currentText()
+        ]
+
+        if "" not in project_files:
+            self.load_project_btn.setEnabled(True)
+
+    # ------------------------------------------------------------------------------
+
+    def loadProject(self):
+        ...
+
 # ==================================================================================
 
 class ScanSelectionWidget(QtGui.QWidget):
