@@ -7,7 +7,7 @@ See LICENSE file.
 
 from pyqtgraph import QtGui
 
-from imageanalysis.io import isValidProjectPath
+from imageanalysis.io import isValidProjectPath, getSPECPaths, getXMLPaths
 
 # ==================================================================================
 
@@ -76,6 +76,23 @@ class ProjectSelectionWidget(QtGui.QWidget):
 
         if isValidProjectPath(project_path):
             self.project_path = project_path
+            self.project_txt.setText(project_path)
+            self.project_files_gbx.setEnabled(True)
+            self.populateProjectFilesGroupbox()
+
+    # ------------------------------------------------------------------------------
+
+    def populateProjectFilesGroupbox(self):
+        """
+        Adds SPEC sources and XML configuration files to comboboxes.
+        """
+
+        spec_paths = [""] + getSPECPaths(self.project_path)
+        xml_paths = [""] + getXMLPaths(self.project_path)
+
+        self.spec_cbx.addItems(spec_paths)
+        self.instrument_cbx.addItems(xml_paths)
+        self.detector_cbx.addItems(xml_paths)
 
 # ==================================================================================
 
