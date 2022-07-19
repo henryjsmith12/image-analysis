@@ -10,9 +10,18 @@ from pyqtgraph import QtGui
 # ==================================================================================
 
 class ProjectSelectionWidget(QtGui.QWidget):
+    """
+    Allows users to open a project.
+    """
 
     def __init__(self) -> None:
         super(ProjectSelectionWidget, self).__init__()
+
+        # Path variables
+        self.project_path = None
+        self.spec_path = None
+        self.instrument_path = None
+        self.detector_path = None
 
         # Child widgets
         self.project_btn = QtGui.QPushButton("Select Project")
@@ -50,7 +59,19 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.layout.addWidget(self.project_txt, 0, 1)
         self.layout.addWidget(self.project_files_gbx, 1, 0, 1, 2)
 
+        # Connections
+        self.project_btn.clicked.connect(self.select_project)
+
     # ------------------------------------------------------------------------------
+
+    def select_project(self):
+        """
+        Allows user to select a directory with a file dialog and then validates the 
+        selected directory.
+        """
+        
+        project_path = QtGui.QFileDialog.getExistingDirectory(self, "Select Project")
+        
 
 # ==================================================================================
 
