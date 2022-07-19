@@ -39,3 +39,36 @@ def isValidProjectPath(path):
     return is_valid
     
 # ==================================================================================
+
+def getSPECPaths(path):
+    """
+    Returns a list of SPEC files immediately below given directory.
+    """
+
+    spec_paths = []
+
+    for item in os.listdir(path):
+        item_path = f"{path}/{item}"
+        if item.endswith(".spec"):
+            spec_paths.append(item_path)
+
+    return spec_paths
+
+# ==================================================================================
+
+def getXMLPaths(path):
+    """
+    Returns a list of XML files immediately below given directory.
+    """
+
+    xml_paths = []
+
+    for item in os.listdir(path):
+        item_path = f"{path}/{item}"
+        if item.endswith(".xml"):
+            xml_paths.append(item_path)
+
+    return xml_paths
+
+# ==================================================================================
+
