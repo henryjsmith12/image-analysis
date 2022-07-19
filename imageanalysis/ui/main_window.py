@@ -8,6 +8,12 @@ See LICENSE file.
 from pyqtgraph import QtGui
 from pyqtgraph.dockarea import Dock, DockArea
 
+# ----------------------------------------------------------------------------------
+
+from imageanalysis.ui.data_view_widget import DataViewWidget
+from imageanalysis.ui.plot_view_widget import PlotViewWidget
+from imageanalysis.ui.selection_widgets import ProjectSelectionWidget, ScanSelectionWidget
+
 # ==================================================================================
 
 class MainWindow(QtGui.QWidget):
@@ -24,7 +30,7 @@ class MainWindow(QtGui.QWidget):
         self.setWindowTitle("image-analysis")
 
         # Child widgets
-
+        
 
         # Docks
         self.dock_area = DockArea()
