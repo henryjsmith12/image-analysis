@@ -30,35 +30,38 @@ class MainWindow(QtGui.QWidget):
         self.setWindowTitle("image-analysis")
 
         # Child widgets
-        
+        self.project_selection_widget = ProjectSelectionWidget()
+        self.scan_selection_widget = ScanSelectionWidget()
+        self.data_view_widget = DataViewWidget()
+        self.plot_view_widget = PlotViewWidget()
 
         # Docks
         self.dock_area = DockArea()
         self.project_selection_dock = Dock(
             name="Select Project",
             size=(1, 1),
-            widget=None,
+            widget=self.project_selection_widget,
             hideTitle=True,
             closable=False
         )
         self.scan_selection_dock = Dock(
             name="Select Scan", 
             size=(1, 2), 
-            widget=None, 
+            widget=self.scan_selection_widget, 
             hideTitle=True, 
             closable=False
         )
         self.data_view_dock = Dock(
             name="Data View", 
             size=(2, 3), 
-            widget=None, 
+            widget=self.data_view_widget, 
             hideTitle=True, 
             closable=False
         )
         self.plot_view_dock = Dock(
             name="Plot View", 
             size=(2, 3), 
-            widget=None, 
+            widget=self.plot_view_widget, 
             hideTitle=True, 
             closable=False
         )
