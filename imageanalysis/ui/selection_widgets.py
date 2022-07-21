@@ -103,7 +103,6 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.detector_cbx.addItems(xml_paths)
 
     # ------------------------------------------------------------------------------
-    
 
     def enableLoadProjectButton(self):
         """
@@ -134,7 +133,7 @@ class ProjectSelectionWidget(QtGui.QWidget):
             detector_path=self.detector_path
         )
 
-        self.main_window.scan_selection_widget.loadProject(self.project)
+        self.main_window.scan_selection_widget.loadProjectScanList(self.project)
 
 # ==================================================================================
 
@@ -166,7 +165,10 @@ class ScanSelectionWidget(QtGui.QWidget):
 
     # ------------------------------------------------------------------------------
 
-    def loadProject(self, project):
+    def loadProjectScanList(self, project):
+        """
+        Populate possible scan list with new scans 
+        """
         self.project = project
         self.scan_lstw.clear()
         self.scan_lstw.addItems(self.project.scan_numbers)
