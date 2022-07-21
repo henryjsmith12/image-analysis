@@ -14,11 +14,13 @@ from imageanalysis.structures import Project
 
 class ProjectSelectionWidget(QtGui.QWidget):
     """
-    Allows users to open a project.
+    Allows user to open a project.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, parent) -> None:
         super(ProjectSelectionWidget, self).__init__()
+
+        self.main_window = parent
 
         # Path variables
         self.project_path = None
@@ -32,11 +34,11 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.project_txt.setReadOnly(True)
         self.project_files_gbx = QtGui.QGroupBox()
         self.project_files_gbx.setEnabled(False)
-        self.spec_lbl = QtGui.QLabel("SPEC:")
+        self.spec_lbl = QtGui.QLabel("SPEC Source:")
         self.spec_cbx = QtGui.QComboBox()
-        self.instrument_lbl = QtGui.QLabel("Instr. Config.:")
+        self.instrument_lbl = QtGui.QLabel("Instrument:")
         self.instrument_cbx = QtGui.QComboBox()
-        self.detector_lbl = QtGui.QLabel("Det. Config.:")
+        self.detector_lbl = QtGui.QLabel("Detector:")
         self.detector_cbx = QtGui.QComboBox()
         self.clear_project_btn = QtGui.QPushButton("Clear Project")
         self.clear_project_btn.setEnabled(False)
@@ -95,6 +97,7 @@ class ProjectSelectionWidget(QtGui.QWidget):
         spec_paths = [""] + getSPECPaths(self.project_path)
         xml_paths = [""] + getXMLPaths(self.project_path)
 
+
         self.spec_cbx.addItems(spec_paths)
         self.instrument_cbx.addItems(xml_paths)
         self.detector_cbx.addItems(xml_paths)
@@ -107,11 +110,11 @@ class ProjectSelectionWidget(QtGui.QWidget):
         Checks if all project file comboboxes are nonempty and enabled "Load Project"
         option.
         """
-        self.spec_path = self.spec_cbx.currentText()
-        self.instrument_path = self.instrument_cbx.currentText()
-        self.detector_path = self.detector_cbx.currentText()
+        self.spec_path = f"{self.project_path}/{self.spec_cbx.currentText()}"
+        self.instrument_path = f"{self.project_path}/{self.instrument_cbx.currentText()}"
+        self.detector_path = f"{self.project_path}/{self.detector_cbx.currentText()}"
 
-        if "" not in [self.spec_path, self.instrument_path, self.detector_path]:
+        if "/" not in [self.spec_path[-1], self.instrument_path[-1], self.detector_path[-1]]:
             self.load_project_btn.setEnabled(True)
         else:
             self.load_project_btn.setEnabled(False)
@@ -119,23 +122,53 @@ class ProjectSelectionWidget(QtGui.QWidget):
     # ------------------------------------------------------------------------------
 
     def loadProject(self):
+        """
+        Create Project object from given paths and load information into the 
+        ScanSelectionWidget.
+        """
 
-        project = Project(
+        self.project = Project(
             project_path=self.project_path,
             spec_path=self.spec_path,
             instrument_path=self.instrument_path,
             detector_path=self.detector_path
         )
 
+        self.main_window.scan_selection_widget.loadProject(self.project)
+
 # ==================================================================================
 
 class ScanSelectionWidget(QtGui.QWidget):
+    """
+    Displays available scans in a Project and allows user to select a specific scan
+    to display information from.
+    """
 
-    def __init__(self) -> None:
+    def __init__(self, parent) -> None:
         super(ScanSelectionWidget, self).__init__()
+
+        self.main_window = parent
+
+        # Project
+        self.project = None
+
+        # Child widgets
+        self.scan_lstw = QtGui.QListWidget()
+        self.scan_details_gbx = QtGui.QGroupBox()
 
         # Layout
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
+        self.layout.addWidget(self.scan_lstw, 0, 0)
+        self.layout.addWidget(self.scan_details_gbx, 1, 0)
+        self.layout.setRowStretch(0, 1)
+        self.layout.setRowStretch(1, 2)
+
+    # ------------------------------------------------------------------------------
+
+    def loadProject(self, project):
+        self.project = project
+        self.scan_lstw.clear()
+        self.scan_lstw.addItems(self.project.scan_numbers)
 
 # ==================================================================================
