@@ -8,6 +8,7 @@ See LICENSE file.
 from pyqtgraph import QtGui
 
 from imageanalysis.io import isValidProjectPath, getSPECPaths, getXMLPaths
+from imageanalysis.structures import Project
 
 # ==================================================================================
 
@@ -63,6 +64,10 @@ class ProjectSelectionWidget(QtGui.QWidget):
 
         # Connections
         self.project_btn.clicked.connect(self.selectProject)
+        self.spec_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
+        self.instrument_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
+        self.detector_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
+        self.load_project_btn.clicked.connect(self.loadProject)
 
     # ------------------------------------------------------------------------------
 
@@ -102,19 +107,25 @@ class ProjectSelectionWidget(QtGui.QWidget):
         Checks if all project file comboboxes are nonempty and enabled "Load Project"
         option.
         """
-        project_files = [
-            self.spec_cbx.currentText(),
-            self.instrument_cbx.currentText(),
-            self.detector_cbx.currentText()
-        ]
+        self.spec_path = self.spec_cbx.currentText()
+        self.instrument_path = self.instrument_cbx.currentText()
+        self.detector_path = self.detector_cbx.currentText()
 
-        if "" not in project_files:
+        if "" not in [self.spec_path, self.instrument_path, self.detector_path]:
             self.load_project_btn.setEnabled(True)
+        else:
+            self.load_project_btn.setEnabled(False)
 
     # ------------------------------------------------------------------------------
 
     def loadProject(self):
-        ...
+
+        project = Project(
+            project_path=self.project_path,
+            spec_path=self.spec_path,
+            instrument_path=self.instrument_path,
+            detector_path=self.detector_path
+        )
 
 # ==================================================================================
 
