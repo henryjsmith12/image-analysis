@@ -11,7 +11,7 @@ from spec2nexus import spec
 # ==================================================================================
 
 class Project:
-
+   
     def __init__(
         self, 
         project_path: str, 
@@ -19,7 +19,11 @@ class Project:
         instrument_path: str,
         detector_path: str
     ) -> None:
-        
+            
+        if not [type(project_path), type(spec_path), type(instrument_path), 
+        type(detector_path)] == [str, str, str, str]:
+            raise TypeError("Paths must be of the type str")
+
         # Path variables
         self.path = project_path
         self.spec_path = spec_path
