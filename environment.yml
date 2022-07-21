@@ -9,4 +9,5 @@ dependencies:
     - pyqtgraph==0.12.1
     - pytest
     - pytest-qt
+    - spec2nexus
     - xrayutilities
