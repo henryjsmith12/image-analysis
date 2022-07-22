@@ -15,6 +15,9 @@ from spec2nexus import spec
 # ==================================================================================
 
 class Project:
+    """
+    Contains a list of experimental scans and path variables.
+    """
    
     def __init__(
         self, 
@@ -42,9 +45,13 @@ class Project:
 # ==================================================================================
 
 class Scan:
+    """
+    Contains SPEC data, raw image data, and gridded image data.
+    """
 
     def __init__(self, spec_scan, project_path, spec_path) -> None:
 
+        # Data variables
         self.spec_data = None
         self.raw_image_data = None
         self.reciprocal_space_map = None
@@ -52,10 +59,13 @@ class Scan:
 
         self.spec_scan = spec_scan
         self.number = spec_scan.scanNum
+
+        # Path variables
         self.project_path = project_path
         self.spec_path = spec_path
         self.raw_image_path = f"{project_path}/images/{os.path.basename(os.path.splitext(self.spec_path)[0])}/S{str(self.number).zfill(3)}"
 
+        # Data processing
         self.spec_data = spec_scan.data
         self.raw_image_data = self.getImageData()
         self.reciprocal_space_map = self.mapImageData()
@@ -63,6 +73,10 @@ class Scan:
     # ------------------------------------------------------------------------------
 
     def getImageData(self):
+        """
+        Retrieves raw image data from path.
+        """
+
         image_paths = sorted(os.listdir(self.raw_image_path))
         image_data = []
 
@@ -72,16 +86,23 @@ class Scan:
             image_data.append(img_array)
 
         image_data = np.array(image_data)
+        
         return image_data
 
     # ------------------------------------------------------------------------------
 
     def mapImageData(self):
+        """
+        Creates a reciprocal space map from raw image data.
+        """
         ...
 
     # ------------------------------------------------------------------------------
 
     def gridImageData(self):
+        """
+        Creates a gridded image dataset from a reciprocal space map and raw image data.
+        """
         ...
 
 # ==================================================================================
