@@ -233,4 +233,12 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.scan_lstw.clear()
         self.scan_lstw.addItems(self.project.scan_numbers)
 
+    # ------------------------------------------------------------------------------
+
+    def loadScan(self, index):
+        """
+        Loads scan data into a new DataView widget tab
+        """
+        ...
+
 # ==================================================================================
