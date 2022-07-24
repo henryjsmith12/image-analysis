@@ -17,5 +17,5 @@ setup(
     packages=find_packages(),
     install_requires=[],
     url=URL,
-    keywords=["python", "xrd"]
+    keywords=["python", "pyqtgraph", "image-analysis", "xrd"]
 )
