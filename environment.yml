@@ -10,5 +10,6 @@ dependencies:
     - pyqtgraph==0.12.1
     - pytest
     - pytest-qt
+    - rsMap3D
     - spec2nexus
     - xrayutilities
