@@ -7,6 +7,9 @@ See LICENSE file.
 
 from pyqtgraph import QtGui
 import sys
+
+# ----------------------------------------------------------------------------------
+
 from imageanalysis.ui.main_window import MainWindow
 
 # ==================================================================================
