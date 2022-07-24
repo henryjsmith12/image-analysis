@@ -5,6 +5,7 @@ See LICENSE file.
 
 # ==================================================================================
 
+import numpy as np
 from pyqtgraph import QtGui
 
 from imageanalysis.io import isValidProjectPath, getSPECPaths, getXMLPaths
@@ -254,6 +255,16 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.scan_date_lbl.setText(date)
         self.scan_type_lbl.setText(type)
         self.scan_bounds_lbl.setText(bounds)
+
+        self.h_min_txt.setText(str(round(np.amin(scan.h_map), 3)))
+        self.h_max_txt.setText(str(round(np.amax(scan.h_map), 3)))
+        self.h_n_txt.setText(str())
+        self.k_min_txt.setText(str(round(np.amin(scan.k_map), 3)))
+        self.k_max_txt.setText(str(round(np.amax(scan.k_map), 3)))
+        self.k_n_txt.setText(str())
+        self.l_min_txt.setText(str(round(np.amin(scan.l_map), 3)))
+        self.l_max_txt.setText(str(round(np.amax(scan.l_map), 3)))
+        self.l_n_txt.setText(str())
 
         self.scan_details_gbx.setEnabled(True)
 
