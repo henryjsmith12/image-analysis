@@ -223,6 +223,9 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.layout.setRowStretch(0, 1)
         self.layout.setRowStretch(1, 2)
 
+        # Connections
+        self.scan_lstw.itemClicked.connect(self.previewScan)
+
     # ------------------------------------------------------------------------------
 
     def loadProjectScanList(self, project):
@@ -232,6 +235,27 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.project = project
         self.scan_lstw.clear()
         self.scan_lstw.addItems(self.project.scan_numbers)
+
+    # ------------------------------------------------------------------------------
+
+    def previewScan(self):
+        i = self.scan_lstw.currentRow()
+        scan = self.project.scans[i]
+
+        header = scan.spec_scan.S.split()
+        number = header[0]
+        type = f"{header[1]} {header[2]}"
+        bounds = f"({header[3]}, {header[4]})"
+        point_count = str(len(scan.spec_scan.data_lines))
+        date = scan.spec_scan.date
+        
+        self.scan_number_txt.setText(number)
+        self.scan_point_count_txt.setText(point_count)
+        self.scan_date_lbl.setText(date)
+        self.scan_type_lbl.setText(type)
+        self.scan_bounds_lbl.setText(bounds)
+
+        self.scan_details_gbx.setEnabled(True)
 
     # ------------------------------------------------------------------------------
 
