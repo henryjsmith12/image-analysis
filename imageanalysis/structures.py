@@ -11,6 +11,8 @@ import os
 import spec2nexus as s2n
 from spec2nexus import spec
 
+# ----------------------------------------------------------------------------------
+
 from imageanalysis.mapping import mapScan
 
 # ==================================================================================
@@ -27,7 +29,10 @@ class Project:
         instrument_path: str,
         detector_path: str
     ) -> None:
-            
+        
+        # TODO: Check if paths are valid
+        # TODO: Allow Pathlib paths
+
         if not [type(project_path), type(spec_path), type(instrument_path), 
         type(detector_path)] == [str, str, str, str]:
             raise TypeError("Paths must be of the type str")
@@ -41,6 +46,7 @@ class Project:
         self.spec_data = spec.SpecDataFile(spec_path)
         self.scan_numbers = self.spec_data.getScanNumbers()
 
+        # List of Scan objects
         self.scans = [Scan(self.spec_data.getScan(i), project_path, spec_path, instrument_path, detector_path) for i in self.scan_numbers]
 
 # ==================================================================================
@@ -104,6 +110,7 @@ class Scan:
         """
         Creates a reciprocal space map from raw image data.
         """
+
         rsm = mapScan(self.spec_scan, self.instrument_path, self.detector_path)
 
         return rsm
@@ -114,6 +121,7 @@ class Scan:
         """
         Creates a gridded image dataset from a reciprocal space map and raw image data.
         """
+        
         ...
 
 # ==================================================================================
