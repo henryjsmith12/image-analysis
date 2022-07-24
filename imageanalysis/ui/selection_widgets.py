@@ -110,6 +110,7 @@ class ProjectSelectionWidget(QtGui.QWidget):
         Checks if all project file comboboxes are nonempty and enabled "Load Project"
         option.
         """
+
         self.spec_path = f"{self.project_path}/{self.spec_cbx.currentText()}"
         self.instrument_path = f"{self.project_path}/{self.instrument_cbx.currentText()}"
         self.detector_path = f"{self.project_path}/{self.detector_cbx.currentText()}"
@@ -231,8 +232,9 @@ class ScanSelectionWidget(QtGui.QWidget):
 
     def loadProjectScanList(self, project):
         """
-        Populate possible scan list with new scans 
+        Populates scan list.
         """
+
         self.project = project
         self.scan_lstw.clear()
         self.scan_lstw.addItems(self.project.scan_numbers)
@@ -240,6 +242,10 @@ class ScanSelectionWidget(QtGui.QWidget):
     # ------------------------------------------------------------------------------
 
     def previewScan(self):
+        """
+        Displays preview information about a scan.
+        """
+
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
 
@@ -255,7 +261,6 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.scan_date_lbl.setText(date)
         self.scan_type_lbl.setText(type)
         self.scan_bounds_lbl.setText(bounds)
-
         self.h_min_txt.setText(str(round(np.amin(scan.h_map), 3)))
         self.h_max_txt.setText(str(round(np.amax(scan.h_map), 3)))
         self.h_n_txt.setText(str())
@@ -274,6 +279,7 @@ class ScanSelectionWidget(QtGui.QWidget):
         """
         Loads scan data into a new DataView widget tab
         """
+        
         ...
 
 # ==================================================================================
