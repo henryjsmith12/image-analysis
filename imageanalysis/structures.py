@@ -8,9 +8,10 @@ See LICENSE file.
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
 import spec2nexus as s2n
 from spec2nexus import spec
+
+from imageanalysis.mapping import mapScan
 
 # ==================================================================================
 
@@ -40,7 +41,7 @@ class Project:
         self.spec_data = spec.SpecDataFile(spec_path)
         self.scan_numbers = self.spec_data.getScanNumbers()
 
-        self.scans = [Scan(self.spec_data.getScan(i), project_path, spec_path) for i in self.scan_numbers]
+        self.scans = [Scan(self.spec_data.getScan(i), project_path, spec_path, instrument_path, detector_path) for i in self.scan_numbers]
 
 # ==================================================================================
 
@@ -49,13 +50,15 @@ class Scan:
     Contains SPEC data, raw image data, and gridded image data.
     """
 
-    def __init__(self, spec_scan, project_path, spec_path) -> None:
+    def __init__(self, spec_scan, project_path, spec_path, instrument_path, detector_path) -> None:
 
         # Data variables
         self.spec_data = None
         self.raw_image_data = None
         self.reciprocal_space_map = None
+        self.h_map, self.k_map, self.l_map = None, None, None
         self.gridded_image_data, self.gridded_image_coords = None, None
+        self.grid_dims = None
 
         self.spec_scan = spec_scan
         self.number = spec_scan.scanNum
@@ -63,12 +66,18 @@ class Scan:
         # Path variables
         self.project_path = project_path
         self.spec_path = spec_path
+        self.instrument_path = instrument_path
+        self.detector_path = detector_path
         self.raw_image_path = f"{project_path}/images/{os.path.basename(os.path.splitext(self.spec_path)[0])}/S{str(self.number).zfill(3)}"
 
         # Data processing
         self.spec_data = spec_scan.data
         self.raw_image_data = self.getImageData()
         self.reciprocal_space_map = self.mapImageData()
+        self.h_map = self.reciprocal_space_map[:, :, :, 0]
+        self.k_map = self.reciprocal_space_map[:, :, :, 1]
+        self.l_map = self.reciprocal_space_map[:, :, :, 2]
+        self.grid_dims = [250, 250, 250]
 
     # ------------------------------------------------------------------------------
 
@@ -95,7 +104,9 @@ class Scan:
         """
         Creates a reciprocal space map from raw image data.
         """
-        ...
+        rsm = mapScan(self.spec_scan, self.instrument_path, self.detector_path)
+
+        return rsm
 
     # ------------------------------------------------------------------------------
 
