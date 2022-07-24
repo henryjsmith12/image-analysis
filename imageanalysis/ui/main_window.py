@@ -46,25 +46,29 @@ class MainWindow(QtGui.QWidget):
         )
         self.scan_selection_dock = Dock(
             name="Select Scan", 
-            size=(1, 3), 
+            size=(1, 4), 
             widget=self.scan_selection_widget, 
             hideTitle=True, 
             closable=False
         )
         self.data_view_dock = Dock(
             name="Data View", 
-            size=(3, 4), 
+            size=(4, 5), 
             widget=self.data_view_widget, 
             hideTitle=True, 
             closable=False
         )
         self.plot_view_dock = Dock(
             name="Plot View", 
-            size=(3, 4), 
+            size=(4, 5), 
             widget=self.plot_view_widget, 
             hideTitle=True, 
             closable=False
         )
+        self.project_selection_dock.setMaximumWidth(300)
+        self.scan_selection_dock.setMaximumWidth(300)
+        self.data_view_dock.setStretch(4, 5)
+        self.plot_view_dock.setStretch(4, 5)
         self.dock_area.addDock(self.project_selection_dock)
         self.dock_area.addDock(self.scan_selection_dock, "bottom", self.project_selection_dock)
         self.dock_area.addDock(self.data_view_dock, "right", self.scan_selection_dock)
