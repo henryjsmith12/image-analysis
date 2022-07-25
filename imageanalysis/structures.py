@@ -5,14 +5,14 @@ See LICENSE file.
 
 # ==================================================================================
 
-import matplotlib.pyplot as plt
 import numpy as np
 import os
-import spec2nexus as s2n
 from spec2nexus import spec
+import tifffile as tiff
 
 # ----------------------------------------------------------------------------------
 
+from imageanalysis.gridding import gridScan
 from imageanalysis.mapping import mapScan
 
 # ==================================================================================
@@ -99,9 +99,14 @@ class Scan:
         image_paths = sorted(os.listdir(self.raw_image_path))
         image_data = []
 
-        for img_basepath in image_paths:
+        monitor_norm_factors = self.spec_scan.data["Ion_Ch_2"] * 200000
+        filter_norm_factors = self.spec_scan.data["transm"] * 1
+
+        for i in range(len(image_paths)):
+            img_basepath = image_paths[i]
             img_path = f"{self.raw_image_path}/{img_basepath}"
-            img_array = plt.imread(img_path)
+            img_array = tiff.imread(img_path).T
+            img_array = img_array / (filter_norm_factors[i] * monitor_norm_factors[i])
             image_data.append(img_array)
 
         image_data = np.array(image_data)
@@ -125,7 +130,14 @@ class Scan:
         """
         Creates a gridded image dataset from a reciprocal space map and raw image data.
         """
-        
-        ...
+        hkl_min = (self.h_grid_min, self.k_grid_min, self.l_grid_min)
+        hkl_max = (self.h_grid_max, self.k_grid_max, self.l_grid_max)
+        hkl_n = (self.h_grid_n, self.k_grid_n, self.l_grid_n)
+
+        self.gridded_image_data, self.gridded_image_coords = gridScan(
+            self.raw_image_data, 
+            self.reciprocal_space_map,
+            (hkl_min, hkl_max, hkl_n)
+        )
 
 # ==================================================================================
