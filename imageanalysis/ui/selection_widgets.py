@@ -236,6 +236,7 @@ class ScanSelectionWidget(QtGui.QWidget):
             self.l_min_txt, self.l_max_txt, self.l_n_txt
         ]:
             txt.textChanged.connect(self.updateGriddingOptions)
+        self.load_scan_btn.clicked.connect(self.loadScan)
 
     # ------------------------------------------------------------------------------
 
@@ -314,7 +315,7 @@ class ScanSelectionWidget(QtGui.QWidget):
         """
         Resets Scan gridding parameters to default values.
         """
-        
+
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
         gridding_options_txts = [
@@ -333,11 +334,14 @@ class ScanSelectionWidget(QtGui.QWidget):
 
     # ------------------------------------------------------------------------------
 
-    def loadScan(self, index):
+    def loadScan(self):
         """
         Loads scan data into a new DataView widget tab
         """
         
-        ...
+        i = self.scan_lstw.currentRow()
+        scan = self.project.scans[i]
+
+        scan.gridImageData()
 
 # ==================================================================================
