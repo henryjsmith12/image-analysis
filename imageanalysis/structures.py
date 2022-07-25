@@ -64,7 +64,9 @@ class Scan:
         self.reciprocal_space_map = None
         self.h_map, self.k_map, self.l_map = None, None, None
         self.gridded_image_data, self.gridded_image_coords = None, None
-        self.grid_dims = None
+        self.h_grid_min, self.h_grid_max, self.h_grid_n = None, None, None
+        self.k_grid_min, self.k_grid_max, self.k_grid_n = None, None, None
+        self.l_grid_min, self.l_grid_max, self.l_grid_n = None, None, None
 
         self.spec_scan = spec_scan
         self.number = spec_scan.scanNum
@@ -83,8 +85,10 @@ class Scan:
         self.h_map = self.reciprocal_space_map[:, :, :, 0]
         self.k_map = self.reciprocal_space_map[:, :, :, 1]
         self.l_map = self.reciprocal_space_map[:, :, :, 2]
-        self.grid_dims = [250, 250, 250]
-
+        self.h_grid_min, self.h_grid_max, self.h_grid_n = np.amin(self.h_map), np.amax(self.h_map), 250
+        self.k_grid_min, self.k_grid_max, self.k_grid_n = np.amin(self.k_map), np.amax(self.k_map), 250
+        self.l_grid_min, self.l_grid_max, self.l_grid_n = np.amin(self.l_map), np.amax(self.l_map), 250
+        
     # ------------------------------------------------------------------------------
 
     def getImageData(self):
