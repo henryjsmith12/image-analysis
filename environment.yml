@@ -12,4 +12,5 @@ dependencies:
     - pytest-qt
     - rsMap3D
     - spec2nexus
+    - tifffile
     - xrayutilities
