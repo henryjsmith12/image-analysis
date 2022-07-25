@@ -183,6 +183,7 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.l_min_txt = QtGui.QLineEdit()
         self.l_max_txt = QtGui.QLineEdit()
         self.l_n_txt = QtGui.QLineEdit()
+        self.reset_btn = QtGui.QPushButton("Reset")
         self.load_scan_btn = QtGui.QPushButton("Load Scan")
         
         # Scan details GroupBox layout
@@ -216,6 +217,7 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.gridding_options_gbx_layout.addWidget(self.l_min_txt, 3, 1)
         self.gridding_options_gbx_layout.addWidget(self.l_max_txt, 3, 2)
         self.gridding_options_gbx_layout.addWidget(self.l_n_txt, 3, 3)
+        self.gridding_options_gbx_layout.addWidget(self.reset_btn, 4, 0, 1, 4)
 
         # Layout
         self.layout = QtGui.QGridLayout()
@@ -227,6 +229,13 @@ class ScanSelectionWidget(QtGui.QWidget):
 
         # Connections
         self.scan_lstw.itemClicked.connect(self.previewScan)
+        self.reset_btn.clicked.connect(self.resetGriddingOptions)
+        for txt in [
+            self.h_min_txt, self.h_max_txt, self.h_n_txt, 
+            self.k_min_txt, self.k_max_txt, self.k_n_txt, 
+            self.l_min_txt, self.l_max_txt, self.l_n_txt
+        ]:
+            txt.textChanged.connect(self.updateGriddingOptions)
 
     # ------------------------------------------------------------------------------
 
@@ -261,17 +270,66 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.scan_date_lbl.setText(date)
         self.scan_type_lbl.setText(type)
         self.scan_bounds_lbl.setText(bounds)
-        self.h_min_txt.setText(str(round(np.amin(scan.h_map), 3)))
-        self.h_max_txt.setText(str(round(np.amax(scan.h_map), 3)))
-        self.h_n_txt.setText(str())
-        self.k_min_txt.setText(str(round(np.amin(scan.k_map), 3)))
-        self.k_max_txt.setText(str(round(np.amax(scan.k_map), 3)))
-        self.k_n_txt.setText(str())
-        self.l_min_txt.setText(str(round(np.amin(scan.l_map), 3)))
-        self.l_max_txt.setText(str(round(np.amax(scan.l_map), 3)))
-        self.l_n_txt.setText(str())
+        self.h_min_txt.setText(str(round(scan.h_grid_min, 3)))
+        self.h_max_txt.setText(str(round(scan.h_grid_max, 3)))
+        self.h_n_txt.setText(str(scan.h_grid_n))
+        self.k_min_txt.setText(str(round(scan.k_grid_min, 3)))
+        self.k_max_txt.setText(str(round(scan.k_grid_max, 3)))
+        self.k_n_txt.setText(str(scan.k_grid_n))
+        self.l_min_txt.setText(str(round(scan.l_grid_min, 3)))
+        self.l_max_txt.setText(str(round(scan.l_grid_max, 3)))
+        self.l_n_txt.setText(str(scan.l_grid_n))
 
         self.scan_details_gbx.setEnabled(True)
+
+    # ------------------------------------------------------------------------------
+
+    def updateGriddingOptions(self):
+        """
+        Updates Scan gridding parameters.
+        """
+
+        i = self.scan_lstw.currentRow()
+        scan = self.project.scans[i]
+        gridding_options_txts = [
+            self.h_min_txt, self.h_max_txt, self.h_n_txt,
+            self.k_min_txt, self.k_max_txt, self.k_n_txt,
+            self.l_min_txt, self.l_max_txt, self.l_n_txt,
+        ]
+        scan_gridding_params = [
+            scan.h_grid_min, scan.h_grid_max, scan.h_grid_n,
+            scan.k_grid_min, scan.k_grid_max, scan.k_grid_n,
+            scan.l_grid_min, scan.l_grid_max, scan.l_grid_n,
+        ]
+
+        for txt, param in zip(gridding_options_txts, scan_gridding_params):
+            try:
+                param = float(txt.text())
+            except:
+                pass
+
+    # ------------------------------------------------------------------------------
+
+    def resetGriddingOptions(self):
+        """
+        Resets Scan gridding parameters to default values.
+        """
+        
+        i = self.scan_lstw.currentRow()
+        scan = self.project.scans[i]
+        gridding_options_txts = [
+            self.h_min_txt, self.h_max_txt, self.h_n_txt,
+            self.k_min_txt, self.k_max_txt, self.k_n_txt,
+            self.l_min_txt, self.l_max_txt, self.l_n_txt,
+        ]
+        original_params = [
+            np.amin(scan.h_map), np.amax(scan.h_map), 250,
+            np.amin(scan.k_map), np.amax(scan.k_map), 250,
+            np.amin(scan.l_map), np.amax(scan.l_map), 250,
+        ]
+
+        for txt, o_param in zip(gridding_options_txts, original_params):
+            txt.setText(str(round(o_param, 3)))
 
     # ------------------------------------------------------------------------------
 
