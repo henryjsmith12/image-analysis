@@ -91,6 +91,17 @@ class Scan:
         
     # ------------------------------------------------------------------------------
 
+    def setGriddingParameters(self, 
+        h_grid_min, h_grid_max, h_grid_n,
+        k_grid_min, k_grid_max, k_grid_n,
+        l_grid_min, l_grid_max, l_grid_n
+    ):
+        self.h_grid_min, self.h_grid_max, self.h_grid_n = h_grid_min, h_grid_max, h_grid_n
+        self.k_grid_min, self.k_grid_max, self.k_grid_n = k_grid_min, k_grid_max, k_grid_n
+        self.l_grid_min, self.l_grid_max, self.l_grid_n = l_grid_min, l_grid_max, l_grid_n
+
+    # ------------------------------------------------------------------------------
+
     def getImageData(self):
         """
         Retrieves raw image data from path.
