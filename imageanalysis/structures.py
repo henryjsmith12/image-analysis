@@ -80,14 +80,6 @@ class Scan:
 
         # Data processing
         self.spec_data = spec_scan.data
-        self.raw_image_data = self.getImageData()
-        self.reciprocal_space_map = self.mapImageData()
-        self.h_map = self.reciprocal_space_map[:, :, :, 0]
-        self.k_map = self.reciprocal_space_map[:, :, :, 1]
-        self.l_map = self.reciprocal_space_map[:, :, :, 2]
-        self.h_grid_min, self.h_grid_max, self.h_grid_n = np.amin(self.h_map), np.amax(self.h_map), 250
-        self.k_grid_min, self.k_grid_max, self.k_grid_n = np.amin(self.k_map), np.amax(self.k_map), 250
-        self.l_grid_min, self.l_grid_max, self.l_grid_n = np.amin(self.l_map), np.amax(self.l_map), 250
         
     # ------------------------------------------------------------------------------
 
@@ -122,7 +114,13 @@ class Scan:
 
         rsm = mapScan(self.spec_scan, self.instrument_path, self.detector_path)
 
-        return rsm
+        self.reciprocal_space_map = rsm
+        self.h_map = self.reciprocal_space_map[:, :, :, 0]
+        self.k_map = self.reciprocal_space_map[:, :, :, 1]
+        self.l_map = self.reciprocal_space_map[:, :, :, 2]
+        self.h_grid_min, self.h_grid_max, self.h_grid_n = np.amin(self.h_map), np.amax(self.h_map), 250
+        self.k_grid_min, self.k_grid_max, self.k_grid_n = np.amin(self.k_map), np.amax(self.k_map), 250
+        self.l_grid_min, self.l_grid_max, self.l_grid_n = np.amin(self.l_map), np.amax(self.l_map), 250
 
     # ------------------------------------------------------------------------------
 

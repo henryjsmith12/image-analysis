@@ -255,6 +255,9 @@ class ScanSelectionWidget(QtGui.QWidget):
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
 
+        self.project.scans[i].raw_image_data = scan.getImageData()
+        self.project.scans[i].mapImageData()
+
         header = scan.spec_scan.S.split()
         number = header[0]
         type = f"{header[1]} {header[2]}"
