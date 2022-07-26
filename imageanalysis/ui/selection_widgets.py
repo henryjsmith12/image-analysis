@@ -8,6 +8,8 @@ See LICENSE file.
 import numpy as np
 from pyqtgraph import QtGui
 
+import matplotlib.pyplot as plt
+
 from imageanalysis.io import isValidProjectPath, getSPECPaths, getXMLPaths
 from imageanalysis.structures import Project
 
@@ -230,12 +232,6 @@ class ScanSelectionWidget(QtGui.QWidget):
         # Connections
         self.scan_lstw.itemClicked.connect(self.previewScan)
         self.reset_btn.clicked.connect(self.resetGriddingOptions)
-        for txt in [
-            self.h_min_txt, self.h_max_txt, self.h_n_txt, 
-            self.k_min_txt, self.k_max_txt, self.k_n_txt, 
-            self.l_min_txt, self.l_max_txt, self.l_n_txt
-        ]:
-            txt.textChanged.connect(self.updateGriddingOptions)
         self.load_scan_btn.clicked.connect(self.loadScan)
 
     # ------------------------------------------------------------------------------
@@ -285,32 +281,6 @@ class ScanSelectionWidget(QtGui.QWidget):
 
     # ------------------------------------------------------------------------------
 
-    def updateGriddingOptions(self):
-        """
-        Updates Scan gridding parameters.
-        """
-
-        i = self.scan_lstw.currentRow()
-        scan = self.project.scans[i]
-        gridding_options_txts = [
-            self.h_min_txt, self.h_max_txt, self.h_n_txt,
-            self.k_min_txt, self.k_max_txt, self.k_n_txt,
-            self.l_min_txt, self.l_max_txt, self.l_n_txt,
-        ]
-        scan_gridding_params = [
-            scan.h_grid_min, scan.h_grid_max, scan.h_grid_n,
-            scan.k_grid_min, scan.k_grid_max, scan.k_grid_n,
-            scan.l_grid_min, scan.l_grid_max, scan.l_grid_n,
-        ]
-
-        for txt, param in zip(gridding_options_txts, scan_gridding_params):
-            try:
-                param = float(txt.text())
-            except:
-                pass
-
-    # ------------------------------------------------------------------------------
-
     def resetGriddingOptions(self):
         """
         Resets Scan gridding parameters to default values.
@@ -342,6 +312,13 @@ class ScanSelectionWidget(QtGui.QWidget):
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
 
+        gridding_options_txts = [
+            self.h_min_txt, self.h_max_txt, self.h_n_txt,
+            self.k_min_txt, self.k_max_txt, self.k_n_txt,
+            self.l_min_txt, self.l_max_txt, self.l_n_txt,
+        ]
+
+        scan.setGriddingParameters(*(float(txt.text()) for txt in gridding_options_txts))
         scan.gridImageData()
 
 # ==================================================================================
