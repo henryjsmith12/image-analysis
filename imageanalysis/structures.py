@@ -91,17 +91,6 @@ class Scan:
         
     # ------------------------------------------------------------------------------
 
-    def setGriddingParameters(self, 
-        h_grid_min, h_grid_max, h_grid_n,
-        k_grid_min, k_grid_max, k_grid_n,
-        l_grid_min, l_grid_max, l_grid_n
-    ):
-        self.h_grid_min, self.h_grid_max, self.h_grid_n = h_grid_min, h_grid_max, h_grid_n
-        self.k_grid_min, self.k_grid_max, self.k_grid_n = k_grid_min, k_grid_max, k_grid_n
-        self.l_grid_min, self.l_grid_max, self.l_grid_n = l_grid_min, l_grid_max, l_grid_n
-
-    # ------------------------------------------------------------------------------
-
     def getImageData(self):
         """
         Retrieves raw image data from path.
@@ -134,6 +123,21 @@ class Scan:
         rsm = mapScan(self.spec_scan, self.instrument_path, self.detector_path)
 
         return rsm
+
+    # ------------------------------------------------------------------------------
+
+    def setGriddingParameters(self, 
+        h_min, h_max, h_n,
+        k_min, k_max, k_n,
+        l_min, l_max, l_n
+    ):
+        """
+        Sets HKL bounds and point count for gridding interpolation.
+        """
+
+        self.h_grid_min, self.h_grid_max, self.h_grid_n = float(h_min), float(h_max), int(h_n)
+        self.k_grid_min, self.k_grid_max, self.k_grid_n = float(k_min), float(k_max), int(k_n)
+        self.l_grid_min, self.l_grid_max, self.l_grid_n = float(l_min), float(l_max), int(l_n)
 
     # ------------------------------------------------------------------------------
 
