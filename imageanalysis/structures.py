@@ -43,6 +43,7 @@ class Project:
         self.instrument_path = instrument_path
         self.detector_path = detector_path
 
+        # TODO: Validate SPEC file
         self.spec_data = spec.SpecDataFile(spec_path)
         self.scan_numbers = self.spec_data.getScanNumbers()
 
@@ -76,6 +77,7 @@ class Scan:
         self.spec_path = spec_path
         self.instrument_path = instrument_path
         self.detector_path = detector_path
+        # TODO: Validate path
         self.raw_image_path = f"{project_path}/images/{os.path.basename(os.path.splitext(self.spec_path)[0])}/S{str(self.number).zfill(3)}"
 
         # Data processing
@@ -88,12 +90,14 @@ class Scan:
         Retrieves raw image data from path.
         """
 
+        # TODO: Check if path contents are valid
         image_paths = sorted(os.listdir(self.raw_image_path))
         image_data = []
 
         monitor_norm_factors = self.spec_scan.data["Ion_Ch_2"] * 200000
         filter_norm_factors = self.spec_scan.data["transm"] * 1
 
+        # TODO: Check if item is an image path with valid dims
         for i in range(len(image_paths)):
             img_basepath = image_paths[i]
             img_path = f"{self.raw_image_path}/{img_basepath}"
@@ -101,8 +105,10 @@ class Scan:
             img_array = img_array / (filter_norm_factors[i] * monitor_norm_factors[i])
             image_data.append(img_array)
 
+        # TODO: Check if conversion is possible
         image_data = np.array(image_data)
         
+        # TODO: Validate returned dims
         return image_data
 
     # ------------------------------------------------------------------------------
@@ -112,9 +118,9 @@ class Scan:
         Creates a reciprocal space map from raw image data.
         """
 
-        rsm = mapScan(self.spec_scan, self.instrument_path, self.detector_path)
+        # TODO: Validate rsm dims
+        self.reciprocal_space_map = mapScan(self.spec_scan, self.instrument_path, self.detector_path)
 
-        self.reciprocal_space_map = rsm
         self.h_map = self.reciprocal_space_map[:, :, :, 0]
         self.k_map = self.reciprocal_space_map[:, :, :, 1]
         self.l_map = self.reciprocal_space_map[:, :, :, 2]
@@ -147,6 +153,7 @@ class Scan:
         hkl_max = (self.h_grid_max, self.k_grid_max, self.l_grid_max)
         hkl_n = (self.h_grid_n, self.k_grid_n, self.l_grid_n)
 
+        # TODO: Validate grid dims/coord lengths
         self.gridded_image_data, self.gridded_image_coords = gridScan(
             self.raw_image_data, 
             self.reciprocal_space_map,
