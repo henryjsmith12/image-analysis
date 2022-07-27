@@ -36,8 +36,5 @@ def gridScan(
     gridded_image_data = gridder.data
     coords = np.array([gridder.xaxis, gridder.yaxis, gridder.zaxis])
 
-    print(gridded_image_data.shape)
-    print(coords.shape)
-
     return gridded_image_data, coords
 
