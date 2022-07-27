@@ -4,7 +4,6 @@ See LICENSE file.
 """
 
 import numpy as np
-from spec2nexus import spec
 import xrayutilities as xu
 
 # ==================================================================================
