@@ -9,9 +9,16 @@ from pyqtgraph import QtGui
 
 # ==================================================================================
 
-class SpecDataWidget(QtGui.QWidget):
+class RawDataWidget(QtGui.QWidget):
 
     def __init__(self) -> None:
-        super(SpecDataWidget, self).__init__()
+        super(RawDataWidget, self).__init__()
+
+# ==================================================================================
+
+class RawDataController(QtGui.QWidget):
+
+    def __init__(self) -> None:
+        super(RawDataController, self).__init__()
 
 # ==================================================================================
