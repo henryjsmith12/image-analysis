@@ -77,6 +77,7 @@ class Scan:
         self.spec_path = spec_path
         self.instrument_path = instrument_path
         self.detector_path = detector_path
+        
         # TODO: Validate path
         self.raw_image_path = f"{project_path}/images/{os.path.basename(os.path.splitext(self.spec_path)[0])}/S{str(self.number).zfill(3)}"
 
