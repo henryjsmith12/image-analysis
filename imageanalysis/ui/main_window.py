@@ -10,8 +10,8 @@ from pyqtgraph.dockarea import Dock, DockArea
 
 # ----------------------------------------------------------------------------------
 
-from imageanalysis.ui.data_view_widget import DataViewWidget
-from imageanalysis.ui.plot_view_widget import PlotViewWidget
+from imageanalysis.ui.data_view import DataView
+from imageanalysis.ui.plot_view import PlotView
 from imageanalysis.ui.selection_widgets import ProjectSelectionWidget, ScanSelectionWidget
 
 # ==================================================================================
@@ -32,8 +32,8 @@ class MainWindow(QtGui.QWidget):
         # Child widgets
         self.project_selection_widget = ProjectSelectionWidget(parent=self)
         self.scan_selection_widget = ScanSelectionWidget(parent=self)
-        self.data_view_widget = DataViewWidget()
-        self.plot_view_widget = PlotViewWidget()
+        self.data_view = DataView()
+        self.plot_view = PlotView()
 
         # Docks
         self.dock_area = DockArea()
@@ -52,16 +52,16 @@ class MainWindow(QtGui.QWidget):
             closable=False
         )
         self.data_view_dock = Dock(
-            name="Data View", 
+            name="DataView", 
             size=(4, 5), 
-            widget=self.data_view_widget, 
+            widget=self.data_view, 
             hideTitle=True, 
             closable=False
         )
         self.plot_view_dock = Dock(
-            name="Plot View", 
+            name="PlotView", 
             size=(4, 5), 
-            widget=self.plot_view_widget, 
+            widget=self.plot_view, 
             hideTitle=True, 
             closable=False
         )
