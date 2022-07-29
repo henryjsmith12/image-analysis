@@ -9,10 +9,10 @@ from pyqtgraph import QtGui
 
 # ==================================================================================
 
-class DataViewWidget(QtGui.QTabWidget):
+class DataView(QtGui.QTabWidget):
     
     def __init__(self) -> None:
-        super(DataViewWidget, self).__init__()
+        super(DataView, self).__init__()
 
 # ==================================================================================
 
