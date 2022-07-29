@@ -9,9 +9,9 @@ from pyqtgraph import QtGui
 
 # ==================================================================================
 
-class PlotViewWidget(QtGui.QWidget):
+class PlotView(QtGui.QWidget):
     
     def __init__(self) -> None:
-        super(PlotViewWidget, self).__init__()
+        super(PlotView, self).__init__()
 
 # ==================================================================================
