@@ -8,7 +8,7 @@ See LICENSE file.
 import numpy as np
 from pyqtgraph import QtGui
 
-import matplotlib.pyplot as plt
+# ----------------------------------------------------------------------------------
 
 from imageanalysis.io import isValidProjectPath, getSPECPaths, getXMLPaths
 from imageanalysis.structures import Project
@@ -99,7 +99,6 @@ class ProjectSelectionWidget(QtGui.QWidget):
 
         spec_paths = [""] + getSPECPaths(self.project_path)
         xml_paths = [""] + getXMLPaths(self.project_path)
-
 
         self.spec_cbx.addItems(spec_paths)
         self.instrument_cbx.addItems(xml_paths)
