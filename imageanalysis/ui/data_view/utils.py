@@ -46,7 +46,7 @@ class ImageTool(QtGui.QWidget):
 class ImageView(pg.ImageView):
 
     def __init__(self) -> None:
-        super(ImageView, self).__init__()
+        super(ImageView, self).__init__(imageItem=pg.ImageItem(), view=pg.PlotItem())
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
         self.ui.menuBtn.hide()
