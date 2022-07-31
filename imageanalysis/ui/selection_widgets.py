@@ -323,4 +323,6 @@ class ScanSelectionWidget(QtGui.QWidget):
         scan.setGriddingParameters(*(float(txt.text()) for txt in gridding_options_txts))
         scan.gridImageData()
 
+        self.main_window.data_view.addScan(scan)
+
 # ==================================================================================
