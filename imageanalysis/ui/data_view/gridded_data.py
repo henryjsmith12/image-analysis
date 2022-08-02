@@ -73,9 +73,11 @@ class GriddedDataController(QtGui.QWidget):
 
         # Child widgets
         self.h_controller = GriddedDimensionController(self, h_info)
-        self.h_controller.setEnabled(False)
+        self.h_controller.dim_slider.setEnabled(False)
+        self.h_controller.dim_cbx.setEnabled(False)
         self.k_controller = GriddedDimensionController(self, k_info)
-        self.k_controller.setEnabled(False)
+        self.k_controller.dim_slider.setEnabled(False)
+        self.k_controller.dim_cbx.setEnabled(False)
         self.l_controller = GriddedDimensionController(self, l_info)
         self.dimension_controllers = [self.h_controller, self.k_controller, self.l_controller]
 
@@ -102,9 +104,12 @@ class GriddedDataController(QtGui.QWidget):
             dim_order.append(dim)
         self.dim_order = tuple(dim_order)
 
-        self.layout.itemAt(0).widget().setEnabled(False)
-        self.layout.itemAt(1).widget().setEnabled(False)
-        self.layout.itemAt(2).widget().setEnabled(True)
+        self.layout.itemAt(0).widget().dim_slider.setEnabled(False)
+        self.layout.itemAt(0).widget().dim_cbx.setEnabled(False)
+        self.layout.itemAt(1).widget().dim_slider.setEnabled(False)
+        self.layout.itemAt(1).widget().dim_cbx.setEnabled(False)
+        self.layout.itemAt(2).widget().dim_slider.setEnabled(True)
+        self.layout.itemAt(2).widget().dim_cbx.setEnabled(True)
 
     # ------------------------------------------------------------------------------
 
@@ -121,10 +126,13 @@ class GriddedDataController(QtGui.QWidget):
         index = self.index
         dim_order = self.dim_order # e.g. (0, 1, 2)
         data = self.data.transpose(*dim_order)
-        labels = [x for i, x in sorted(zip(list(dim_order), ["H", "K", "L"]))]
+        labels = ["H", "K", "L"]
         image = data[:, :, index]
 
-        self.image_tool.setImage(self.data, image, labels[0], labels[1])
+        x_label = labels[dim_order.index(0)]
+        y_label = labels[dim_order.index(1)]
+
+        self.image_tool.setImage(self.data, image, x_label, y_label)
 
     # ------------------------------------------------------------------------------
 
