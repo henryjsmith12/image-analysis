@@ -41,6 +41,11 @@ class ImageTool(QtGui.QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.dock_area, 0, 0)
 
+    # ------------------------------------------------------------------------------
+
+    def setImage(self, image):
+        self.image_view.setImage(image)
+
 # ==================================================================================
 
 class ImageView(pg.ImageView):
@@ -50,6 +55,16 @@ class ImageView(pg.ImageView):
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
         self.ui.menuBtn.hide()
+    
+    # ------------------------------------------------------------------------------
+
+    def setScale(self):
+        ...
+
+    # ------------------------------------------------------------------------------
+
+    def setColormap(self):
+        ...
 
 # ==================================================================================
 
@@ -60,6 +75,5 @@ class ROIWidget(QtGui.QWidget):
 
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
-
 
 # ==================================================================================
