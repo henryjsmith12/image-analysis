@@ -5,6 +5,7 @@ See LICENSE file.
 
 # ==================================================================================
 
+import matplotlib.pyplot as plt
 import numpy as np
 import os
 from spec2nexus import spec
@@ -100,11 +101,18 @@ class Scan:
 
         # TODO: Check if item is an image path with valid dims
         for i in range(len(image_paths)):
-            img_basepath = image_paths[i]
-            img_path = f"{self.raw_image_path}/{img_basepath}"
-            img_array = tiff.imread(img_path).T
-            img_array = img_array / (filter_norm_factors[i] * monitor_norm_factors[i])
-            image_data.append(img_array)
+            if image_paths[i].endswith("tif"):
+                img_basepath = image_paths[i]
+                img_path = f"{self.raw_image_path}/{img_basepath}"
+                try:
+                    img_array = tiff.imread(img_path).T
+                except:
+                    img_array = plt.imread(img_path).T
+
+                img_array = img_array / (filter_norm_factors[i] * monitor_norm_factors[i])
+                image_data.append(img_array)
+            else:
+                i =- 1
 
         # TODO: Check if conversion is possible
         image_data = np.array(image_data)
@@ -153,6 +161,9 @@ class Scan:
         hkl_min = (self.h_grid_min, self.k_grid_min, self.l_grid_min)
         hkl_max = (self.h_grid_max, self.k_grid_max, self.l_grid_max)
         hkl_n = (self.h_grid_n, self.k_grid_n, self.l_grid_n)
+
+        print(self.reciprocal_space_map.shape)
+        print(self.raw_image_data.shape)
 
         # TODO: Validate grid dims/coord lengths
         self.gridded_image_data, self.gridded_image_coords = gridScan(
