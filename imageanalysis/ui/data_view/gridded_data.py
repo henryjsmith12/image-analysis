@@ -53,20 +53,6 @@ class GriddedDataWidget(DockArea):
         self.addDock(self.controller_dock)
         self.addDock(self.image_tool_3d_dock, "bottom" ,self.controller_dock)
         self.addDock(self.image_tool_2d_dock, "bottom" ,self.image_tool_3d_dock)
-
-        data = self.scan.gridded_image_data.astype("int64")
-        img_item = self.image_tool_3d.image_view.getImageItem()
-        stop_count = 2048
-        cmap_stops = np.logspace(0.0, float(len(str(np.amax(data)))), num=stop_count) / (10 ** (len(str(np.amax(data)))))
-        cmap_stops = np.concatenate((np.array([0.0, 0.0000000000001]), cmap_stops))
-        cmap_colors = pg.getFromMatplotlib("jet").getLookupTable(nPts=stop_count)
-        cmap_colors = np.concatenate((np.array([[0, 0, 0], cmap_colors[0]]), cmap_colors))
-
-        cmap = pg.ColorMap(cmap_stops, cmap_colors)
-        '''cbi = pg.ColorBarItem(cmap=cmap, limits=(0, np.amax(data)))
-        cbi.setImageItem(img_item, insert_in=self.image_tool_3d.image_view.view)'''
-        self.image_tool_3d.image_view.setImage(data)
-        self.image_tool_3d.image_view.setColorMap(cmap)
         
 # ==================================================================================
 

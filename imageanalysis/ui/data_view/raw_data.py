@@ -55,17 +55,6 @@ class RawDataWidget(DockArea):
         self.addDock(self.image_tool_3d_dock, "bottom" ,self.controller_dock)
         self.addDock(self.image_tool_2d_dock, "bottom" ,self.image_tool_3d_dock)
 
-        data = self.scan.raw_image_data.astype("int64")
-        self.image_tool_3d.image_view.setImage(data)
-
-        stop_count = 15
-        cmap_stops = np.logspace(0.0, float(len(str(np.amax(data)))), num=stop_count) / (10 ** len(str(np.amax(data))))
-        cmap_colors = pg.getFromMatplotlib("jet").getLookupTable(nPts=stop_count)
-
-        # color map
-        cmap = pg.ColorMap(cmap_stops, cmap_colors)
-        self.image_tool_3d.image_view.setColorMap(cmap)
-
 # ==================================================================================
 
 class RawDataController(QtGui.QWidget):
