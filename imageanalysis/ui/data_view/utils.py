@@ -5,6 +5,7 @@ See LICENSE file.
 
 # ==================================================================================
 
+import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtGui
 from pyqtgraph.dockarea import Dock, DockArea
@@ -15,6 +16,9 @@ class ImageTool(QtGui.QWidget):
 
     def __init__(self) -> None:
         super(ImageTool, self).__init__()
+
+        self.data_max = None
+        self.cmap = None
 
         self.image_view = ImageView()
         self.roi_widget = ROIWidget()
@@ -43,8 +47,26 @@ class ImageTool(QtGui.QWidget):
 
     # ------------------------------------------------------------------------------
 
-    def setImage(self, image):
+    def setImage(self, data, image, x_label=None, y_label=None):
         self.image_view.setImage(image)
+
+        # Color mapping test
+        '''if self.data_max is None:
+            self.data_max = np.amax(data)
+
+        if self.cmap is None:
+            n = 2048
+            stops = np.logspace(0, len(str(int(self.data_max))), n) / (10 ** len(str(int(self.data_max))))
+            colors = pg.getFromMatplotlib("jet").getLookupTable(nPts=n)
+
+            self.cmap = pg.ColorMap(stops, colors)
+
+            self.image_view.setColorMap(self.cmap)'''
+
+        if x_label is not None:
+            self.image_view.getView().setLabel("bottom", x_label)
+        if y_label is not None:
+            self.image_view.getView().setLabel("left", y_label)
 
 # ==================================================================================
 
@@ -52,7 +74,7 @@ class ImageView(pg.ImageView):
 
     def __init__(self) -> None:
         super(ImageView, self).__init__(imageItem=pg.ImageItem(), view=pg.PlotItem())
-        self.ui.histogram.hide()
+        #self.ui.histogram.hide()
         self.ui.roiBtn.hide()
         self.ui.menuBtn.hide()
     
