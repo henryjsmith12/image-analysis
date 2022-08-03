@@ -25,8 +25,8 @@ class MainWindow(QtGui.QWidget):
         super(MainWindow, self).__init__()
 
         # Window attributes
-        self.setMinimumSize(1400, 800)
-        self.setGeometry(0, 50, 1400, 800)
+        self.setMinimumSize(900, 700)
+        self.setGeometry(0, 50, 900, 700)
         self.setWindowTitle("image-analysis")
 
         # Child widgets
@@ -72,7 +72,7 @@ class MainWindow(QtGui.QWidget):
         self.dock_area.addDock(self.project_selection_dock)
         self.dock_area.addDock(self.scan_selection_dock, "bottom", self.project_selection_dock)
         self.dock_area.addDock(self.data_view_dock, "right", self.scan_selection_dock)
-        self.dock_area.addDock(self.plot_view_dock, "right", self.data_view_dock)
+        #self.dock_area.addDock(self.plot_view_dock, "right", self.data_view_dock)
         self.dock_area.moveDock(self.project_selection_dock, "left", self.data_view_dock)
         self.dock_area.moveDock(self.project_selection_dock, "top", self.scan_selection_dock)
 
