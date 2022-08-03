@@ -49,7 +49,13 @@ class Project:
         self.scan_numbers = self.spec_data.getScanNumbers()
 
         # List of Scan objects
-        self.scans = [Scan(self.spec_data.getScan(i), project_path, spec_path, instrument_path, detector_path) for i in self.scan_numbers]
+        self.scans = []
+        for i in self.scan_numbers:
+            scan = Scan(self.spec_data.getScan(i), project_path, spec_path, instrument_path, detector_path)
+            if os.path.exists(scan.raw_image_path):
+                self.scans.append(scan)
+
+        self.scan_numbers = [scan.number for scan in self.scans]
 
 # ==================================================================================
 
@@ -79,7 +85,6 @@ class Scan:
         self.instrument_path = instrument_path
         self.detector_path = detector_path
         
-        # TODO: Validate path
         self.raw_image_path = f"{project_path}/images/{os.path.basename(os.path.splitext(self.spec_path)[0])}/S{str(self.number).zfill(3)}"
 
         # Data processing
@@ -161,9 +166,6 @@ class Scan:
         hkl_min = (self.h_grid_min, self.k_grid_min, self.l_grid_min)
         hkl_max = (self.h_grid_max, self.k_grid_max, self.l_grid_max)
         hkl_n = (self.h_grid_n, self.k_grid_n, self.l_grid_n)
-
-        print(self.reciprocal_space_map.shape)
-        print(self.raw_image_data.shape)
 
         # TODO: Validate grid dims/coord lengths
         self.gridded_image_data, self.gridded_image_coords = gridScan(
