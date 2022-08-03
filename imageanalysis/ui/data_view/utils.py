@@ -28,7 +28,7 @@ class ImageTool(QtGui.QWidget):
             name="Image",
             size=(1, 1),
             widget=self.image_view,
-            hideTitle=False,
+            hideTitle=True,
             closable=False
         )
         self.roi_widget_dock = Dock(
@@ -38,8 +38,7 @@ class ImageTool(QtGui.QWidget):
             hideTitle=False, 
             closable=False
         )
-        self.dock_area.addDock(self.roi_widget_dock)
-        self.dock_area.addDock(self.image_view_dock, "above", self.roi_widget_dock)
+        self.dock_area.addDock(self.image_view_dock)
 
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
@@ -48,20 +47,20 @@ class ImageTool(QtGui.QWidget):
     # ------------------------------------------------------------------------------
 
     def setImage(self, data, image, x_label=None, y_label=None):
-        self.image_view.setImage(image)
+        self.image_view.setImage(image, autoRange=False)
 
         # Color mapping test
-        '''if self.data_max is None:
+        if self.data_max is None:
             self.data_max = np.amax(data)
 
         if self.cmap is None:
-            n = 2048
+            n = 5
             stops = np.logspace(0, len(str(int(self.data_max))), n) / (10 ** len(str(int(self.data_max))))
-            colors = pg.getFromMatplotlib("jet").getLookupTable(nPts=n)
+            colors = pg.getFromMatplotlib("viridis").getLookupTable(nPts=n)
 
             self.cmap = pg.ColorMap(stops, colors)
 
-            self.image_view.setColorMap(self.cmap)'''
+            self.image_view.setColorMap(self.cmap)
 
         if x_label is not None:
             self.image_view.getView().setLabel("bottom", x_label)
