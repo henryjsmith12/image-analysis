@@ -62,9 +62,10 @@ class GriddedDataController(QtGui.QWidget):
         super(GriddedDataController, self).__init__()
 
         self.data = scan.gridded_image_data
+        self.coords = scan.gridded_image_coords
         self.dim_order = (0, 1, 2)
         self.image_tool = image_tool
-        self.index = None
+        self.index = 0
         self.scan = scan
         h_info = {"label" : "H", "coords" : self.scan.gridded_image_coords[0]}
         k_info = {"label" : "K", "coords" : self.scan.gridded_image_coords[1]}
@@ -94,6 +95,8 @@ class GriddedDataController(QtGui.QWidget):
         self.orderUpdated.connect(self.setDimensionOrder)
         self.orderUpdated.connect(self.setImage)
 
+        self.setImage()
+
     # ------------------------------------------------------------------------------
 
     def setDimensionOrder(self):
@@ -122,6 +125,7 @@ class GriddedDataController(QtGui.QWidget):
     def setImage(self):
         if self.data is None:
             self.data = self.scan.gridded_image_data
+            self.coords = self.scan.gridded_image_coords
 
         index = self.index
         dim_order = self.dim_order # e.g. (0, 1, 2)
@@ -129,10 +133,15 @@ class GriddedDataController(QtGui.QWidget):
         labels = ["H", "K", "L"]
         image = data[:, :, index]
 
+        #print(self.coords[dim_order.index(2)].shape)
         x_label = labels[dim_order.index(0)]
         y_label = labels[dim_order.index(1)]
+        x_coords = self.coords[dim_order.index(0)]
+        y_coords = self.coords[dim_order.index(1)]
+        slice_label = labels[dim_order.index(2)]
+        slice_value = round(float(self.coords[dim_order.index(2)][index]), 5)
 
-        self.image_tool.setImage(self.data, image, x_label, y_label)
+        self.image_tool.setImage(self.data, image, x_label, y_label, x_coords, y_coords, slice_label, slice_value)
 
     # ------------------------------------------------------------------------------
 
