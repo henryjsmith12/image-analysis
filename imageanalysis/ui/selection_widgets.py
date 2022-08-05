@@ -17,7 +17,7 @@ from imageanalysis.structures import Project
 
 class ProjectSelectionWidget(QtGui.QWidget):
     """
-    Allows user to open a project.
+    Allows user to select a project and respective config files.
     """
 
     def __init__(self, parent) -> None:
@@ -73,13 +73,13 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.instrument_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
         self.detector_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
         self.load_project_btn.clicked.connect(self.loadProject)
+        self.clear_project_btn.clicked.connect(self.clearProject)
 
     # ------------------------------------------------------------------------------
 
     def selectProject(self):
         """
-        Allows user to select a directory with a file dialog and then validates the 
-        selected directory.
+        Allows user to select a project directory.
         """
 
         project_path = QtGui.QFileDialog.getExistingDirectory(self, "Select Project")
@@ -89,6 +89,13 @@ class ProjectSelectionWidget(QtGui.QWidget):
             self.project_txt.setText(project_path)
             self.project_files_gbx.setEnabled(True)
             self.populateProjectFilesGroupbox()
+        else:
+            self.project_files_gbx.setEnabled(False)
+            msg = QtGui.QMessageBox()
+            msg.setIcon(QtGui.QMessageBox.Critical)
+            msg.setWindowTitle("Error")
+            msg.setText("Invalid project directory.")
+            msg.exec_()
 
     # ------------------------------------------------------------------------------
 
@@ -96,9 +103,12 @@ class ProjectSelectionWidget(QtGui.QWidget):
         """
         Adds SPEC sources and XML configuration files to comboboxes.
         """
+        self.spec_cbx.clear()
+        self.instrument_cbx.clear()
+        self.detector_cbx.clear()
 
-        spec_paths = [""] + getSPECPaths(self.project_path)
-        xml_paths = [""] + getXMLPaths(self.project_path)
+        spec_paths = getSPECPaths(self.project_path)
+        xml_paths = getXMLPaths(self.project_path)
 
         self.spec_cbx.addItems(spec_paths)
         self.instrument_cbx.addItems(xml_paths)
@@ -136,7 +146,20 @@ class ProjectSelectionWidget(QtGui.QWidget):
             detector_path=self.detector_path
         )
 
+        self.clear_project_btn.setEnabled(True)
         self.main_window.scan_selection_widget.loadProjectScanList(self.project)
+
+    # ------------------------------------------------------------------------------
+
+    def clearProject(self):
+        """
+        Clears ProjectSelectionWidget
+        """
+        self.project = None
+        self.project_txt.setText("")
+        self.spec_cbx.clear()
+        self.instrument_cbx.clear()
+        self.detector_cbx.clear()
 
 # ==================================================================================
 
@@ -246,6 +269,15 @@ class ScanSelectionWidget(QtGui.QWidget):
 
     # ------------------------------------------------------------------------------
 
+    def clearProjectScanList(self):
+        """
+        Populates scan list.
+        """
+
+        self.scan_lstw.clear()
+
+    # ------------------------------------------------------------------------------
+
     def previewScan(self):
         """
         Displays preview information about a scan.
@@ -303,6 +335,26 @@ class ScanSelectionWidget(QtGui.QWidget):
 
         for txt, o_param in zip(gridding_options_txts, original_params):
             txt.setText(str(round(o_param, 3)))
+        self.load_scan_btn.setEnabled(True)
+
+    # ------------------------------------------------------------------------------
+
+    def clearGriddingOptions(self):
+        """
+        Resets Scan gridding parameters to default values.
+        """
+
+        gridding_options_txts = [
+            self.h_min_txt, self.h_max_txt, self.h_n_txt,
+            self.k_min_txt, self.k_max_txt, self.k_n_txt,
+            self.l_min_txt, self.l_max_txt, self.l_n_txt,
+        ]
+        
+        for txt in gridding_options_txts:
+            txt.setText("")
+
+        self.scan_details_gbx.setEnabled(False)
+        self.load_scan_btn.setEnabled(False)
 
     # ------------------------------------------------------------------------------
 
