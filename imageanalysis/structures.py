@@ -47,14 +47,17 @@ class Project:
         # TODO: Validate SPEC file
         self.spec_data = spec.SpecDataFile(spec_path)
         self.scan_numbers = self.spec_data.getScanNumbers()
+        self.spec_image_path = f"{project_path}/images/{os.path.basename(os.path.splitext(self.spec_path)[0])}"
 
         # List of Scan objects
         self.scans = []
-        for i in self.scan_numbers:
-            scan = Scan(self.spec_data.getScan(i), project_path, spec_path, instrument_path, detector_path)
-            if os.path.exists(scan.raw_image_path):
-                self.scans.append(scan)
-
+        for path in os.listdir(self.spec_image_path):
+            if str.isdigit(path[1:]):
+                i = int(path[1:])
+                scan = Scan(self.spec_data.getScan(i), project_path, spec_path, instrument_path, detector_path)
+                if os.path.exists(scan.raw_image_path):
+                    self.scans.append(scan)
+            
         self.scan_numbers = [scan.number for scan in self.scans]
 
 # ==================================================================================
@@ -105,9 +108,10 @@ class Scan:
         filter_norm_factors = self.spec_scan.data["transm"] * 1
 
         # TODO: Check if item is an image path with valid dims
-        for i in range(len(image_paths)):
-            if image_paths[i].endswith("tif"):
-                img_basepath = image_paths[i]
+        i = 0
+        for path in image_paths:
+            if path.endswith("tif") and not path.startswith("alignment") and not path.startswith("."):
+                img_basepath = path
                 img_path = f"{self.raw_image_path}/{img_basepath}"
                 try:
                     img_array = tiff.imread(img_path).T
@@ -116,8 +120,7 @@ class Scan:
 
                 img_array = img_array / (filter_norm_factors[i] * monitor_norm_factors[i])
                 image_data.append(img_array)
-            else:
-                i =- 1
+                i += 1
 
         # TODO: Check if conversion is possible
         image_data = np.array(image_data)
@@ -165,7 +168,10 @@ class Scan:
         """
         hkl_min = (self.h_grid_min, self.k_grid_min, self.l_grid_min)
         hkl_max = (self.h_grid_max, self.k_grid_max, self.l_grid_max)
-        hkl_n = (self.h_grid_n, self.k_grid_n, self.l_grid_n)
+        hkl_n = (self.h_grid_n, self.k_grid_n, self.l_grid_n)   
+
+        print(self.raw_image_data.shape)
+        print(self.reciprocal_space_map.shape)
 
         # TODO: Validate grid dims/coord lengths
         self.gridded_image_data, self.gridded_image_coords = gridScan(
