@@ -13,6 +13,7 @@ import tifffile as tiff
 
 # ----------------------------------------------------------------------------------
 
+from imageanalysis import io
 from imageanalysis.gridding import gridScan
 from imageanalysis.mapping import mapScan
 
@@ -36,7 +37,16 @@ class Project:
 
         if not [type(project_path), type(spec_path), type(instrument_path), 
         type(detector_path)] == [str, str, str, str]:
-            raise TypeError("Paths must be of the type str")
+            raise TypeError("Paths must be of the type str.")
+
+        if not io.isValidSPECFile(spec_path):
+            raise TypeError("Invalid SPEC file.")
+
+        if not io.isValidInstrumentXMLFile(instrument_path):
+            raise TypeError("Invalid instrument configuration file.")
+
+        if not io.isValidDetectorXMLFile(detector_path):
+            raise TypeError("Invalid detector configuration file.")
 
         # Path variables
         self.path = project_path
