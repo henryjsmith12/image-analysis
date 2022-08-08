@@ -6,6 +6,9 @@ See LICENSE file.
 # ==================================================================================
 
 import os
+from rsMap3D.datasource.DetectorGeometryForXrayutilitiesReader import DetectorGeometryForXrayutilitiesReader
+from rsMap3D.datasource.InstForXrayutilitiesReader import InstForXrayutilitiesReader
+from spec2nexus import spec
 
 # ==================================================================================
 
@@ -66,6 +69,38 @@ def getXMLPaths(path):
             xml_paths.append(item)
 
     return xml_paths
+
+# ==================================================================================
+
+def isValidSPECFile(path):
+    try:
+        spec_data = spec.SpecDataFile(path)
+        return True
+    except:
+        return False
+
+# ==================================================================================
+
+def isValidInstrumentXMLFile(path):
+    try:
+        instrument_reader = InstForXrayutilitiesReader(path)
+        sc = instrument_reader.getSampleCircleDirections()
+    except:
+        return False
+
+    return True
+
+# ==================================================================================
+
+def isValidDetectorXMLFile(path):
+    try:
+        detector_reader = DetectorGeometryForXrayutilitiesReader(path)
+        detector = detector_reader.getDetectors()[0]
+    except:
+        return False
+
+    return True
+
 
 # ==================================================================================
 
