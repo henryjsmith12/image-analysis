@@ -23,11 +23,20 @@ class DataView(QtGui.QTabWidget):
         super(DataView, self).__init__()
 
         self.scan_list = []
+        self.setTabsClosable(True)
+        self.tabCloseRequested.connect(self.closeTab)
 
     # ------------------------------------------------------------------------------
 
     def addScan(self, scan: Scan):
         self.addTab(DataViewTab(scan), str(scan.number))
+
+    # ------------------------------------------------------------------------------   
+
+    def closeTab (self, index):
+        w = self.widget(index)
+        w.deleteLater()
+        self.removeTab(index)
 
 # ==================================================================================
 
