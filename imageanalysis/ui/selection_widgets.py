@@ -43,8 +43,6 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.instrument_cbx = QtGui.QComboBox()
         self.detector_lbl = QtGui.QLabel("Detector:")
         self.detector_cbx = QtGui.QComboBox()
-        self.clear_project_btn = QtGui.QPushButton("Clear Project")
-        self.clear_project_btn.setEnabled(False)
         self.load_project_btn = QtGui.QPushButton("Load Project")
         self.load_project_btn.setEnabled(False)
 
@@ -57,7 +55,6 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.project_files_gbx_layout.addWidget(self.instrument_cbx, 1, 1)
         self.project_files_gbx_layout.addWidget(self.detector_lbl, 2, 0)
         self.project_files_gbx_layout.addWidget(self.detector_cbx, 2, 1)
-        self.project_files_gbx_layout.addWidget(self.clear_project_btn, 3, 0)
         self.project_files_gbx_layout.addWidget(self.load_project_btn, 3, 1)
 
         # Main layout
@@ -73,7 +70,6 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.instrument_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
         self.detector_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
         self.load_project_btn.clicked.connect(self.loadProject)
-        self.clear_project_btn.clicked.connect(self.clearProject)
 
     # ------------------------------------------------------------------------------
 
@@ -139,27 +135,20 @@ class ProjectSelectionWidget(QtGui.QWidget):
         ScanSelectionWidget.
         """
 
-        self.project = Project(
-            project_path=self.project_path,
-            spec_path=self.spec_path,
-            instrument_path=self.instrument_path,
-            detector_path=self.detector_path
-        )
-
-        self.clear_project_btn.setEnabled(True)
-        self.main_window.scan_selection_widget.loadProjectScanList(self.project)
-
-    # ------------------------------------------------------------------------------
-
-    def clearProject(self):
-        """
-        Clears ProjectSelectionWidget
-        """
-        self.project = None
-        self.project_txt.setText("")
-        self.spec_cbx.clear()
-        self.instrument_cbx.clear()
-        self.detector_cbx.clear()
+        try:
+            self.project = Project(
+                project_path=self.project_path,
+                spec_path=self.spec_path,
+                instrument_path=self.instrument_path,
+                detector_path=self.detector_path
+            )
+            self.main_window.scan_selection_widget.loadProjectScanList(self.project)
+        except Exception as ex:
+            msg = QtGui.QMessageBox()
+            msg.setIcon(QtGui.QMessageBox.Critical)
+            msg.setWindowTitle("Error")
+            msg.setText(ex.args[-1])
+            msg.exec_()
 
 # ==================================================================================
 
