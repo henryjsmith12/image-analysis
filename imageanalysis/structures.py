@@ -32,7 +32,6 @@ class Project:
         detector_path: str
     ) -> None:
         
-        # TODO: Check if paths are valid
         # TODO: Allow Pathlib paths
 
         if not [type(project_path), type(spec_path), type(instrument_path), 
@@ -54,7 +53,6 @@ class Project:
         self.instrument_path = instrument_path
         self.detector_path = detector_path
 
-        # TODO: Validate SPEC file
         self.spec_data = spec.SpecDataFile(spec_path)
         self.scan_numbers = self.spec_data.getScanNumbers()
         self.spec_image_path = f"{project_path}/images/{os.path.basename(os.path.splitext(self.spec_path)[0])}"
@@ -180,10 +178,6 @@ class Scan:
         hkl_max = (self.h_grid_max, self.k_grid_max, self.l_grid_max)
         hkl_n = (self.h_grid_n, self.k_grid_n, self.l_grid_n)   
 
-        print(self.raw_image_data.shape)
-        print(self.reciprocal_space_map.shape)
-
-        # TODO: Validate grid dims/coord lengths
         self.gridded_image_data, self.gridded_image_coords = gridScan(
             self.raw_image_data, 
             self.reciprocal_space_map,
