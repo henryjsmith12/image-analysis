@@ -49,25 +49,11 @@ class ImageTool(QtGui.QWidget):
 
     def setImage(self, data, image, x_label=None, y_label=None, x_coords=None, y_coords=None, slice_label=None, slice_value=None):
 
-        # Color mapping test
         if self.data_max is None:
-
             self.data_max = float(np.amax(data))
 
-        #image = image.astype("float64")
-
         if self.cmap is None:
-            n_pts = 1024
-            base = 2
-            
-            stops = np.logspace(start=0, stop=len(str(int(self.data_max))), num=n_pts, base=base) / (base ** len(str(int(self.data_max))))
-            #stops = np.linspace(start=0, stop=1.0, num=n_pts)
-
-            colors = pg.getFromMatplotlib("jet").getLookupTable(nPts=n_pts)
-
-            self.cmap = pg.ColorMap(stops, colors)
-            
-            self.image_view.setColorMap(self.cmap)
+            self.setColorMap()
 
         if self.cbar is None:
             self.cbar = pg.ColorBarItem(values=(0, self.data_max), cmap=self.cmap, interactive=False, width=15, label="Intensity", orientation="h")
@@ -90,6 +76,21 @@ class ImageTool(QtGui.QWidget):
 
         self.image_view.setImage(image, autoRange=False, autoLevels=False, transform=tr)
 
+    # ------------------------------------------------------------------------------
+
+    def setColorMap(self):
+        n_pts = 16
+        base = 2
+        
+        stops = np.logspace(start=0, stop=len(str(int(self.data_max))), num=n_pts, base=base) / (base ** len(str(int(self.data_max))))
+        #stops = np.linspace(start=0, stop=1.0, num=n_pts)
+
+        colors = pg.getFromMatplotlib("jet").getLookupTable(nPts=n_pts)
+
+        self.cmap = pg.ColorMap(stops, colors)
+        
+        self.image_view.setColorMap(self.cmap)
+
 # ==================================================================================
 
 class ImageView(pg.ImageView):
@@ -99,18 +100,7 @@ class ImageView(pg.ImageView):
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
         self.ui.menuBtn.hide()
-
         self.getView().setAspectLocked(False)
-
-    # ------------------------------------------------------------------------------
-
-    def setScale(self):
-        ...
-
-    # ------------------------------------------------------------------------------
-
-    def setColormap(self):
-        ...
 
 # ==================================================================================
 
