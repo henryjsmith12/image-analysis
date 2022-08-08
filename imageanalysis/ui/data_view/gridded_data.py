@@ -106,6 +106,7 @@ class GriddedDataController(QtGui.QWidget):
             dim = [self.h_controller, self.k_controller, self.l_controller].index(dim_ctrl)
             dim_order.append(dim)
         self.dim_order = tuple(dim_order)
+        self.index = self.layout.itemAt(2).widget().index
 
         self.layout.itemAt(0).widget().dim_slider.setEnabled(False)
         self.layout.itemAt(0).widget().dim_cbx.setEnabled(False)
