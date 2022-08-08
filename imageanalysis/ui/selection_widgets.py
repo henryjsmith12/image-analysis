@@ -166,6 +166,8 @@ class ScanSelectionWidget(QtGui.QWidget):
         # Project
         self.project = None
 
+        self.previewed_scans = []
+
         # Child widgets
         self.scan_lstw = QtGui.QListWidget()
         self.scan_details_gbx = QtGui.QGroupBox()
@@ -185,17 +187,25 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.max_lbl = QtGui.QLabel("Max")
         self.n_lbl = QtGui.QLabel("n")
         self.h_lbl = QtGui.QLabel("H:")
-        self.h_min_txt = QtGui.QLineEdit()
-        self.h_max_txt = QtGui.QLineEdit()
-        self.h_n_txt = QtGui.QLineEdit()
+        self.h_min_sbx = QtGui.QDoubleSpinBox()
+        self.h_max_sbx = QtGui.QDoubleSpinBox()
+        self.h_n_sbx = QtGui.QSpinBox()
         self.k_lbl = QtGui.QLabel("K:")
-        self.k_min_txt = QtGui.QLineEdit()
-        self.k_max_txt = QtGui.QLineEdit()
-        self.k_n_txt = QtGui.QLineEdit()
+        self.k_min_sbx = QtGui.QDoubleSpinBox()
+        self.k_max_sbx = QtGui.QDoubleSpinBox()
+        self.k_n_sbx = QtGui.QSpinBox()
         self.l_lbl = QtGui.QLabel("L:")
-        self.l_min_txt = QtGui.QLineEdit()
-        self.l_max_txt = QtGui.QLineEdit()
-        self.l_n_txt = QtGui.QLineEdit()
+        self.l_min_sbx = QtGui.QDoubleSpinBox()
+        self.l_max_sbx = QtGui.QDoubleSpinBox()
+        self.l_n_sbx = QtGui.QSpinBox()
+        
+        for sbx in [self.h_min_sbx, self.h_max_sbx, self.k_min_sbx, self.k_max_sbx, self.l_min_sbx, self.l_max_sbx]:
+            sbx.setDecimals(3)
+            sbx.setRange(-100, 100)
+            sbx.setSingleStep(0.001)
+        for sbx in [self.h_n_sbx, self.k_n_sbx, self.l_n_sbx]:
+            sbx.setRange(1, 1000)
+
         self.reset_btn = QtGui.QPushButton("Reset")
         self.load_scan_btn = QtGui.QPushButton("Load Scan")
         
@@ -219,17 +229,17 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.gridding_options_gbx_layout.addWidget(self.max_lbl, 0, 2)
         self.gridding_options_gbx_layout.addWidget(self.n_lbl, 0, 3)
         self.gridding_options_gbx_layout.addWidget(self.h_lbl, 1, 0)
-        self.gridding_options_gbx_layout.addWidget(self.h_min_txt, 1, 1)
-        self.gridding_options_gbx_layout.addWidget(self.h_max_txt, 1, 2)
-        self.gridding_options_gbx_layout.addWidget(self.h_n_txt, 1, 3)
+        self.gridding_options_gbx_layout.addWidget(self.h_min_sbx, 1, 1)
+        self.gridding_options_gbx_layout.addWidget(self.h_max_sbx, 1, 2)
+        self.gridding_options_gbx_layout.addWidget(self.h_n_sbx, 1, 3)
         self.gridding_options_gbx_layout.addWidget(self.k_lbl, 2, 0)
-        self.gridding_options_gbx_layout.addWidget(self.k_min_txt, 2, 1)
-        self.gridding_options_gbx_layout.addWidget(self.k_max_txt, 2, 2)
-        self.gridding_options_gbx_layout.addWidget(self.k_n_txt, 2, 3)
+        self.gridding_options_gbx_layout.addWidget(self.k_min_sbx, 2, 1)
+        self.gridding_options_gbx_layout.addWidget(self.k_max_sbx, 2, 2)
+        self.gridding_options_gbx_layout.addWidget(self.k_n_sbx, 2, 3)
         self.gridding_options_gbx_layout.addWidget(self.l_lbl, 3, 0)
-        self.gridding_options_gbx_layout.addWidget(self.l_min_txt, 3, 1)
-        self.gridding_options_gbx_layout.addWidget(self.l_max_txt, 3, 2)
-        self.gridding_options_gbx_layout.addWidget(self.l_n_txt, 3, 3)
+        self.gridding_options_gbx_layout.addWidget(self.l_min_sbx, 3, 1)
+        self.gridding_options_gbx_layout.addWidget(self.l_max_sbx, 3, 2)
+        self.gridding_options_gbx_layout.addWidget(self.l_n_sbx, 3, 3)
         self.gridding_options_gbx_layout.addWidget(self.reset_btn, 4, 0, 1, 4)
 
         # Layout
@@ -271,12 +281,14 @@ class ScanSelectionWidget(QtGui.QWidget):
         """
         Displays preview information about a scan.
         """
-
+        
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
 
-        self.project.scans[i].raw_image_data = scan.getImageData()
-        self.project.scans[i].mapImageData()
+        if scan not in self.previewed_scans:
+            self.project.scans[i].raw_image_data = scan.getImageData()
+            self.project.scans[i].mapImageData()
+            self.previewed_scans.append(scan)
 
         header = scan.spec_scan.S.split()
         number = header[0]
@@ -290,15 +302,15 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.scan_date_lbl.setText(date)
         self.scan_type_lbl.setText(type)
         self.scan_bounds_lbl.setText(bounds)
-        self.h_min_txt.setText(str(round(scan.h_grid_min, 3)))
-        self.h_max_txt.setText(str(round(scan.h_grid_max, 3)))
-        self.h_n_txt.setText(str(scan.h_grid_n))
-        self.k_min_txt.setText(str(round(scan.k_grid_min, 3)))
-        self.k_max_txt.setText(str(round(scan.k_grid_max, 3)))
-        self.k_n_txt.setText(str(scan.k_grid_n))
-        self.l_min_txt.setText(str(round(scan.l_grid_min, 3)))
-        self.l_max_txt.setText(str(round(scan.l_grid_max, 3)))
-        self.l_n_txt.setText(str(scan.l_grid_n))
+        self.h_min_sbx.setValue(round(scan.h_grid_min, 3))
+        self.h_max_sbx.setValue(round(scan.h_grid_max, 3))
+        self.h_n_sbx.setValue(scan.h_grid_n)
+        self.k_min_sbx.setValue(round(scan.k_grid_min, 3))
+        self.k_max_sbx.setValue(round(scan.k_grid_max, 3))
+        self.k_n_sbx.setValue(scan.k_grid_n)
+        self.l_min_sbx.setValue(round(scan.l_grid_min, 3))
+        self.l_max_sbx.setValue(round(scan.l_grid_max, 3))
+        self.l_n_sbx.setValue(scan.l_grid_n)
 
         self.scan_details_gbx.setEnabled(True)
 
@@ -312,9 +324,9 @@ class ScanSelectionWidget(QtGui.QWidget):
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
         gridding_options_txts = [
-            self.h_min_txt, self.h_max_txt, self.h_n_txt,
-            self.k_min_txt, self.k_max_txt, self.k_n_txt,
-            self.l_min_txt, self.l_max_txt, self.l_n_txt,
+            self.h_min_sbx, self.h_max_sbx, self.h_n_sbx,
+            self.k_min_sbx, self.k_max_sbx, self.k_n_sbx,
+            self.l_min_sbx, self.l_max_sbx, self.l_n_sbx,
         ]
         original_params = [
             np.amin(scan.h_map), np.amax(scan.h_map), 250,
@@ -322,8 +334,8 @@ class ScanSelectionWidget(QtGui.QWidget):
             np.amin(scan.l_map), np.amax(scan.l_map), 250,
         ]
 
-        for txt, o_param in zip(gridding_options_txts, original_params):
-            txt.setText(str(round(o_param, 3)))
+        for sbx, o_param in zip(gridding_options_txts, original_params):
+            sbx.setValue(round(o_param, 3))
         self.load_scan_btn.setEnabled(True)
 
     # ------------------------------------------------------------------------------
@@ -334,13 +346,13 @@ class ScanSelectionWidget(QtGui.QWidget):
         """
 
         gridding_options_txts = [
-            self.h_min_txt, self.h_max_txt, self.h_n_txt,
-            self.k_min_txt, self.k_max_txt, self.k_n_txt,
-            self.l_min_txt, self.l_max_txt, self.l_n_txt,
+            self.h_min_sbx, self.h_max_sbx, self.h_n_sbx,
+            self.k_min_sbx, self.k_max_sbx, self.k_n_sbx,
+            self.l_min_sbx, self.l_max_sbx, self.l_n_sbx,
         ]
         
         for txt in gridding_options_txts:
-            txt.setText("")
+            txt.setValue(0)
 
         self.scan_details_gbx.setEnabled(False)
         self.load_scan_btn.setEnabled(False)
@@ -355,15 +367,21 @@ class ScanSelectionWidget(QtGui.QWidget):
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
 
-        gridding_options_txts = [
-            self.h_min_txt, self.h_max_txt, self.h_n_txt,
-            self.k_min_txt, self.k_max_txt, self.k_n_txt,
-            self.l_min_txt, self.l_max_txt, self.l_n_txt,
+        sbxs = [
+            self.h_min_sbx, self.h_max_sbx, self.h_n_sbx,
+            self.k_min_sbx, self.k_max_sbx, self.k_n_sbx,
+            self.l_min_sbx, self.l_max_sbx, self.l_n_sbx,
         ]
 
-        scan.setGriddingParameters(*(float(txt.text()) for txt in gridding_options_txts))
-        scan.gridImageData()
-
-        self.main_window.data_view.addScan(scan)
+        if sbxs[0].value() < sbxs[1].value() and sbxs[3].value() < sbxs[4].value() and sbxs[6].value() < sbxs[7].value():
+            scan.setGriddingParameters(*(float(sbx.value()) for sbx in sbxs))
+            scan.gridImageData()
+            self.main_window.data_view.addScan(scan)
+        else:
+            msg = QtGui.QMessageBox()
+            msg.setIcon(QtGui.QMessageBox.Critical)
+            msg.setWindowTitle("Error")
+            msg.setText("Invalid gridding bounds.")
+            msg.exec_()
 
 # ==================================================================================
