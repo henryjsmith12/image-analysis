@@ -81,14 +81,14 @@ class RawDataController(QtGui.QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.data_slider, 0, 0, 1, 3)
         self.layout.addWidget(self.data_sbx, 0, 3, 1, 1)
-        self.layout.addWidget(self.h_rbtn, 1, 0, 1, 1)
-        self.layout.addWidget(self.k_rbtn, 1, 1, 1, 1)
-        self.layout.addWidget(self.l_rbtn, 1, 2, 1, 1)
-        self.layout.addWidget(self.intensity_rbtn, 1, 3, 1, 1)
-        for i in range(self.layout.rowCount()):
-            self.layout.setRowStretch(i, 1)
+        #self.layout.addWidget(self.h_rbtn, 1, 0, 1, 1)
+        #self.layout.addWidget(self.k_rbtn, 1, 1, 1, 1)
+        #self.layout.addWidget(self.l_rbtn, 1, 2, 1, 1)
+        #self.layout.addWidget(self.intensity_rbtn, 1, 3, 1, 1)
+        '''for i in range(self.layout.rowCount()):
+            self.layout.setRowStretch(i, 1)'''
         for i in range(self.layout.columnCount()):
-            self.layout.setRowStretch(i, 1)
+            self.layout.setColumnStretch(i, 1)
 
         # Connections
         for btn in [self.h_rbtn, self.k_rbtn, self.l_rbtn, self.intensity_rbtn]:
