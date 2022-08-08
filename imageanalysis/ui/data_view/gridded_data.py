@@ -118,8 +118,7 @@ class GriddedDataController(QtGui.QWidget):
     # ------------------------------------------------------------------------------
 
     def setIndex(self):
-        sender = self.sender()
-        self.index = sender.index
+        self.index = self.layout.itemAt(2).widget().index
 
     # ------------------------------------------------------------------------------
 
@@ -130,17 +129,20 @@ class GriddedDataController(QtGui.QWidget):
 
         index = self.index
         dim_order = self.dim_order # e.g. (0, 1, 2)
-        data = self.data.transpose(*dim_order)
         labels = ["H", "K", "L"]
-        image = data[:, :, index]
+        if dim_order[2] == 0:
+            image = self.data[index, :, :]
+        elif dim_order[2] == 1:
+            image = self.data[:, index, :]
+        else:
+            image = self.data[:, :, index]
 
-        #print(self.coords[dim_order.index(2)].shape)
-        x_label = labels[dim_order.index(0)]
-        y_label = labels[dim_order.index(1)]
-        x_coords = self.coords[dim_order.index(0)]
-        y_coords = self.coords[dim_order.index(1)]
-        slice_label = labels[dim_order.index(2)]
-        slice_value = round(float(self.coords[dim_order.index(2)][index]), 5)
+        x_label = labels[dim_order[0]]
+        y_label = labels[dim_order[1]]
+        x_coords = self.coords[dim_order[2]]
+        y_coords = self.coords[dim_order[2]]
+        slice_label = labels[dim_order[2]]
+        slice_value = round(float(self.coords[dim_order[2]][index]), 5)
 
         self.image_tool.setImage(self.data, image, x_label, y_label, x_coords, y_coords, slice_label, slice_value)
 
