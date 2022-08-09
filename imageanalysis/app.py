@@ -11,7 +11,7 @@ from pyqtgraph import QtGui
 from imageanalysis.ui.main_window import MainWindow
 
 
-def run():
+def run() -> None:
     """Package driver function."""
 
     app = QtGui.QApplication(sys.argv)

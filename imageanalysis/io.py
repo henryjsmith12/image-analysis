@@ -15,7 +15,7 @@ from spec2nexus import spec  # isValidSPECFile
 
 # TODO: Basic testing for all functions
 
-def isValidProjectPath(path):
+def isValidProjectPath(path: str) -> bool:
     """Checks if path is a valid Project path.
 
     A valid project directory includes: A SPEC file (.spec), instrument and
@@ -60,7 +60,7 @@ def isValidProjectPath(path):
     return is_valid
 
 
-def getSPECPaths(path):
+def getSPECPaths(path: str) -> list:
     """Returns list of SPEC file basepaths in given directory."""
 
     spec_paths = []
@@ -72,7 +72,7 @@ def getSPECPaths(path):
     return spec_paths
 
 
-def getXMLPaths(path):
+def getXMLPaths(path: str) -> list:
     """Returns list of XML file basepaths in given directory."""
 
     xml_paths = []
@@ -84,7 +84,7 @@ def getXMLPaths(path):
     return xml_paths
 
 
-def isValidSPECFile(path):
+def isValidSPECFile(path: str) -> bool:
     """Checks if given path is a valid SPEC file."""
 
     try:
@@ -94,7 +94,7 @@ def isValidSPECFile(path):
         return False
 
 
-def isValidInstrumentXMLFile(path):
+def isValidInstrumentXMLFile(path: str) -> bool:
     """Checks if given path is a valid instrument configuration file."""
 
     try:
@@ -106,7 +106,7 @@ def isValidInstrumentXMLFile(path):
     return True
 
 
-def isValidDetectorXMLFile(path):
+def isValidDetectorXMLFile(path: str) -> bool:
     """Checks if given path is a valid detector configuration file."""
 
     try:
