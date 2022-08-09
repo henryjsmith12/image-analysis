@@ -1,51 +1,67 @@
-"""
-Copyright (c) UChicago Argonne, LLC. All rights reserved.
+"""Copyright (c) UChicago Argonne, LLC. All rights reserved.
+
 See LICENSE file.
 """
 
-# ==================================================================================
 
 import os
-from rsMap3D.datasource.DetectorGeometryForXrayutilitiesReader import DetectorGeometryForXrayutilitiesReader
-from rsMap3D.datasource.InstForXrayutilitiesReader import InstForXrayutilitiesReader
-from spec2nexus import spec
 
-# ==================================================================================
+from rsMap3D.datasource.DetectorGeometryForXrayutilitiesReader import \
+    DetectorGeometryForXrayutilitiesReader  # isValidDetectorXMLFile
+from rsMap3D.datasource.InstForXrayutilitiesReader import \
+    InstForXrayutilitiesReader  # isValidInstrumentXMLFile
+from spec2nexus import spec  # isValidSPECFile
+
+
+# TODO: Basic testing for all functions
 
 def isValidProjectPath(path):
-    """
-    Check if a path has the correct structure to be a project path. A valid project 
-    directory includes: A SPEC file (.spec), instrument and detector configuration 
-    files (.xml), and an "images" subdirectory.
+    """Checks if path is a valid Project path.
+
+    A valid project directory includes: A SPEC file (.spec), instrument and
+    detector configuration files (.xml), and an "images" subdirectory.
     """
 
+    # Hold status of each required element
     spec, instr_config, det_config, images = False, False, False, False
 
+    # Evaluates every item in given directory path until conditions are met
     for item in os.listdir(path):
+
         item_path = f"{path}/{item}"
+
+        # Checks if item is a directory
         if os.path.isdir(item_path):
+
+            # "images" subdirectory
             if item == "images":
                 images = True
+
+        # Checks if item is a file
         elif os.path.isfile(item_path):
+
+            # SPEC file
             if item.endswith(".spec"):
                 spec = True
+
+            # At least 2 configuration files
+            # Configuration files are validated when Project object is created
             elif item.endswith(".xml"):
                 if not instr_config:
                     instr_config = True
                 else:
                     det_config = True
-        is_valid = not False in [spec, instr_config, det_config, images]
+
+        # Checks if conditions for Project path are met
+        is_valid = False not in [spec, instr_config, det_config, images]
         if is_valid:
             break
 
     return is_valid
-    
-# ==================================================================================
+
 
 def getSPECPaths(path):
-    """
-    Returns a list of SPEC file basepaths immediately below given directory.
-    """
+    """Returns list of SPEC file basepaths in given directory."""
 
     spec_paths = []
 
@@ -55,12 +71,9 @@ def getSPECPaths(path):
 
     return spec_paths
 
-# ==================================================================================
 
 def getXMLPaths(path):
-    """
-    Returns a list of XML file basepaths immediately below given directory.
-    """
+    """Returns list of XML file basepaths in given directory."""
 
     xml_paths = []
 
@@ -70,18 +83,20 @@ def getXMLPaths(path):
 
     return xml_paths
 
-# ==================================================================================
 
 def isValidSPECFile(path):
+    """Checks if given path is a valid SPEC file."""
+
     try:
         spec_data = spec.SpecDataFile(path)
         return True
     except:
         return False
 
-# ==================================================================================
 
 def isValidInstrumentXMLFile(path):
+    """Checks if given path is a valid instrument configuration file."""
+
     try:
         instrument_reader = InstForXrayutilitiesReader(path)
         sc = instrument_reader.getSampleCircleDirections()
@@ -90,9 +105,10 @@ def isValidInstrumentXMLFile(path):
 
     return True
 
-# ==================================================================================
 
 def isValidDetectorXMLFile(path):
+    """Checks if given path is a valid detector configuration file."""
+
     try:
         detector_reader = DetectorGeometryForXrayutilitiesReader(path)
         detector = detector_reader.getDetectors()[0]
@@ -100,7 +116,3 @@ def isValidDetectorXMLFile(path):
         return False
 
     return True
-
-
-# ==================================================================================
-
