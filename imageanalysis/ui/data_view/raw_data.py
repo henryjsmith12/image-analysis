@@ -1,30 +1,30 @@
-"""
-Copyright (c) UChicago Argonne, LLC. All rights reserved.
+"""Copyright (c) UChicago Argonne, LLC. All rights reserved.
+
 See LICENSE file.
 """
 
-# ==================================================================================
 
 from pyqtgraph import QtCore, QtGui
 from pyqtgraph.dockarea import Dock, DockArea
 
-# ----------------------------------------------------------------------------------
-
+from imageanalysis.structures import Scan
 from imageanalysis.ui.data_view.utils import ImageTool
 
-# ==================================================================================
 
 class RawDataWidget(DockArea):
+    """Allows users to view raw image data from a scan."""
 
     def __init__(self, scan) -> None:
         super(RawDataWidget, self).__init__()
 
         self.scan = scan
 
+        # Child widgets
         self.image_tool_3d = ImageTool()
         self.image_tool_2d = ImageTool()
         self.controller = RawDataController(scan, self.image_tool_3d)
 
+        # Child docks
         self.controller_dock = Dock(
             name="Controller",
             size=(1, 1),
@@ -48,14 +48,16 @@ class RawDataWidget(DockArea):
         )
         self.controller_dock.setMaximumHeight(75)
         self.addDock(self.controller_dock)
-        self.addDock(self.image_tool_3d_dock, "bottom" ,self.controller_dock)
-        #self.addDock(self.image_tool_2d_dock, "bottom" ,self.image_tool_3d_dock)
+        self.addDock(self.image_tool_3d_dock, "bottom", self.controller_dock)
 
-# ==================================================================================
 
 class RawDataController(QtGui.QWidget):
 
-    def __init__(self, scan, image_tool) -> None:
+    def __init__(
+        self,
+        scan: Scan,
+        image_tool: ImageTool
+    ) -> None:
         super(RawDataController, self).__init__()
 
         self.data = scan.raw_image_data
@@ -73,7 +75,13 @@ class RawDataController(QtGui.QWidget):
         self.l_rbtn = QtGui.QRadioButton("L")
         self.intensity_rbtn = QtGui.QRadioButton("Intensity")
         self.intensity_rbtn.setChecked(True)
-        for btn in [self.h_rbtn, self.k_rbtn, self.l_rbtn, self.intensity_rbtn]:
+        self.rbtns = [
+            self.h_rbtn,
+            self.k_rbtn,
+            self.l_rbtn,
+            self.intensity_rbtn
+        ]
+        for btn in self.rbtns:
             self.data_type_rbg.addButton(btn)
 
         # Layout
@@ -81,17 +89,11 @@ class RawDataController(QtGui.QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.data_slider, 0, 0, 1, 3)
         self.layout.addWidget(self.data_sbx, 0, 3, 1, 1)
-        #self.layout.addWidget(self.h_rbtn, 1, 0, 1, 1)
-        #self.layout.addWidget(self.k_rbtn, 1, 1, 1, 1)
-        #self.layout.addWidget(self.l_rbtn, 1, 2, 1, 1)
-        #self.layout.addWidget(self.intensity_rbtn, 1, 3, 1, 1)
-        '''for i in range(self.layout.rowCount()):
-            self.layout.setRowStretch(i, 1)'''
         for i in range(self.layout.columnCount()):
             self.layout.setColumnStretch(i, 1)
 
         # Connections
-        for btn in [self.h_rbtn, self.k_rbtn, self.l_rbtn, self.intensity_rbtn]:
+        for btn in self.rbtns:
             btn.toggled.connect(self.setDataType)
             btn.toggled.connect(self.setImage)
         self.data_slider.valueChanged.connect(self.setIndex)
@@ -102,9 +104,8 @@ class RawDataController(QtGui.QWidget):
         # Display first image
         self.setImage()
 
-    # ------------------------------------------------------------------------------
-
     def setDataType(self):
+        """Changes data type to selected radio button."""
         btn = self.sender()
         if btn.isChecked():
             if btn.text() == "Intensity":
@@ -116,12 +117,12 @@ class RawDataController(QtGui.QWidget):
             elif btn.text() == "L":
                 self.data = self.scan.l_map
 
+            # Adjusts slider to match index count
             self.data_slider.setMaximum(self.data.shape[0] - 1)
             self.data_sbx.setMaximum(self.data.shape[0] - 1)
 
-    # ------------------------------------------------------------------------------
-
     def setIndex(self):
+        """Sets index for slice in view."""
         sender = self.sender()
         index = sender.value()
         if sender == self.data_slider:
@@ -129,12 +130,9 @@ class RawDataController(QtGui.QWidget):
         elif sender == self.data_sbx:
             self.data_slider.setValue(index)
 
-    # ------------------------------------------------------------------------------
-
     def setImage(self):
+        """Sets image for connected ImageTool."""
         index = self.data_sbx.value()
         image = self.data[index]
 
         self.image_tool.setImage(self.data, image)
-
-# ==================================================================================
