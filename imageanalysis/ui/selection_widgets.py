@@ -1,24 +1,19 @@
-"""
-Copyright (c) UChicago Argonne, LLC. All rights reserved.
+"""Copyright (c) UChicago Argonne, LLC. All rights reserved.
+
 See LICENSE file.
 """
 
-# ==================================================================================
 
 import numpy as np
 from pyqtgraph import QtGui
 
-# ----------------------------------------------------------------------------------
-
-from imageanalysis.io import isValidProjectPath, getSPECPaths, getXMLPaths
+from imageanalysis.io import \
+    isValidProjectPath, getSPECPaths, getXMLPaths
 from imageanalysis.structures import Project
 
-# ==================================================================================
 
 class ProjectSelectionWidget(QtGui.QWidget):
-    """
-    Allows user to select a project and respective config files.
-    """
+    """Handles project and project-dependent file selection."""
 
     def __init__(self, parent) -> None:
         super(ProjectSelectionWidget, self).__init__()
@@ -66,20 +61,25 @@ class ProjectSelectionWidget(QtGui.QWidget):
 
         # Connections
         self.project_btn.clicked.connect(self.selectProject)
-        self.spec_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
-        self.instrument_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
-        self.detector_cbx.currentTextChanged.connect(self.enableLoadProjectButton)
+        self.spec_cbx.currentTextChanged.connect(
+            self.enableLoadProjectButton
+        )
+        self.instrument_cbx.currentTextChanged.connect(
+            self.enableLoadProjectButton
+        )
+        self.detector_cbx.currentTextChanged.connect(
+            self.enableLoadProjectButton
+        )
         self.load_project_btn.clicked.connect(self.loadProject)
 
-    # ------------------------------------------------------------------------------
+    def selectProject(self) -> None:
+        """Allows user to select a project directory."""
 
-    def selectProject(self):
-        """
-        Allows user to select a project directory.
-        """
+        project_path = QtGui.QFileDialog.getExistingDirectory(
+            self, "Select Project"
+        )
 
-        project_path = QtGui.QFileDialog.getExistingDirectory(self, "Select Project")
-
+        # Checks if project path is valid
         if isValidProjectPath(project_path):
             self.project_path = project_path
             self.project_txt.setText(project_path)
@@ -93,12 +93,9 @@ class ProjectSelectionWidget(QtGui.QWidget):
             msg.setText("Invalid project directory.")
             msg.exec_()
 
-    # ------------------------------------------------------------------------------
+    def populateProjectFilesGroupbox(self) -> None:
+        """Adds SPEC files and XML files to comboboxes."""
 
-    def populateProjectFilesGroupbox(self):
-        """
-        Adds SPEC sources and XML configuration files to comboboxes.
-        """
         self.spec_cbx.clear()
         self.instrument_cbx.clear()
         self.detector_cbx.clear()
@@ -110,31 +107,22 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.instrument_cbx.addItems(xml_paths)
         self.detector_cbx.addItems(xml_paths)
 
-    # ------------------------------------------------------------------------------
+    def enableLoadProjectButton(self) -> None:
+        """Enables "Load Project" button."""
 
-    def enableLoadProjectButton(self):
-        """
-        Checks if all project file comboboxes are nonempty and enabled "Load Project"
-        option.
-        """
+        self.spec_path = f"{self.project_path}/" \
+            f"{self.spec_cbx.currentText()}"
+        self.instrument_path = f"{self.project_path}/" \
+            f"{self.instrument_cbx.currentText()}"
+        self.detector_path = f"{self.project_path}/" \
+            f"{self.detector_cbx.currentText()}"
 
-        self.spec_path = f"{self.project_path}/{self.spec_cbx.currentText()}"
-        self.instrument_path = f"{self.project_path}/{self.instrument_cbx.currentText()}"
-        self.detector_path = f"{self.project_path}/{self.detector_cbx.currentText()}"
+        self.load_project_btn.setEnabled(True)
 
-        if "/" not in [self.spec_path[-1], self.instrument_path[-1], self.detector_path[-1]]:
-            self.load_project_btn.setEnabled(True)
-        else:
-            self.load_project_btn.setEnabled(False)
+    def loadProject(self) -> None:
+        """Creates and loads Project object."""
 
-    # ------------------------------------------------------------------------------
-
-    def loadProject(self):
-        """
-        Create Project object from given paths and load information into the 
-        ScanSelectionWidget.
-        """
-
+        # Attempts to create and load Project with given file paths
         try:
             self.project = Project(
                 project_path=self.project_path,
@@ -142,7 +130,10 @@ class ProjectSelectionWidget(QtGui.QWidget):
                 instrument_path=self.instrument_path,
                 detector_path=self.detector_path
             )
-            self.main_window.scan_selection_widget.loadProjectScanList(self.project)
+            # Loads project scans
+            self.main_window.scan_selection_widget.loadProjectScanList(
+                self.project
+            )
         except Exception as ex:
             msg = QtGui.QMessageBox()
             msg.setIcon(QtGui.QMessageBox.Critical)
@@ -150,13 +141,9 @@ class ProjectSelectionWidget(QtGui.QWidget):
             msg.setText(ex.args[-1])
             msg.exec_()
 
-# ==================================================================================
 
 class ScanSelectionWidget(QtGui.QWidget):
-    """
-    Displays available scans in a Project and allows user to select a specific scan
-    to display information from.
-    """
+    """Handles scan selection and loading."""
 
     def __init__(self, parent) -> None:
         super(ScanSelectionWidget, self).__init__()
@@ -166,6 +153,7 @@ class ScanSelectionWidget(QtGui.QWidget):
         # Project
         self.project = None
 
+        # Scans that have been previewed
         self.previewed_scans = []
 
         # Child widgets
@@ -198,29 +186,42 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.l_min_sbx = QtGui.QDoubleSpinBox()
         self.l_max_sbx = QtGui.QDoubleSpinBox()
         self.l_n_sbx = QtGui.QSpinBox()
-        
-        for sbx in [self.h_min_sbx, self.h_max_sbx, self.k_min_sbx, self.k_max_sbx, self.l_min_sbx, self.l_max_sbx]:
+        self.reset_btn = QtGui.QPushButton("Reset")
+        self.load_scan_btn = QtGui.QPushButton("Load Scan")
+
+        # SpinBox properties
+        for sbx in [
+            self.h_min_sbx, self.h_max_sbx,
+            self.k_min_sbx, self.k_max_sbx,
+            self.l_min_sbx, self.l_max_sbx
+        ]:
             sbx.setDecimals(3)
             sbx.setRange(-100, 100)
             sbx.setSingleStep(0.001)
         for sbx in [self.h_n_sbx, self.k_n_sbx, self.l_n_sbx]:
             sbx.setRange(1, 1000)
 
-        self.reset_btn = QtGui.QPushButton("Reset")
-        self.load_scan_btn = QtGui.QPushButton("Load Scan")
-        
         # Scan details GroupBox layout
         self.scan_details_gbx_layout = QtGui.QGridLayout()
         self.scan_details_gbx.setLayout(self.scan_details_gbx_layout)
-        self.scan_details_gbx_layout.addWidget(self.scan_number_lbl, 0, 0)
-        self.scan_details_gbx_layout.addWidget(self.scan_number_txt, 0, 1)
-        self.scan_details_gbx_layout.addWidget(self.scan_point_count_lbl, 0, 2)
-        self.scan_details_gbx_layout.addWidget(self.scan_point_count_txt, 0, 3)
-        self.scan_details_gbx_layout.addWidget(self.scan_date_lbl, 1, 0, 1, 4)
-        self.scan_details_gbx_layout.addWidget(self.scan_type_lbl, 2, 0)
-        self.scan_details_gbx_layout.addWidget(self.scan_bounds_lbl, 2, 1, 1, 3)
-        self.scan_details_gbx_layout.addWidget(self.gridding_options_gbx, 3, 0, 1, 4)
-        self.scan_details_gbx_layout.addWidget(self.load_scan_btn, 4, 2, 1, 2)
+        self.scan_details_gbx_layout.addWidget(
+            self.scan_number_lbl, 0, 0)
+        self.scan_details_gbx_layout.addWidget(
+            self.scan_number_txt, 0, 1)
+        self.scan_details_gbx_layout.addWidget(
+            self.scan_point_count_lbl, 0, 2)
+        self.scan_details_gbx_layout.addWidget(
+            self.scan_point_count_txt, 0, 3)
+        self.scan_details_gbx_layout.addWidget(
+            self.scan_date_lbl, 1, 0, 1, 4)
+        self.scan_details_gbx_layout.addWidget(
+            self.scan_type_lbl, 2, 0)
+        self.scan_details_gbx_layout.addWidget(
+            self.scan_bounds_lbl, 2, 1, 1, 3)
+        self.scan_details_gbx_layout.addWidget(
+            self.gridding_options_gbx, 3, 0, 1, 4)
+        self.scan_details_gbx_layout.addWidget(
+            self.load_scan_btn, 4, 2, 1, 2)
 
         # gridding options GroupBox layout
         self.gridding_options_gbx_layout = QtGui.QGridLayout()
@@ -255,48 +256,40 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.reset_btn.clicked.connect(self.resetGriddingOptions)
         self.load_scan_btn.clicked.connect(self.loadScan)
 
-    # ------------------------------------------------------------------------------
-
-    def loadProjectScanList(self, project):
-        """
-        Populates scan list.
-        """
+    def loadProjectScanList(self, project) -> None:
+        """Populates scan list."""
 
         self.project = project
         self.scan_lstw.clear()
         self.scan_lstw.addItems(self.project.scan_numbers)
 
-    # ------------------------------------------------------------------------------
-
-    def clearProjectScanList(self):
-        """
-        Populates scan list.
-        """
+    def clearProjectScanList(self) -> None:
+        """Clears scan list."""
 
         self.scan_lstw.clear()
 
-    # ------------------------------------------------------------------------------
+    def previewScan(self) -> None:
+        """Displays preview information for currently selected scan."""
 
-    def previewScan(self):
-        """
-        Displays preview information about a scan.
-        """
-        
+        # Retrieve current scan
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
 
+        # Loads RSM and raw image data if not previously previewed
         if scan not in self.previewed_scans:
             self.project.scans[i].raw_image_data = scan.getImageData()
             self.project.scans[i].mapImageData()
             self.previewed_scans.append(scan)
 
+        # Scan header details from SPEC
         header = scan.spec_scan.S.split()
         number = header[0]
         type = f"{header[1]} {header[2]}"
         bounds = f"({header[3]}, {header[4]})"
         point_count = str(len(scan.spec_scan.data_lines))
         date = scan.spec_scan.date
-        
+
+        # Displays scan details in child widgets
         self.scan_number_txt.setText(number)
         self.scan_point_count_txt.setText(point_count)
         self.scan_date_lbl.setText(date)
@@ -314,16 +307,14 @@ class ScanSelectionWidget(QtGui.QWidget):
 
         self.scan_details_gbx.setEnabled(True)
 
-    # ------------------------------------------------------------------------------
+    def resetGriddingOptions(self) -> None:
+        """Resets gridding parameters to default values for scan."""
 
-    def resetGriddingOptions(self):
-        """
-        Resets Scan gridding parameters to default values.
-        """
-
+        # Retrieves current scan
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
-        gridding_options_txts = [
+
+        gridding_options_sbxs = [
             self.h_min_sbx, self.h_max_sbx, self.h_n_sbx,
             self.k_min_sbx, self.k_max_sbx, self.k_n_sbx,
             self.l_min_sbx, self.l_max_sbx, self.l_n_sbx,
@@ -334,36 +325,16 @@ class ScanSelectionWidget(QtGui.QWidget):
             np.amin(scan.l_map), np.amax(scan.l_map), 250,
         ]
 
-        for sbx, o_param in zip(gridding_options_txts, original_params):
+        for sbx, o_param in zip(gridding_options_sbxs, original_params):
             sbx.setValue(round(o_param, 3))
+
+        # Enable "Load Scan" button
         self.load_scan_btn.setEnabled(True)
 
-    # ------------------------------------------------------------------------------
+    def loadScan(self) -> None:
+        """Loads scan data into a new DataView tab."""
 
-    def clearGriddingOptions(self):
-        """
-        Resets Scan gridding parameters to default values.
-        """
-
-        gridding_options_txts = [
-            self.h_min_sbx, self.h_max_sbx, self.h_n_sbx,
-            self.k_min_sbx, self.k_max_sbx, self.k_n_sbx,
-            self.l_min_sbx, self.l_max_sbx, self.l_n_sbx,
-        ]
-        
-        for txt in gridding_options_txts:
-            txt.setValue(0)
-
-        self.scan_details_gbx.setEnabled(False)
-        self.load_scan_btn.setEnabled(False)
-
-    # ------------------------------------------------------------------------------
-
-    def loadScan(self):
-        """
-        Loads scan data into a new DataView widget tab
-        """
-        
+        # Retrieves current scan
         i = self.scan_lstw.currentRow()
         scan = self.project.scans[i]
 
@@ -373,7 +344,12 @@ class ScanSelectionWidget(QtGui.QWidget):
             self.l_min_sbx, self.l_max_sbx, self.l_n_sbx,
         ]
 
-        if sbxs[0].value() < sbxs[1].value() and sbxs[3].value() < sbxs[4].value() and sbxs[6].value() < sbxs[7].value():
+        # Checks if spinbox mins/maxes are valid
+        if (
+            sbxs[0].value() < sbxs[1].value() and
+            sbxs[3].value() < sbxs[4].value() and
+            sbxs[6].value() < sbxs[7].value()
+        ):
             scan.setGriddingParameters(*(float(sbx.value()) for sbx in sbxs))
             scan.gridImageData()
             self.main_window.data_view.addScan(scan)
@@ -383,5 +359,3 @@ class ScanSelectionWidget(QtGui.QWidget):
             msg.setWindowTitle("Error")
             msg.setText("Invalid gridding bounds.")
             msg.exec_()
-
-# ==================================================================================
