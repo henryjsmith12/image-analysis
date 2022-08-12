@@ -5,7 +5,7 @@ EMAIL = "smithh@anl.gov"
 URL = "https://github.com/henryjsmith12/image-analysis"
 VERSION = "0.0.5"
 DESCRIPTION = "Python-based software for XRD data analysis."
-LONG_DESCRIPTION = "Python-based software for XRD data analysis. Allows users to analyze SPEC data, raw XRD scan images, and reciprocal space-converted datasets."
+LONG_DESCRIPTION = "Python-based software for XRD data analysis. Allows users to analyze raw XRD scan images and reciprocal space-converted datasets."
 
 setup(
     name="image-analysis", 
