@@ -79,19 +79,21 @@ class ProjectSelectionWidget(QtGui.QWidget):
             self, "Select Project"
         )
 
-        # Checks if project path is valid
-        if isValidProjectPath(project_path):
-            self.project_path = project_path
-            self.project_txt.setText(project_path)
-            self.project_files_gbx.setEnabled(True)
-            self.populateProjectFilesGroupbox()
-        else:
-            self.project_files_gbx.setEnabled(False)
-            msg = QtGui.QMessageBox()
-            msg.setIcon(QtGui.QMessageBox.Critical)
-            msg.setWindowTitle("Error")
-            msg.setText("Invalid project directory.")
-            msg.exec_()
+        # Omits empty paths from cancelling out of file dialog
+        if project_path != "":
+            # Checks if project path is valid
+            if isValidProjectPath(project_path):
+                self.project_path = project_path
+                self.project_txt.setText(project_path)
+                self.project_files_gbx.setEnabled(True)
+                self.populateProjectFilesGroupbox()
+            else:
+                self.project_files_gbx.setEnabled(False)
+                msg = QtGui.QMessageBox()
+                msg.setIcon(QtGui.QMessageBox.Critical)
+                msg.setWindowTitle("Error")
+                msg.setText("Invalid project directory.")
+                msg.exec_()
 
     def populateProjectFilesGroupbox(self) -> None:
         """Adds SPEC files and XML files to comboboxes."""
