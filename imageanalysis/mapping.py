@@ -13,6 +13,7 @@ from spec2nexus import spec
 import xrayutilities as xu
 
 
+# TODO: Make arbitrary enough to use as a static function
 def mapScan(
     spec_scan: spec.SpecDataFileScan,
     instrument_path: str,

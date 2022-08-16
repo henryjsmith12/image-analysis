@@ -14,6 +14,7 @@ from spec2nexus import spec  # isValidSPECFile
 
 
 # TODO: Basic testing for all functions
+# TODO: Pathlib capabilities
 
 def isValidProjectPath(path: str) -> bool:
     """Checks if path is a valid Project path.
