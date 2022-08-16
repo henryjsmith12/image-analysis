@@ -141,7 +141,7 @@ class ImageView(pg.ImageView):
 
 
 class ROIWidget(QtGui.QWidget):
-    """Allows user to apply ROI's to an image."""
+    """Allows user to apply an ROI to an image."""
 
     def __init__(self) -> None:
         super(ROIWidget, self).__init__()
@@ -149,3 +149,12 @@ class ROIWidget(QtGui.QWidget):
         # Layout
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
+
+
+class ColorMapWidget(QtGui.QWidget):
+    """Allows user to apply a colormap to an image."""
+
+    def __init__(self) -> None:
+        super(ColorMapWidget, self).__init__()
+
+        ...
