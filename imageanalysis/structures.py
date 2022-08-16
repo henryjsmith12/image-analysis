@@ -96,6 +96,7 @@ class Project:
         self.scan_numbers = [scan.number for scan in self.scans]
 
 
+# TODO: Create a data structure class to properly organize raw/gridded data
 class Scan:
     """Houses SPEC data and image data for a single scan."""
 
@@ -201,6 +202,7 @@ class Scan:
         self.l_grid_min, self.l_grid_max, self.l_grid_n = \
             (np.amin(self.l_map), np.amax(self.l_map), 250)
 
+    # TODO: Fix this absolute atrocity
     def setGriddingParameters(
         self,
         h_min, h_max, h_n,
