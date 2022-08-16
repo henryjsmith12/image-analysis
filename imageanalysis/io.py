@@ -88,10 +88,17 @@ def isValidSPECFile(path: str) -> bool:
     """Checks if given path is a valid SPEC file."""
 
     try:
+        # Pip package version: Always returns as False on first runthrough
+        # Second try/except block added to catch this oddity.
+        # I have no idea why only the package version has this error.
         spec_data = spec.SpecDataFile(path)
         return True
     except:
-        return False
+        try:
+            spec_data = spec.SpecDataFile(path)
+            return True
+        except:
+            return False
 
 
 def isValidInstrumentXMLFile(path: str) -> bool:
