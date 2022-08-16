@@ -90,7 +90,15 @@ If not in the repository directory, change into the repository directory using `
 python imageanalysis.py
 ```
 
-###
+### Projects
+
+`image-analysis` is built for displaying data from a Project, a preset directory structure that contains:
+- A SPEC data source
+- Accompanying raw images for each scan in SPEC source
+- Configuration files for a both detector and instrument
+
+See `image-analysis/sample_project` for a Project directory example.
+
 ## License
 See [`LICENSE.txt`](https://github.com/henryjsmith12/image-analysis/blob/main/LICENSE) for more information.
 
