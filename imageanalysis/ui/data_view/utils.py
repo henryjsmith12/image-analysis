@@ -151,6 +151,12 @@ class ROIWidget(QtGui.QWidget):
         self.setLayout(self.layout)
 
 
+class ROI(pg.ROI):
+    """Custom ROI object."""
+
+    ...
+
+
 class ColorMapWidget(QtGui.QWidget):
     """Allows user to apply a colormap to an image."""
 
@@ -158,3 +164,9 @@ class ColorMapWidget(QtGui.QWidget):
         super(ColorMapWidget, self).__init__()
 
         ...
+
+
+class ColorMap(pg.ColorMap):
+    """Custom colormap object."""
+
+    ...
