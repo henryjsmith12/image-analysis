@@ -228,3 +228,9 @@ class Scan:
             rsm=self.reciprocal_space_map,
             gridding_params=(hkl_min, hkl_max, hkl_n)
         )
+
+
+class Curve:
+    """Describes a 1-D line of values with coordinates and metadata."""
+
+    ...
