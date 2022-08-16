@@ -2,6 +2,8 @@
 
 ## [0.2.0] 2022-09
 
+- [ ] Extensive testing
+
 ### Color Mapping
 - [ ] A "Color Map" tab for ImageTool objects that controls the bounds and scaling for the image's map.
 
