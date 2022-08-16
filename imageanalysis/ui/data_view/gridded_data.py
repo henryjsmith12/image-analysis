@@ -149,10 +149,16 @@ class GriddedDataController(QtGui.QWidget):
         dim_order = self.dim_order
         if dim_order[2] == 0:
             image = self.data[index, :, :]
+            if dim_order[0] == 2:
+                image = image.T
         elif dim_order[2] == 1:
             image = self.data[:, index, :]
+            if dim_order[0] == 2:
+                image = image.T
         else:
             image = self.data[:, :, index]
+            if dim_order[0] == 1:
+                image = image.T
 
         # Determines labels for image
         labels = ["H", "K", "L"]
