@@ -15,13 +15,19 @@ import xrayutilities as xu
 def gridScan(
     raw_image_data: np.ndarray,
     rsm: np.ndarray,
-    gridding_params: tuple
+    grid_params: dict
 ) -> tuple:
     """Creates a gridded array of raw image data from RSM coordinates."""
 
-    h_min, k_min, l_min = gridding_params[0]
-    h_max, k_max, l_max = gridding_params[1]
-    h_n, k_n, l_n = gridding_params[2]
+    h_min = grid_params["H"]["min"]
+    k_min = grid_params["K"]["min"]
+    l_min = grid_params["L"]["min"]
+    h_max = grid_params["H"]["max"]
+    k_max = grid_params["K"]["max"]
+    l_max = grid_params["L"]["max"]
+    h_n = grid_params["H"]["n"]
+    k_n = grid_params["K"]["n"]
+    l_n = grid_params["L"]["n"]
 
     # Splits RSM into separate maps for H, K, and L coordinates
     h, k, l = rsm[:, :, :, 0], rsm[:, :, :, 1], rsm[:, :, :, 2]
