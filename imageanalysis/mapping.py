@@ -21,7 +21,7 @@ def mapScan(
 ) -> np.ndarray:
     """Creates a reciprocal space map for each point in a scan."""
 
-    rsm = []
+    point_rsm_list = []
     angle_names = []
     rsm_params = {"Energy": 0, "UB_Matrix": None}
 
@@ -74,10 +74,10 @@ def mapScan(
             instrument_reader=instrument_reader,
             detector_reader=detector_reader
         )
-        rsm.append(point_rsm)
+        point_rsm_list.append(point_rsm)
 
     # Convert RSM list to 3D array
-    rsm = np.array(rsm)
+    rsm = np.array(point_rsm_list)
     rsm = rsm.swapaxes(1, 3)
     rsm = rsm.swapaxes(1, 2)
 
