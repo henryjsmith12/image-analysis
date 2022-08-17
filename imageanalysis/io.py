@@ -15,7 +15,6 @@ from spec2nexus import spec  # isValidSPECFile
 
 # TODO: Basic testing for all functions
 # TODO: Pathlib capabilities
-
 def isValidProjectPath(path: str) -> bool:
     """Checks if path is a valid Project path.
 
@@ -33,24 +32,20 @@ def isValidProjectPath(path: str) -> bool:
 
         # Checks if item is a directory
         if os.path.isdir(item_path):
-
             # "images" subdirectory
             if item == "images":
                 images = True
 
         # Checks if item is a file
         elif os.path.isfile(item_path):
-
             # SPEC file
             if item.endswith(".spec"):
-                spec = True
-
-            # At least 2 configuration files
-            # Configuration files are validated when Project object is created
+                    spec = True
+            # Configuration files
             elif item.endswith(".xml"):
-                if not instr_config:
+                if isValidInstrumentXMLFile(item_path):
                     instr_config = True
-                else:
+                elif isValidDetectorXMLFile(item_path):
                     det_config = True
 
         # Checks if conditions for Project path are met
@@ -59,31 +54,6 @@ def isValidProjectPath(path: str) -> bool:
             break
 
     return is_valid
-
-
-def getSPECPaths(path: str) -> list:
-    """Returns list of SPEC file basepaths in given directory."""
-
-    spec_paths = []
-
-    for item in os.listdir(path):
-        if item.endswith(".spec"):
-            spec_paths.append(item)
-
-    return spec_paths
-
-
-def getXMLPaths(path: str) -> list:
-    """Returns list of XML file basepaths in given directory."""
-
-    xml_paths = []
-
-    for item in os.listdir(path):
-        if item.endswith(".xml"):
-            xml_paths.append(item)
-
-    return xml_paths
-
 
 def isValidSPECFile(path: str) -> bool:
     """Checks if given path is a valid SPEC file."""
@@ -124,3 +94,26 @@ def isValidDetectorXMLFile(path: str) -> bool:
         return False
 
     return True
+
+def getSPECPaths(path: str) -> list:
+    """Returns list of SPEC file basepaths in given directory."""
+
+    spec_paths = []
+
+    for item in os.listdir(path):
+        if item.endswith(".spec"):
+            spec_paths.append(item)
+
+    return spec_paths
+
+
+def getXMLPaths(path: str) -> list:
+    """Returns list of XML file basepaths in given directory."""
+
+    xml_paths = []
+
+    for item in os.listdir(path):
+        if item.endswith(".xml"):
+            xml_paths.append(item)
+
+    return xml_paths
