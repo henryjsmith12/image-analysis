@@ -246,16 +246,19 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.load_scan_btn.clicked.connect(self._loadScan)
 
     def _loadProject(self, project: Project) -> None:
+        """Sets project variable and loads scan numbers in list."""
         self.project = project
         self.scan_lstw.clear()
         self.scan_lstw.addItems(self.project.getScanNumbers())
 
     def _getCurrentScan(self) -> Scan:
+        """Returns Scan object of currently highlighted scan number."""
         scan_number = int(self.scan_lstw.currentItem().text())
         scan = self.project.getScan(scan_number)
         return scan
 
     def _previewScan(self, scan=None) -> None:
+        """Displays preview information for a Scan object."""
         self.scan_details_gbx.setEnabled(True)
 
         scan = self._getCurrentScan()
@@ -272,7 +275,7 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.scan_date_lbl.setText(date)
         self.scan_type_lbl.setText(type)
         self.scan_bounds_lbl.setText(bounds)
-        
+
         # Scan grid parameters
         if scan.rsm is None:
             scan._mapRawImageData()
@@ -294,13 +297,15 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.l_min_sbx.setValue(l_min)
         self.l_max_sbx.setValue(l_max)
         self.l_n_sbx.setValue(l_n)
-        
+
     def _resetScanGridParameters(self) -> None:
+        """Resets grid parameters for a scan object."""
         scan = self._getCurrentScan()
         scan._resetGridParameters()
         self._previewScan()
 
     def _loadScan(self) -> None:
+        """Prepares and loads a Scan into the DataView."""
         if (
             self.h_min_sbx.value() < self.h_max_sbx.value() and
             self.k_min_sbx.value() < self.k_max_sbx.value() and
@@ -308,18 +313,18 @@ class ScanSelectionWidget(QtGui.QWidget):
         ):
             grid_params = {
                 "H": {
-                    "min": self.h_min_sbx.value(), 
-                    "max": self.h_max_sbx.value(), 
+                    "min": self.h_min_sbx.value(),
+                    "max": self.h_max_sbx.value(),
                     "n": self.h_n_sbx.value()
                 },
                 "K": {
-                    "min": self.k_min_sbx.value(), 
-                    "max": self.k_max_sbx.value(), 
+                    "min": self.k_min_sbx.value(),
+                    "max": self.k_max_sbx.value(),
                     "n": self.k_n_sbx.value()
                 },
                 "L": {
-                    "min": self.l_min_sbx.value(), 
-                    "max": self.l_max_sbx.value(), 
+                    "min": self.l_min_sbx.value(),
+                    "max": self.l_max_sbx.value(),
                     "n": self.l_n_sbx.value()
                 }
             }
