@@ -7,8 +7,8 @@ See LICENSE file.
 import os
 
 import numpy as np
+from PIL import Image
 from spec2nexus import spec
-import tifffile as tiff
 
 from imageanalysis.gridding import gridScan
 from imageanalysis.mapping import mapScan
@@ -105,7 +105,8 @@ class Scan:
         for i in range(len(image_paths)):
             img_path = f"{scan_image_path}/{image_paths[i]}"
             norm_factor = filter_norm_factors[i] * monitor_norm_factors[i]
-            img_array = tiff.imread(img_path).T / norm_factor
+            img = Image.open(img_path)
+            img_array = np.array(img).T / norm_factor
             images.append(img_array)
 
         self.raw_image_data = np.array(images)
