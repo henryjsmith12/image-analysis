@@ -6,12 +6,10 @@ See LICENSE file.
 
 import os
 
-import matplotlib.pyplot as plt
 import numpy as np
 from spec2nexus import spec
 import tifffile as tiff
 
-from imageanalysis import io
 from imageanalysis.gridding import gridScan
 from imageanalysis.mapping import mapScan
 
@@ -49,6 +47,7 @@ class Project:
 
     def getScanNumbers(self):
         """Returns list of scan numbers for project."""
+
         scan_numbers = []
         for n in self.spec_data.getScanNumbers():
             scan_image_path = self.image_path + f"/S{str(n).zfill(3)}"
@@ -96,11 +95,11 @@ class Scan:
                 p.endswith("tif")
             )
         ]
-        
+
         # Normalization factors from SPEC
         monitor_norm_factors = self.spec_scan.data["Ion_Ch_2"] * 200000
         filter_norm_factors = self.spec_scan.data["transm"] * 1
-        
+
         images = []
         # Retrieve image data from paths
         for i in range(len(image_paths)):
@@ -129,8 +128,10 @@ class Scan:
             rsm=self.rsm,
             grid_params=self.grid_parameters
         )
-    
+
     def _setGridParameters(self, params: dict) -> None:
+        """Sets parameters for gridding."""
+
         self.grid_parameters["H"]["min"] = params["H"]["min"]
         self.grid_parameters["K"]["min"] = params["K"]["min"]
         self.grid_parameters["L"]["min"] = params["L"]["min"]
@@ -142,6 +143,8 @@ class Scan:
         self.grid_parameters["L"]["n"] = params["L"]["n"]
 
     def _resetGridParameters(self) -> None:
+        """Resets gridding parameters to defaults."""
+
         self.grid_parameters["H"]["min"] = np.amin(self.rsm[:, :, :, 0])
         self.grid_parameters["K"]["min"] = np.amin(self.rsm[:, :, :, 1])
         self.grid_parameters["L"]["min"] = np.amin(self.rsm[:, :, :, 2])
@@ -151,6 +154,7 @@ class Scan:
         self.grid_parameters["H"]["n"] = 250
         self.grid_parameters["K"]["n"] = 250
         self.grid_parameters["L"]["n"] = 250
+
 
 class Curve:
     """Describes a 1-D line of values with coordinates and metadata."""

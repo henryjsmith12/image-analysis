@@ -55,6 +55,7 @@ def isValidProjectPath(path: str) -> bool:
 
     return is_valid
 
+
 def isValidSPECFile(path: str) -> bool:
     """Checks if given path is a valid SPEC file."""
 
@@ -94,6 +95,7 @@ def isValidDetectorXMLFile(path: str) -> bool:
         return False
 
     return True
+
 
 def getSPECPaths(path: str) -> list:
     """Returns list of SPEC file basepaths in given directory."""
