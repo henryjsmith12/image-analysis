@@ -54,7 +54,6 @@ class GriddedDataWidget(DockArea):
         self.addDock(self.image_tool_3d_dock, "bottom", self.controller_dock)
 
 
-# TODO: Reorganize way HKL info is passed down
 class GriddedDataController(QtGui.QWidget):
     """Controls dimension order and index of gridded image slice in view."""
 
@@ -105,15 +104,15 @@ class GriddedDataController(QtGui.QWidget):
 
         # Connections
         for dim_ctrl in self.dimension_controllers:
-            dim_ctrl.updated.connect(self.setIndex)
-            dim_ctrl.updated.connect(self.setImage)
-        self.orderUpdated.connect(self.setDimensionOrder)
-        self.orderUpdated.connect(self.setImage)
+            dim_ctrl.updated.connect(self._setIndex)
+            dim_ctrl.updated.connect(self._setImage)
+        self.orderUpdated.connect(self._setDimensionOrder)
+        self.orderUpdated.connect(self._setImage)
 
         # Set initial image
-        self.setImage()
+        self._setImage()
 
-    def setDimensionOrder(self) -> None:
+    def _setDimensionOrder(self) -> None:
         """Updates dimension order to match order of dimension controllers."""
 
         dim_order = []
@@ -133,11 +132,11 @@ class GriddedDataController(QtGui.QWidget):
         self.layout.itemAt(2).widget().dim_slider.setEnabled(True)
         self.layout.itemAt(2).widget().dim_cbx.setEnabled(True)
 
-    def setIndex(self) -> None:
+    def _setIndex(self) -> None:
         """Updates index to match index of last dimension controller."""
         self.index = self.layout.itemAt(2).widget().index
 
-    def setImage(self) -> None:
+    def _setImage(self) -> None:
         """Sets image for connected ImageTool."""
 
         if self.data is None:
@@ -151,14 +150,30 @@ class GriddedDataController(QtGui.QWidget):
             image = self.data[index, :, :]
             if dim_order[0] == 2:
                 image = image.T
+                x_coords = self.coords[2]
+                y_coords = self.coords[1]
+            else:
+                x_coords = self.coords[1]
+                y_coords = self.coords[2]
+                
         elif dim_order[2] == 1:
             image = self.data[:, index, :]
             if dim_order[0] == 2:
                 image = image.T
+                x_coords = self.coords[2]
+                y_coords = self.coords[0]
+            else:
+                x_coords = self.coords[0]
+                y_coords = self.coords[2]
         else:
             image = self.data[:, :, index]
             if dim_order[0] == 1:
                 image = image.T
+                x_coords = self.coords[1]
+                y_coords = self.coords[0]
+            else:
+                x_coords = self.coords[0]
+                y_coords = self.coords[1]
 
         # Determines labels for image
         labels = ["H", "K", "L"]
@@ -167,8 +182,7 @@ class GriddedDataController(QtGui.QWidget):
         slice_label = labels[dim_order[2]]
 
         # Determines axis coordinates and slice direction coordinate
-        x_coords = self.coords[dim_order[2]]
-        y_coords = self.coords[dim_order[2]]
+        
         slice_coord = round(float(self.coords[dim_order[2]][index]), 5)
 
         self.image_tool.setImage(
@@ -182,11 +196,11 @@ class GriddedDataController(QtGui.QWidget):
             slice_coord=slice_coord
         )
 
-    def dragEnterEvent(self, e):
+    def _dragEnterEvent(self, e):
         """For dragging a dimension controller."""
         e.accept()
 
-    def dropEvent(self, e):
+    def _dropEvent(self, e):
         """For dropping a dimension controller.
 
         Updates dimension order.
@@ -242,10 +256,10 @@ class GriddedDimensionController(QtGui.QGroupBox):
             self.layout.setRowStretch(i, 1)
 
         # Connections
-        self.dim_slider.valueChanged.connect(self.setIndex)
-        self.dim_cbx.currentIndexChanged.connect(self.setIndex)
+        self.dim_slider.valueChanged.connect(self._setIndex)
+        self.dim_cbx.currentIndexChanged.connect(self._setIndex)
 
-    def setIndex(self):
+    def _setIndex(self):
         """Sets order index for dimension."""
 
         sender = self.sender()
@@ -259,7 +273,7 @@ class GriddedDimensionController(QtGui.QGroupBox):
         self.index = index
         self.updated.emit()
 
-    def mouseMoveEvent(self, e):
+    def _mouseMoveEvent(self, e):
         """For draging/dropping"""
 
         if isinstance(self.parent, GriddedDataController):
