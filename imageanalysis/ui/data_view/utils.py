@@ -8,6 +8,7 @@ import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtGui
 from pyqtgraph.dockarea import Dock, DockArea
+from sklearn import preprocessing
 
 
 class ImageTool(QtGui.QWidget):
@@ -22,7 +23,6 @@ class ImageTool(QtGui.QWidget):
 
         # Child widgets
         self.image_view = ImageView()
-        self.roi_widget = ROIWidget()
 
         # Docks
         self.dock_area = DockArea()
@@ -31,13 +31,6 @@ class ImageTool(QtGui.QWidget):
             size=(1, 1),
             widget=self.image_view,
             hideTitle=True,
-            closable=False
-        )
-        self.roi_widget_dock = Dock(
-            name="ROI",
-            size=(1, 1),
-            widget=self.roi_widget,
-            hideTitle=False,
             closable=False
         )
         self.dock_area.addDock(self.image_view_dock)
@@ -103,28 +96,23 @@ class ImageTool(QtGui.QWidget):
             transform=tr
         )
 
+    def setCoordinates(self):
+        ...
+
+    def setLabels(self):
+        ...
+
     def setColorMap(self):
         """Sets colormap for image."""
 
-        n_pts = 16
-        base = 2
-
-        # Logarithmic stops between 0 and max data value
-        stops = np.logspace(
-            start=0,
-            stop=len(str(int(self.data_max))),
-            num=n_pts,
-            base=base
+        self.cmap = createColorMap(
+            name="jet",
+            scale="power",
+            min=0,
+            max=self.data_max
         )
 
-        # Normalized stops (0 to 1)
-        norm_stops = stops / (base ** len(str(int(self.data_max))))
-
-        colors = pg.getFromMatplotlib("jet").getLookupTable(nPts=n_pts)
-        self.cmap = pg.ColorMap(norm_stops, colors)
-
         self.image_view.setColorMap(self.cmap)
-
 
 class ImageView(pg.ImageView):
     """Altered pyqtgraph ImageView widget."""
@@ -139,24 +127,6 @@ class ImageView(pg.ImageView):
         self.ui.menuBtn.hide()
         self.getView().setAspectLocked(False)
 
-
-class ROIWidget(QtGui.QWidget):
-    """Allows user to apply an ROI to an image."""
-
-    def __init__(self) -> None:
-        super(ROIWidget, self).__init__()
-
-        # Layout
-        self.layout = QtGui.QGridLayout()
-        self.setLayout(self.layout)
-
-
-class ROI(pg.ROI):
-    """Custom ROI object."""
-
-    ...
-
-
 class ColorMapWidget(QtGui.QWidget):
     """Allows user to apply a colormap to an image."""
 
@@ -166,7 +136,52 @@ class ColorMapWidget(QtGui.QWidget):
         ...
 
 
-class ColorMap(pg.ColorMap):
-    """Custom colormap object."""
+def createColorMap(
+    name: str, 
+    scale: str, 
+    min: float, 
+    max: float,
+    n_pts: int=128,
+    base: float=1.75,
+    gamma: float=2
+) -> pg.ColorMap:
+    
+    if name in pg.colormap.listMaps(source="matplotlib"):
+        colors = pg.getFromMatplotlib(name).getLookupTable(nPts=n_pts)
+    elif name in pg.colormap.listMaps(source="colorcet"):
+        colors = pg.getFromColorcet(name).getLookupTable(nPts=n_pts)
+    elif name in pg.colormap.listMaps():
+        colors = pg.get(name).getLookupTable(nPts=n_pts)
+    else:
+        raise KeyError("Color map name not found.")
+        
+    if scale == "linear":
+        stops = np.linspace(start=min, stop=max, num=n_pts)
+        stops = np.array([list(stops)])
+        stops = preprocessing.normalize(stops, norm="max")
+        stops = list(stops[0])
+    elif scale == "log":
+        stops = np.logspace(
+            start=0,
+            stop=7.5,
+            endpoint=True,
+            num=n_pts,
+            base=base
+        )
+        stops = np.array([list(stops)])
+        stops = preprocessing.normalize(stops, norm="max")
+        stops = list(stops[0])
+    elif scale == "power":
+        stops = np.linspace(start=min, stop=max, num=n_pts)
+        stops -= min
+        stops[stops < 0] = 0
+        np.power(stops, gamma, stops)
+        stops /= (max - min) ** gamma
+        stops = np.array([list(stops)])
+        stops = preprocessing.normalize(stops, norm="max")
+        stops = list(stops[0])
+    else:
+        raise ValueError("Scale type not valid.")
 
-    ...
+    return pg.ColorMap(pos=stops, color=colors)
+    
