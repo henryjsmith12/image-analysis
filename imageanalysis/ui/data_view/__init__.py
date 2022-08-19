@@ -19,14 +19,17 @@ class DataView(QtGui.QTabWidget):
 
         self.scan_list = []
         self.setTabsClosable(True)
-        self.tabCloseRequested.connect(self.closeTab)
+        self.tabCloseRequested.connect(self._closeTab)
 
-    def addScan(self, scan: Scan) -> None:
+    def _addScan(self, scan: Scan) -> None:
         """Adds new DataViewTab."""
-        self.addTab(DataViewTab(scan), str(scan.number))
 
-    def closeTab(self, index: int) -> None:
+        tab_title = str(scan.number)
+        self.addTab(DataViewTab(scan=scan), tab_title)
+
+    def _closeTab(self, index: int) -> None:
         """Closes DataViewTab at specific index."""
+        
         w = self.widget(index)
         w.deleteLater()
         self.removeTab(index)
@@ -42,8 +45,8 @@ class DataViewTab(QtGui.QWidget):
 
         # Child widgets
         self.tab_widget = QtGui.QTabWidget()
-        self.tab_widget.addTab(RawDataWidget(scan), "Raw")
-        self.tab_widget.addTab(GriddedDataWidget(scan), "Gridded")
+        self.tab_widget.addTab(RawDataWidget(scan=scan), "Raw")
+        self.tab_widget.addTab(GriddedDataWidget(scan=scan), "Gridded")
 
         # Layout
         self.layout = QtGui.QGridLayout()
