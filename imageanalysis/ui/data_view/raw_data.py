@@ -14,7 +14,7 @@ from imageanalysis.ui.data_view.utils import ImageTool
 class RawDataWidget(DockArea):
     """Allows users to view raw image data from a scan."""
 
-    def __init__(self, scan) -> None:
+    def __init__(self, scan: Scan) -> None:
         super(RawDataWidget, self).__init__()
 
         self.scan = scan
@@ -22,7 +22,11 @@ class RawDataWidget(DockArea):
         # Child widgets
         self.image_tool_3d = ImageTool()
         self.image_tool_2d = ImageTool()
-        self.controller = RawDataController(scan, self.image_tool_3d)
+        self.controller = RawDataController(
+            parent=self,
+            image_tool=self.image_tool_3d,
+            scan=scan
+        )
 
         # Child docks
         self.controller_dock = Dock(
@@ -52,37 +56,28 @@ class RawDataWidget(DockArea):
 
 
 class RawDataController(QtGui.QWidget):
+    """Controls slice index for image in view."""
 
     def __init__(
         self,
-        scan: Scan,
-        image_tool: ImageTool
+        parent: RawDataWidget,
+        image_tool: ImageTool,
+        scan: Scan
     ) -> None:
         super(RawDataController, self).__init__()
 
-        self.data = scan.raw_image_data
-        self.scan = scan
+        self.parent = parent
         self.image_tool = image_tool
+        self.scan = scan
+        self.data = scan.raw_image_data
+        self.coords = scan.gridded_image_coords
+        self.slice_index = 0
 
         # Child widgets
         self.data_slider = QtGui.QSlider(QtCore.Qt.Horizontal)
         self.data_slider.setMaximum(self.data.shape[0] - 1)
         self.data_sbx = QtGui.QSpinBox()
         self.data_sbx.setMaximum(self.data.shape[0] - 1)
-        self.data_type_rbg = QtGui.QButtonGroup()
-        self.h_rbtn = QtGui.QRadioButton("H")
-        self.k_rbtn = QtGui.QRadioButton("K")
-        self.l_rbtn = QtGui.QRadioButton("L")
-        self.intensity_rbtn = QtGui.QRadioButton("Intensity")
-        self.intensity_rbtn.setChecked(True)
-        self.rbtns = [
-            self.h_rbtn,
-            self.k_rbtn,
-            self.l_rbtn,
-            self.intensity_rbtn
-        ]
-        for btn in self.rbtns:
-            self.data_type_rbg.addButton(btn)
 
         # Layout
         self.layout = QtGui.QGridLayout()
@@ -93,36 +88,15 @@ class RawDataController(QtGui.QWidget):
             self.layout.setColumnStretch(i, 1)
 
         # Connections
-        for btn in self.rbtns:
-            btn.toggled.connect(self.setDataType)
-            btn.toggled.connect(self.setImage)
-        self.data_slider.valueChanged.connect(self.setIndex)
-        self.data_slider.valueChanged.connect(self.setImage)
-        self.data_sbx.valueChanged.connect(self.setIndex)
-        self.data_sbx.valueChanged.connect(self.setImage)
+        self.data_slider.valueChanged.connect(self._setSliceIndex)
+        self.data_sbx.valueChanged.connect(self._setSliceIndex)
 
         # Display first image
-        self.setImage()
+        self._setImage()
 
-    def setDataType(self):
-        """Changes data type to selected radio button."""
-        btn = self.sender()
-        if btn.isChecked():
-            if btn.text() == "Intensity":
-                self.data = self.scan.raw_image_data
-            elif btn.text() == "H":
-                self.data = self.scan.h_map
-            elif btn.text() == "K":
-                self.data = self.scan.k_map
-            elif btn.text() == "L":
-                self.data = self.scan.l_map
-
-            # Adjusts slider to match index count
-            self.data_slider.setMaximum(self.data.shape[0] - 1)
-            self.data_sbx.setMaximum(self.data.shape[0] - 1)
-
-    def setIndex(self):
+    def _setSliceIndex(self):
         """Sets index for slice in view."""
+
         sender = self.sender()
         index = sender.value()
         if sender == self.data_slider:
@@ -130,9 +104,11 @@ class RawDataController(QtGui.QWidget):
         elif sender == self.data_sbx:
             self.data_slider.setValue(index)
 
-    def setImage(self):
-        """Sets image for connected ImageTool."""
-        index = self.data_sbx.value()
-        image = self.data[index]
+        self.slice_index = index
+        self._setImage()
 
-        self.image_tool.setImage(self.data, image)
+    def _setImage(self):
+        """Sets image for connected ImageTool."""
+
+        image = self.data[self.slice_index]
+        self.image_tool._setImage(image=image, data=self.data)
