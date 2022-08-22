@@ -146,12 +146,20 @@ class GriddedDataController(QtGui.QWidget):
         image = data[:, :, self.slice_index]
         x_label = ["H", "K", "L"][self.dim_order[0]]
         y_label = ["H", "K", "L"][self.dim_order[1]]
+        slice_label = ["H", "K", "L"][self.dim_order[2]]
+        x_coords = self.coords[self.dim_order[0]]
+        y_coords = self.coords[self.dim_order[1]]
+        slice_coord = self.coords[self.dim_order[2]][self.slice_index]
 
-        self.image_tool.setImage(
-            self.data,
-            image,
+        self.image_tool._setImage(
+            image=image,
+            data=self.data,
             x_label=x_label,
-            y_label=y_label
+            y_label=y_label,
+            x_coords=x_coords,
+            y_coords=y_coords,
+            slice_label=slice_label,
+            slice_coord=slice_coord
         )
 
     def dragEnterEvent(self, e) -> None:
