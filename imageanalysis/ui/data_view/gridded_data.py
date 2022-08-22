@@ -119,12 +119,12 @@ class GriddedDataController(QtGui.QWidget):
         # Set initial image
         self._setImage()
 
-    def _setSliceIndex(self):
+    def _setSliceIndex(self) -> None:
         """Updates index to match index of last dimension controller."""
         self.slice_index = self.layout.itemAt(2).widget().index
         self._setImage()
 
-    def _setDimensionOrder(self):
+    def _setDimensionOrder(self) -> None:
         """Updates dimension order to match order of dimension controllers."""
 
         dim_order = []
@@ -140,19 +140,25 @@ class GriddedDataController(QtGui.QWidget):
         self.layout.itemAt(1).widget()._setEnabled(False)
         self.layout.itemAt(2).widget()._setEnabled(True)
 
-    def _setImage(self):
+    def _setImage(self) -> None:
+        """Loads image in connected image tool."""
         data = np.transpose(self.data, self.dim_order)
         image = data[:, :, self.slice_index]
         x_label = ["H", "K", "L"][self.dim_order[0]]
         y_label = ["H", "K", "L"][self.dim_order[1]]
 
-        self.image_tool.setImage(self.data, image, x_label=x_label, y_label=y_label)
+        self.image_tool.setImage(
+            self.data,
+            image,
+            x_label=x_label,
+            y_label=y_label
+        )
 
-    def dragEnterEvent(self, e):
+    def dragEnterEvent(self, e) -> None:
         """For dragging a dimension controller."""
         e.accept()
 
-    def dropEvent(self, e):
+    def dropEvent(self, e) -> None:
         """For dropping a dimension controller.
 
         Updates dimension order.
@@ -173,7 +179,7 @@ class GriddedDataController(QtGui.QWidget):
         e.accept()
         self.dimensionOrderChanged.emit()
 
-    
+
 class GriddedDimensionController(QtGui.QGroupBox):
     """Child class for DataViewController.
 
@@ -185,7 +191,7 @@ class GriddedDimensionController(QtGui.QGroupBox):
     indexChanged = QtCore.pyqtSignal()
 
     def __init__(
-        self, 
+        self,
         parent: GriddedDataController,
         label: str,
         coords: list
@@ -215,7 +221,7 @@ class GriddedDimensionController(QtGui.QGroupBox):
         self.dim_slider.valueChanged.connect(self._setIndex)
         self.dim_cbx.currentIndexChanged.connect(self._setIndex)
 
-    def _setIndex(self):
+    def _setIndex(self) -> None:
         """Sets index value."""
 
         sender = self.sender()
@@ -229,7 +235,7 @@ class GriddedDimensionController(QtGui.QGroupBox):
         self.index = index
         self.indexChanged.emit()
 
-    def _setEnabled(self, enabled: bool):
+    def _setEnabled(self, enabled: bool) -> None:
         """Enables/disables slider and combobox."""
 
         if enabled:
@@ -239,7 +245,7 @@ class GriddedDimensionController(QtGui.QGroupBox):
             self.dim_slider.setEnabled(False)
             self.dim_cbx.setEnabled(False)
 
-    def mouseMoveEvent(self, e):
+    def mouseMoveEvent(self, e) -> None:
         """Checks if dimension controller is being dragged."""
 
         if isinstance(self.parent, GriddedDataController):
