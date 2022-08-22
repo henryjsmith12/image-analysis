@@ -17,11 +17,11 @@ class ImageTool(QtGui.QWidget):
     def __init__(self) -> None:
         super(ImageTool, self).__init__()
 
-        self.data_max = None
-        self.cmap = None
-        self.cbar = None
+        self.data, self.image = None, None
+        self.data_min, self.data_max = None, None
 
-        # Child widgets
+        self.color_map, self.color_bar = None, None
+
         self.image_view = ImageView()
 
         # Docks
@@ -40,43 +40,30 @@ class ImageTool(QtGui.QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.dock_area, 0, 0)
 
-    def setImage(
+    def _setImage(
         self,
-        data: np.ndarray,
         image: np.ndarray,
+        data: np.ndarray,
         x_label: str=None,
         y_label: str=None,
-        x_coords: np.ndarray=None,
-        y_coords: np.ndarray=None,
+        x_coords: list=None,
+        y_coords: list=None,
         slice_label: str=None,
         slice_coord: float=None
     ):
-        # For first-time runthrough
-        if self.data_max is None:
-            self.data_max = float(np.amax(data))
-        if self.cmap is None:
-            self.setColorMap()
-        if self.cbar is None:
-            self.cbar = pg.ColorBarItem(
-                values=(0, self.data_max),
-                cmap=self.cmap,
-                interactive=False,
-                width=15,
-                label="Intensity",
-                orientation="h"
-            )
-            self.cbar.setImageItem(
-                img=image,
-                insert_in=self.image_view.getView()
-            )
+        self.image = image
 
-        # Sets axis labels if given
+        # First-time runthough
+        if self.data is None:
+            self.data = data
+            self.data_min, self.data_max = np.amin(data), np.amax(data)
+            self._setColorMap()
+
         if x_label is not None:
             self.image_view.getView().setLabel("bottom", x_label)
         if y_label is not None:
             self.image_view.getView().setLabel("left", y_label)
 
-        # Sets image transform if given
         tr = QtGui.QTransform()
         if x_coords is not None and y_coords is not None:
             scale = (x_coords[1] - x_coords[0], y_coords[1] - y_coords[0])
@@ -96,23 +83,29 @@ class ImageTool(QtGui.QWidget):
             transform=tr
         )
 
-    def setCoordinates(self):
-        ...
+    def _setColorMap(self):
+        """Sets color map and color bar for image."""
 
-    def setLabels(self):
-        ...
-
-    def setColorMap(self):
-        """Sets colormap for image."""
-
-        self.cmap = createColorMap(
+        self.color_map = createColorMap(
             name="jet",
             scale="power",
             min=0,
             max=self.data_max
         )
+        self.image_view.setColorMap(self.color_map)
 
-        self.image_view.setColorMap(self.cmap)
+        self.color_bar = pg.ColorBarItem(
+            values=(0, self.data_max),
+            cmap=self.color_map,
+            interactive=False,
+            width=15,
+            orientation="h"
+        )
+        self.color_bar.setImageItem(
+            img=self.image,
+            insert_in=self.image_view.getView()
+        )
+
 
 class ImageView(pg.ImageView):
     """Altered pyqtgraph ImageView widget."""
@@ -127,6 +120,7 @@ class ImageView(pg.ImageView):
         self.ui.menuBtn.hide()
         self.getView().setAspectLocked(False)
 
+
 class ColorMapWidget(QtGui.QWidget):
     """Allows user to apply a colormap to an image."""
 
@@ -137,15 +131,15 @@ class ColorMapWidget(QtGui.QWidget):
 
 
 def createColorMap(
-    name: str, 
-    scale: str, 
-    min: float, 
+    name: str,
+    scale: str,
+    min: float,
     max: float,
     n_pts: int=128,
     base: float=1.75,
     gamma: float=2
 ) -> pg.ColorMap:
-    
+
     if name in pg.colormap.listMaps(source="matplotlib"):
         colors = pg.getFromMatplotlib(name).getLookupTable(nPts=n_pts)
     elif name in pg.colormap.listMaps(source="colorcet"):
@@ -154,7 +148,7 @@ def createColorMap(
         colors = pg.get(name).getLookupTable(nPts=n_pts)
     else:
         raise KeyError("Color map name not found.")
-        
+
     if scale == "linear":
         stops = np.linspace(start=min, stop=max, num=n_pts)
         stops = np.array([list(stops)])
@@ -184,4 +178,3 @@ def createColorMap(
         raise ValueError("Scale type not valid.")
 
     return pg.ColorMap(pos=stops, color=colors)
-    
