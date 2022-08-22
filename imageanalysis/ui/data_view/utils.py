@@ -6,7 +6,7 @@ See LICENSE file.
 
 import numpy as np
 import pyqtgraph as pg
-from pyqtgraph import QtGui
+from pyqtgraph import QtCore, QtGui
 from pyqtgraph.dockarea import Dock, DockArea
 from sklearn import preprocessing
 
@@ -23,6 +23,7 @@ class ImageTool(QtGui.QWidget):
         self.color_map, self.color_bar = None, None
 
         self.image_view = ImageView()
+        self.color_map_widget = ColorMapWidget(parent=self)
 
         # Docks
         self.dock_area = DockArea()
@@ -30,15 +31,26 @@ class ImageTool(QtGui.QWidget):
             name="Image",
             size=(1, 1),
             widget=self.image_view,
-            hideTitle=True,
+            hideTitle=False,
             closable=False
         )
-        self.dock_area.addDock(self.image_view_dock)
+        self.color_map_dock = Dock(
+            name="Color Mapping",
+            size=(1, 1),
+            widget=self.color_map_widget,
+            hideTitle=False,
+            closable=False
+        )
+        self.dock_area.addDock(self.color_map_dock)
+        self.dock_area.addDock(self.image_view_dock, "above", self.color_map_dock)
 
         # Layout
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.dock_area, 0, 0)
+
+        # Connections
+        self.color_map_widget.colorMapChanged.connect(self._setColorMap)
 
     def _setImage(
         self,
@@ -86,16 +98,29 @@ class ImageTool(QtGui.QWidget):
     def _setColorMap(self):
         """Sets color map and color bar for image."""
 
+        name = self.color_map_widget.name
+        scale = self.color_map_widget.scale
+        min = np.amin(self.data)
+        max = np.amax(self.data)
+        n_pts = self.color_map_widget.n_pts
+        base = self.color_map_widget.base
+        gamma = self.color_map_widget.gamma
+        
+        del self.color_map
         self.color_map = createColorMap(
-            name="jet",
-            scale="power",
-            min=0,
-            max=self.data_max
+            name=name,
+            scale=scale,
+            min=min,
+            max=max,
+            n_pts=n_pts,
+            base=base,
+            gamma=gamma
         )
         self.image_view.setColorMap(self.color_map)
 
+        del self.color_bar
         self.color_bar = pg.ColorBarItem(
-            values=(0, self.data_max),
+            values=(min, max),
             cmap=self.color_map,
             interactive=False,
             width=15,
@@ -124,18 +149,111 @@ class ImageView(pg.ImageView):
 class ColorMapWidget(QtGui.QWidget):
     """Allows user to apply a colormap to an image."""
 
-    def __init__(self) -> None:
+    colorMapChanged = QtCore.pyqtSignal()
+
+    def __init__(
+        self,
+        parent: ImageTool
+    ) -> None:
         super(ColorMapWidget, self).__init__()
 
-        ...
+        self.parent = parent
+        self.preview_color_map, self.preview_color_bar = None, None
+        
+        available_color_maps = [
+            'magma', 'inferno', 'plasma', 'viridis', 'cividis', 'twilight',
+            'turbo', 'cool', 'coolwarm', 'afmhot', 'autumn', 'copper', 
+            'cubehelix', 'gnuplot', 'gnuplot2', 'gray', 'hot', 'hsv', 'jet',
+            'nipy_spectral', 'ocean', 'pink', 'prism', 'rainbow',
+            'spring', 'summer', 'winter'
+        ]
+        available_color_maps = sorted(available_color_maps)
+        scales = ["linear", "log", "power"]
 
+        self.name = available_color_maps[0]
+        self.scale = scales[0]
+        self.n_pts = 16
+        self.base = 2.0
+        self.gamma = 2.0
+
+        # Child widgets
+        self.name_cbx = QtGui.QComboBox()
+        self.name_cbx.addItems(available_color_maps)
+        self.scale_cbx = QtGui.QComboBox()
+        self.scale_cbx.addItems(scales)
+        self.n_pts_lbl = QtGui.QLabel("# Points:")
+        self.n_pts_sbx = QtGui.QSpinBox()
+        self.n_pts_sbx.setMinimum(2)
+        self.n_pts_sbx.setMaximum(256)
+        self.n_pts_sbx.setValue(16)
+        self.base_lbl = QtGui.QLabel("Base:")
+        self.base_lbl.hide()
+        self.base_sbx = QtGui.QDoubleSpinBox()
+        self.base_sbx.setMinimum(0.0001)
+        self.base_sbx.setMaximum(1000)
+        self.base_sbx.setSingleStep(0.1)
+        self.base_sbx.hide()
+        self.base_sbx.setValue(2.0)
+        self.gamma_lbl = QtGui.QLabel("Gamma:")
+        self.gamma_lbl.hide()
+        self.gamma_sbx = QtGui.QDoubleSpinBox()
+        self.gamma_sbx.setMinimum(0.0001)
+        self.gamma_sbx.setMaximum(1000)
+        self.gamma_sbx.setSingleStep(0.1)
+        self.gamma_sbx.hide()
+        self.gamma_sbx.setValue(2.0)
+
+        # Layout
+        self.layout = QtGui.QGridLayout()
+        self.setLayout(self.layout)
+        self.layout.addWidget(self.name_cbx, 0, 0, 1, 2)
+        self.layout.addWidget(self.scale_cbx, 0, 2, 1, 2)
+        self.layout.addWidget(self.n_pts_lbl, 1, 0)
+        self.layout.addWidget(self.n_pts_sbx, 1, 1)
+        self.layout.addWidget(self.base_lbl, 1, 2)
+        self.layout.addWidget(self.base_sbx, 1, 3)
+        self.layout.addWidget(self.gamma_lbl, 1, 2)
+        self.layout.addWidget(self.gamma_sbx, 1, 3)
+
+        # Connections
+        self.name_cbx.currentIndexChanged.connect(self._setColorMap)
+        self.scale_cbx.currentIndexChanged.connect(self._setColorMap)
+        self.scale_cbx.currentIndexChanged.connect(self._toggleScaleOptions)
+        self.n_pts_sbx.valueChanged.connect(self._setColorMap)
+        self.base_sbx.valueChanged.connect(self._setColorMap)
+        self.gamma_sbx.valueChanged.connect(self._setColorMap)
+
+    def _setColorMap(self):
+        self.name = self.name_cbx.currentText()
+        self.scale = self.scale_cbx.currentText()
+        self.n_pts = self.n_pts_sbx.value()
+        self.base = self.base_sbx.value()
+        self.gamma = self.gamma_sbx.value()
+        self.colorMapChanged.emit()
+
+    def _toggleScaleOptions(self):
+        if self.scale_cbx.currentText() == "linear":
+            self.base_lbl.hide()
+            self.base_sbx.hide()
+            self.gamma_lbl.hide()
+            self.gamma_sbx.hide()
+        elif self.scale_cbx.currentText() == "log":
+            self.base_lbl.show()
+            self.base_sbx.show()
+            self.gamma_lbl.hide()
+            self.gamma_sbx.hide()
+        elif self.scale_cbx.currentText() == "power":
+            self.base_lbl.hide()
+            self.base_sbx.hide()
+            self.gamma_lbl.show()
+            self.gamma_sbx.show()
 
 def createColorMap(
     name: str,
     scale: str,
-    min: float,
-    max: float,
-    n_pts: int=128,
+    min: float=0.0,
+    max: float=1.0,
+    n_pts: int=16,
     base: float=1.75,
     gamma: float=2
 ) -> pg.ColorMap:
