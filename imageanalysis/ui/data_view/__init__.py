@@ -4,7 +4,7 @@ See LICENSE file.
 """
 
 
-from pyqtgraph import QtGui
+from pyqtgraph import QtCore, QtGui
 
 from imageanalysis.structures import Scan
 from imageanalysis.ui.data_view.gridded_data import GriddedDataWidget
@@ -41,6 +41,8 @@ class DataViewTab(QtGui.QWidget):
     def __init__(self, scan: Scan) -> None:
         super(DataViewTab, self).__init__()
 
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        
         self.scan = scan
 
         # Child widgets
