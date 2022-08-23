@@ -16,7 +16,6 @@ from imageanalysis.mapping import mapScan
 
 # TODO: Allow Pathlib paths
 # TODO: Basic testing
-# TODO: Validate scan number exists
 class Project:
     """Houses SPEC/XML filepaths and Scans."""
 
@@ -28,13 +27,34 @@ class Project:
         detector_path: str
     ) -> None:
 
+        if project_path is None or type(project_path) != str:
+            raise ValueError("Invalid project path.")
+        if spec_path is None or type(spec_path) != str:
+            raise ValueError("Invalid SPEC path.")
+        if instrument_path is None or type(instrument_path) != str:
+            raise ValueError("Invalid instrument configuration path.")
+        if detector_path is None or type(detector_path) != str:
+            raise ValueError("Invalid detector configuration path.")
+
+        if not os.path.exists(project_path):
+            raise NotADirectoryError(f"Path '{project_path}' not found.")
+        if not os.path.exists(spec_path):
+            raise FileNotFoundError(f"Path '{spec_path}' not found.")
+        if not os.path.exists(instrument_path):
+            raise FileNotFoundError(f"Path '{instrument_path}' not found.")
+        if not os.path.exists(detector_path):
+            raise FileNotFoundError(f"Path '{detector_path}' not found.")
+        
         # Path variables
         self.path = project_path
         self.spec_path = spec_path
         self.instrument_path = instrument_path
         self.detector_path = detector_path
+
         spec_basename = os.path.basename(os.path.splitext(self.spec_path)[0])
-        self.image_path = f"{project_path}/images/{spec_basename}"
+        image_path = f"{project_path}/images/{spec_basename}"
+        self.image_path = image_path
+        
 
         # SPEC data object
         self.spec_data = spec.SpecDataFile(spec_path)
