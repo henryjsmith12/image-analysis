@@ -9,8 +9,6 @@ import xrayutilities as xu
 
 
 # TODO: Basic testing
-# TODO: Find replacement for current gridding_params format
-# TODO: Return coords as a list
 # TODO: Make arbitrary enough to use as a static function
 def gridScan(
     raw_image_data: np.ndarray,
