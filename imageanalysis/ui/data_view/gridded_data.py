@@ -17,6 +17,8 @@ class GriddedDataWidget(DockArea):
     def __init__(self, scan: Scan) -> None:
         super(GriddedDataWidget, self).__init__()
 
+        self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        
         self.scan = scan
 
         # Child widgets
