@@ -10,6 +10,7 @@ First major release. Provides user with the bare essentials to load projects and
 - ImageTool controller for selecting image to view
 
 ## [0.1.1] - 2022-23-08
+Basic color mapping. 
 
 ### Added
-- Custom color mapping for images
+- ColorMapWidget for creating custom color maps
