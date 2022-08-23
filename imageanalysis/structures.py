@@ -51,10 +51,10 @@ class Project:
         self.instrument_path = instrument_path
         self.detector_path = detector_path
 
+        # TODO: Check that image path exists
         spec_basename = os.path.basename(os.path.splitext(self.spec_path)[0])
         image_path = f"{project_path}/images/{spec_basename}"
         self.image_path = image_path
-        
 
         # SPEC data object
         self.spec_data = spec.SpecDataFile(spec_path)
@@ -81,7 +81,6 @@ class Project:
         return self.scans[n]
 
 
-# TODO: Create a data structure class to properly organize raw/gridded data
 class Scan:
     """Houses data for a single scan."""
 
