@@ -108,7 +108,6 @@ class ImageTool(QtGui.QWidget):
         base = self.color_map_widget.base
         gamma = self.color_map_widget.gamma
 
-        del self.color_map
         self.color_map = createColorMap(
             name=name,
             scale=scale,
@@ -270,13 +269,13 @@ def createColorMap(
     """Returns a color map object created from given parameters."""
 
     if name in pg.colormap.listMaps(source="matplotlib"):
-        colors = pg.getFromMatplotlib(name).getLookupTable(nPts=n_pts)
+        colors = pg.getFromMatplotlib(name).getLookupTable(nPts=n_pts, alpha=False)
     elif name in pg.colormap.listMaps(source="colorcet"):
-        colors = pg.getFromColorcet(name).getLookupTable(nPts=n_pts)
+        colors = pg.getFromColorcet(name).getLookupTable(nPts=n_pts, alpha=False)
     elif name in pg.colormap.listMaps():
-        colors = pg.get(name).getLookupTable(nPts=n_pts)
+        colors = pg.get(name).getLookupTable(nPts=n_pts, alpha=False)
     else:
-        raise KeyError("Color map name not found.")
+        raise KeyError("Color map not found.")
 
     if scale == "linear":
         stops = np.linspace(start=min, stop=max, num=n_pts)
