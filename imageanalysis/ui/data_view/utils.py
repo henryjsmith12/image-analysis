@@ -29,20 +29,20 @@ class ImageTool(QtGui.QWidget):
         self.dock_area = DockArea()
         self.image_view_dock = Dock(
             name="Image",
-            size=(1, 1),
+            size=(1, 10),
             widget=self.image_view,
-            hideTitle=False,
+            hideTitle=True,
             closable=False
         )
         self.color_map_dock = Dock(
             name="Color Mapping",
             size=(1, 1),
             widget=self.color_map_widget,
-            hideTitle=False,
+            hideTitle=True,
             closable=False
         )
         self.dock_area.addDock(self.color_map_dock)
-        self.dock_area.addDock(self.image_view_dock, "above", self.color_map_dock)
+        self.dock_area.addDock(self.image_view_dock, "top", self.color_map_dock)
 
         # Layout
         self.layout = QtGui.QGridLayout()
@@ -102,7 +102,7 @@ class ImageTool(QtGui.QWidget):
         scale = self.color_map_widget.scale
         min = np.amin(self.data)
         max = np.amax(self.data)
-        n_pts = self.color_map_widget.n_pts
+        n_pts = 16
         base = self.color_map_widget.base
         gamma = self.color_map_widget.gamma
         
@@ -118,7 +118,6 @@ class ImageTool(QtGui.QWidget):
         )
         self.image_view.setColorMap(self.color_map)
 
-        del self.color_bar
         self.color_bar = pg.ColorBarItem(
             values=(min, max),
             cmap=self.color_map,
@@ -144,6 +143,7 @@ class ImageView(pg.ImageView):
         self.ui.roiBtn.hide()
         self.ui.menuBtn.hide()
         self.getView().setAspectLocked(False)
+        self.getView().ctrlMenu = None
 
 
 class ColorMapWidget(QtGui.QWidget):
@@ -187,6 +187,9 @@ class ColorMapWidget(QtGui.QWidget):
         self.n_pts_sbx.setMaximum(256)
         self.n_pts_sbx.setValue(16)
         self.base_lbl = QtGui.QLabel("Base:")
+        self.base_lbl.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
+        )
         self.base_lbl.hide()
         self.base_sbx = QtGui.QDoubleSpinBox()
         self.base_sbx.setMinimum(0.0001)
@@ -195,6 +198,9 @@ class ColorMapWidget(QtGui.QWidget):
         self.base_sbx.hide()
         self.base_sbx.setValue(2.0)
         self.gamma_lbl = QtGui.QLabel("Gamma:")
+        self.gamma_lbl.setAlignment(
+            QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
+        )
         self.gamma_lbl.hide()
         self.gamma_sbx = QtGui.QDoubleSpinBox()
         self.gamma_sbx.setMinimum(0.0001)
@@ -208,12 +214,10 @@ class ColorMapWidget(QtGui.QWidget):
         self.setLayout(self.layout)
         self.layout.addWidget(self.name_cbx, 0, 0, 1, 2)
         self.layout.addWidget(self.scale_cbx, 0, 2, 1, 2)
-        self.layout.addWidget(self.n_pts_lbl, 1, 0)
-        self.layout.addWidget(self.n_pts_sbx, 1, 1)
-        self.layout.addWidget(self.base_lbl, 1, 2)
-        self.layout.addWidget(self.base_sbx, 1, 3)
-        self.layout.addWidget(self.gamma_lbl, 1, 2)
-        self.layout.addWidget(self.gamma_sbx, 1, 3)
+        self.layout.addWidget(self.base_lbl, 0, 4)
+        self.layout.addWidget(self.base_sbx, 0, 5)
+        self.layout.addWidget(self.gamma_lbl, 0, 4)
+        self.layout.addWidget(self.gamma_sbx, 0, 5)
 
         # Connections
         self.name_cbx.currentIndexChanged.connect(self._setColorMap)
