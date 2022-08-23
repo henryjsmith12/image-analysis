@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 NAME = "Henry Smith"
 EMAIL = "smithh@anl.gov"
 URL = "https://github.com/henryjsmith12/image-analysis"
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 DESCRIPTION = "Python-based software for XRD data analysis."
 LONG_DESCRIPTION = "Python-based software for XRD data analysis. Allows users to analyze raw XRD scan images and reciprocal space-converted datasets."
 
