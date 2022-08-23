@@ -42,7 +42,9 @@ class ImageTool(QtGui.QWidget):
             closable=False
         )
         self.dock_area.addDock(self.color_map_dock)
-        self.dock_area.addDock(self.image_view_dock, "top", self.color_map_dock)
+        self.dock_area.addDock(
+            self.image_view_dock, "top", self.color_map_dock
+        )
 
         # Layout
         self.layout = QtGui.QGridLayout()
@@ -105,7 +107,7 @@ class ImageTool(QtGui.QWidget):
         n_pts = 16
         base = self.color_map_widget.base
         gamma = self.color_map_widget.gamma
-        
+
         del self.color_map
         self.color_map = createColorMap(
             name=name,
@@ -158,11 +160,10 @@ class ColorMapWidget(QtGui.QWidget):
         super(ColorMapWidget, self).__init__()
 
         self.parent = parent
-        self.preview_color_map, self.preview_color_bar = None, None
-        
+
         available_color_maps = [
             'magma', 'inferno', 'plasma', 'viridis', 'cividis', 'twilight',
-            'turbo', 'cool', 'coolwarm', 'afmhot', 'autumn', 'copper', 
+            'turbo', 'cool', 'coolwarm', 'afmhot', 'autumn', 'copper',
             'cubehelix', 'gnuplot', 'gnuplot2', 'gray', 'hot', 'hsv', 'jet',
             'nipy_spectral', 'ocean', 'pink', 'prism', 'rainbow',
             'spring', 'summer', 'winter'
@@ -228,6 +229,8 @@ class ColorMapWidget(QtGui.QWidget):
         self.gamma_sbx.valueChanged.connect(self._setColorMap)
 
     def _setColorMap(self):
+        """Sets parameters for color map creation and emits signal."""
+
         self.name = self.name_cbx.currentText()
         self.scale = self.scale_cbx.currentText()
         self.n_pts = self.n_pts_sbx.value()
@@ -236,6 +239,8 @@ class ColorMapWidget(QtGui.QWidget):
         self.colorMapChanged.emit()
 
     def _toggleScaleOptions(self):
+        """Hides/shows respective options for each color map scale."""
+
         if self.scale_cbx.currentText() == "linear":
             self.base_lbl.hide()
             self.base_sbx.hide()
@@ -252,6 +257,7 @@ class ColorMapWidget(QtGui.QWidget):
             self.gamma_lbl.show()
             self.gamma_sbx.show()
 
+
 def createColorMap(
     name: str,
     scale: str,
@@ -261,6 +267,7 @@ def createColorMap(
     base: float=1.75,
     gamma: float=2
 ) -> pg.ColorMap:
+    """Returns a color map object created from given parameters."""
 
     if name in pg.colormap.listMaps(source="matplotlib"):
         colors = pg.getFromMatplotlib(name).getLookupTable(nPts=n_pts)
