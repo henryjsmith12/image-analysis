@@ -54,7 +54,10 @@ class Project:
         # TODO: Check that image path exists
         spec_basename = os.path.basename(os.path.splitext(self.spec_path)[0])
         image_path = f"{project_path}/images/{spec_basename}"
-        self.image_path = image_path
+        if os.path.exists(image_path):
+            self.image_path = image_path
+        else:
+            raise NotADirectoryError(f"Path '{image_path}' not found.")
 
         # SPEC data object
         self.spec_data = spec.SpecDataFile(spec_path)
