@@ -8,7 +8,7 @@ from pyqtgraph import QtCore, QtGui
 from pyqtgraph.dockarea import Dock, DockArea
 
 from imageanalysis.structures import Scan
-from imageanalysis.ui.data_view.utils import ImageTool
+from imageanalysis.ui.data_view.image_tool import ImageTool
 
 
 class GriddedDataWidget(DockArea):
@@ -22,11 +22,10 @@ class GriddedDataWidget(DockArea):
         self.scan = scan
 
         # Child widgets
-        self.image_tool_3d = ImageTool()
-        self.image_tool_2d = ImageTool()
+        self.image_tool = ImageTool()
         self.controller = GriddedDataController(
             parent=self,
-            image_tool=self.image_tool_3d,
+            image_tool=self.image_tool,
             scan=scan
         )
 
@@ -38,17 +37,10 @@ class GriddedDataWidget(DockArea):
             hideTitle=True,
             closable=False
         )
-        self.image_tool_3d_dock = Dock(
+        self.image_tool_dock = Dock(
             name="Controller",
             size=(1, 5),
-            widget=self.image_tool_3d,
-            hideTitle=True,
-            closable=False
-        )
-        self.image_tool_2d_dock = Dock(
-            name="Controller",
-            size=(1, 5),
-            widget=self.image_tool_2d,
+            widget=self.image_tool,
             hideTitle=True,
             closable=False
         )
@@ -57,7 +49,7 @@ class GriddedDataWidget(DockArea):
 
         # Add docks to dock area
         self.addDock(self.controller_dock)
-        self.addDock(self.image_tool_3d_dock, "bottom", self.controller_dock)
+        self.addDock(self.image_tool_dock, "bottom", self.controller_dock)
 
 
 class GriddedDataController(QtGui.QWidget):
@@ -148,10 +140,8 @@ class GriddedDataController(QtGui.QWidget):
         image = data[:, :, self.slice_index]
         x_label = ["H", "K", "L"][self.dim_order[0]]
         y_label = ["H", "K", "L"][self.dim_order[1]]
-        slice_label = ["H", "K", "L"][self.dim_order[2]]
         x_coords = self.coords[self.dim_order[0]]
         y_coords = self.coords[self.dim_order[1]]
-        slice_coord = self.coords[self.dim_order[2]][self.slice_index]
 
         self.image_tool._setImage(
             image=image,
@@ -159,9 +149,7 @@ class GriddedDataController(QtGui.QWidget):
             x_label=x_label,
             y_label=y_label,
             x_coords=x_coords,
-            y_coords=y_coords,
-            slice_label=slice_label,
-            slice_coord=slice_coord
+            y_coords=y_coords
         )
 
     def dragEnterEvent(self, e) -> None:

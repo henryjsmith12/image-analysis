@@ -8,7 +8,7 @@ from pyqtgraph import QtCore, QtGui
 from pyqtgraph.dockarea import Dock, DockArea
 
 from imageanalysis.structures import Scan
-from imageanalysis.ui.data_view.utils import ImageTool
+from imageanalysis.ui.data_view.image_tool import ImageTool
 
 
 class RawDataWidget(DockArea):
@@ -22,11 +22,10 @@ class RawDataWidget(DockArea):
         self.scan = scan
 
         # Child widgets
-        self.image_tool_3d = ImageTool()
-        self.image_tool_2d = ImageTool()
+        self.image_tool = ImageTool()
         self.controller = RawDataController(
             parent=self,
-            image_tool=self.image_tool_3d,
+            image_tool=self.image_tool,
             scan=scan
         )
 
@@ -38,23 +37,16 @@ class RawDataWidget(DockArea):
             hideTitle=True,
             closable=False
         )
-        self.image_tool_3d_dock = Dock(
-            name="Controller",
-            size=(1, 5),
-            widget=self.image_tool_3d,
-            hideTitle=True,
-            closable=False
-        )
-        self.image_tool_2d_dock = Dock(
-            name="Controller",
-            size=(1, 5),
-            widget=self.image_tool_2d,
+        self.image_tool_dock = Dock(
+            name="Image Tool",
+            size=(1, 10),
+            widget=self.image_tool,
             hideTitle=True,
             closable=False
         )
         self.controller_dock.setMaximumHeight(75)
         self.addDock(self.controller_dock)
-        self.addDock(self.image_tool_3d_dock, "bottom", self.controller_dock)
+        self.addDock(self.image_tool_dock, "bottom", self.controller_dock)
 
 
 class RawDataController(QtGui.QWidget):
@@ -71,8 +63,8 @@ class RawDataController(QtGui.QWidget):
         self.parent = parent
         self.image_tool = image_tool
         self.scan = scan
+
         self.data = scan.raw_image_data
-        self.coords = scan.gridded_image_coords
         self.slice_index = 0
 
         # Child widgets
@@ -113,4 +105,7 @@ class RawDataController(QtGui.QWidget):
         """Sets image for connected ImageTool."""
 
         image = self.data[self.slice_index]
-        self.image_tool._setImage(image=image, data=self.data)
+        self.image_tool._setImage(
+            image=image, 
+            data=self.data
+        )
