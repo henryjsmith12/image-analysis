@@ -22,7 +22,7 @@ class RawDataWidget(DockArea):
         self.scan = scan
 
         # Child widgets
-        self.image_tool = ImageTool()
+        self.image_tool = ImageTool(parent=self)
         self.controller = RawDataController(
             parent=self,
             image_tool=self.image_tool,
