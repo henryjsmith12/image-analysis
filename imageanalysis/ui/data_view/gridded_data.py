@@ -22,7 +22,7 @@ class GriddedDataWidget(DockArea):
         self.scan = scan
 
         # Child widgets
-        self.image_tool = ImageTool()
+        self.image_tool = ImageTool(parent=self)
         self.controller = GriddedDataController(
             parent=self,
             image_tool=self.image_tool,
@@ -50,7 +50,6 @@ class GriddedDataWidget(DockArea):
         # Add docks to dock area
         self.addDock(self.controller_dock)
         self.addDock(self.image_tool_dock, "bottom", self.controller_dock)
-
 
 class GriddedDataController(QtGui.QWidget):
     """Controls dimension order and index of gridded image slice in view."""
