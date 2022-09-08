@@ -29,7 +29,7 @@ class DataView(QtGui.QTabWidget):
 
     def _closeTab(self, index: int) -> None:
         """Closes DataViewTab at specific index."""
-        
+
         w = self.widget(index)
         w.deleteLater()
         self.removeTab(index)
@@ -42,7 +42,7 @@ class DataViewTab(QtGui.QWidget):
         super(DataViewTab, self).__init__()
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        
+
         self.scan = scan
 
         # Child widgets

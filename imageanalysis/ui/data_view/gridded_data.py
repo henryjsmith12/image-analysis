@@ -18,7 +18,7 @@ class GriddedDataWidget(DockArea):
         super(GriddedDataWidget, self).__init__()
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
-        
+
         self.scan = scan
 
         # Child widgets
@@ -44,12 +44,10 @@ class GriddedDataWidget(DockArea):
             hideTitle=True,
             closable=False
         )
-        # Sets max height for controller
         self.controller_dock.setMaximumHeight(200)
-
-        # Add docks to dock area
         self.addDock(self.controller_dock)
         self.addDock(self.image_tool_dock, "bottom", self.controller_dock)
+
 
 class GriddedDataController(QtGui.QWidget):
     """Controls dimension order and index of gridded image slice in view."""
@@ -109,11 +107,12 @@ class GriddedDataController(QtGui.QWidget):
             ctrl.indexChanged.connect(self._setSliceIndex)
         self.dimensionOrderChanged.connect(self._setDimensionOrder)
 
-        # Set initial image
+        # Sets initial image
         self._setImage()
 
     def _setSliceIndex(self) -> None:
         """Updates index to match index of last dimension controller."""
+
         self.slice_index = self.layout.itemAt(2).widget().index
         self._setImage()
 
@@ -135,6 +134,7 @@ class GriddedDataController(QtGui.QWidget):
 
     def _setImage(self) -> None:
         """Loads image in connected image tool."""
+
         data = np.transpose(self.data, self.dim_order)
         image = data[:, :, self.slice_index]
         x_label = ["H", "K", "L"][self.dim_order[0]]
@@ -153,6 +153,7 @@ class GriddedDataController(QtGui.QWidget):
 
     def dragEnterEvent(self, e) -> None:
         """For dragging a dimension controller."""
+
         e.accept()
 
     def dropEvent(self, e) -> None:
