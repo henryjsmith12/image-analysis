@@ -27,6 +27,7 @@ class Project:
         detector_path: str
     ) -> None:
 
+        # Basic parameter testing
         if project_path is None or type(project_path) != str:
             raise ValueError("Invalid project path.")
         if spec_path is None or type(spec_path) != str:
@@ -35,7 +36,6 @@ class Project:
             raise ValueError("Invalid instrument configuration path.")
         if detector_path is None or type(detector_path) != str:
             raise ValueError("Invalid detector configuration path.")
-
         if not os.path.exists(project_path):
             raise NotADirectoryError(f"Path '{project_path}' not found.")
         if not os.path.exists(spec_path):
@@ -44,14 +44,13 @@ class Project:
             raise FileNotFoundError(f"Path '{instrument_path}' not found.")
         if not os.path.exists(detector_path):
             raise FileNotFoundError(f"Path '{detector_path}' not found.")
-        
+
         # Path variables
         self.path = project_path
         self.spec_path = spec_path
         self.instrument_path = instrument_path
         self.detector_path = detector_path
 
-        # TODO: Check that image path exists
         spec_basename = os.path.basename(os.path.splitext(self.spec_path)[0])
         image_path = f"{project_path}/images/{spec_basename}"
         if os.path.exists(image_path):
@@ -81,6 +80,7 @@ class Project:
 
     def getScan(self, n):
         """Returns a Scan object for a given scan number"""
+
         return self.scans[n]
 
 
