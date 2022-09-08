@@ -175,6 +175,7 @@ class GriddedDataController(QtGui.QWidget):
 
         e.accept()
         self.dimensionOrderChanged.emit()
+        self.dimensionOrderChanged.emit()
 
 
 class GriddedDimensionController(QtGui.QGroupBox):
