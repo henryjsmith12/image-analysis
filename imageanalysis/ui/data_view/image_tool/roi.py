@@ -22,3 +22,18 @@ class LineSegmentROI(pg.LineSegmentROI):
 
     def _setImage(self) -> None:
         ...
+
+class RectROI(pg.RectROI):
+
+    def __init__(self, pos, size, centered=False, sideScalers=False, **args):
+        super().__init__(pos, size, centered, sideScalers, **args)
+
+class CircleROI(pg.CircleROI):
+
+    def __init__(self, pos, size=None, radius=None, **args):
+        super().__init__(pos, size, radius, **args)
+
+class PolygonROI(pg.PolygonROI):
+
+    def __init__(self, positions, pos=None, **args):
+        super().__init__(positions, pos, **args)
