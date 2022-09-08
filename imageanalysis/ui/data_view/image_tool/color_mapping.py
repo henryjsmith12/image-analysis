@@ -1,3 +1,8 @@
+"""Copyright (c) UChicago Argonne, LLC. All rights reserved.
+
+See LICENSE file.
+"""
+
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtCore, QtGui
@@ -100,6 +105,7 @@ class ColorMapController(QtGui.QGroupBox):
         self.gamma_sbx.valueChanged.connect(self._setColorMap)
         self.max_value_sbx.valueChanged.connect(self._setColorMapBounds)
 
+        # Sets initial color map
         self._setColorMap()
         self._setColorMapBounds()
 
@@ -141,9 +147,11 @@ class ColorMapController(QtGui.QGroupBox):
             self.gamma_sbx.show()
 
     def _setColorMapBounds(self):
+        """Sets maximum pixel value for color map."""
 
         self.color_map_max = self.max_value_sbx.value()
         self.colorMapBoundsChanged.emit()
+
 
 def createColorMap(
     name: str,
@@ -157,11 +165,11 @@ def createColorMap(
     """Returns a color map object created from given parameters."""
 
     if name in pg.colormap.listMaps(source="matplotlib"):
-        colors = pg.getFromMatplotlib(name).getLookupTable(nPts=n_pts, alpha=False)
+        colors = pg.getFromMatplotlib(name).getLookupTable(nPts=n_pts)
     elif name in pg.colormap.listMaps(source="colorcet"):
-        colors = pg.getFromColorcet(name).getLookupTable(nPts=n_pts, alpha=False)
+        colors = pg.getFromColorcet(name).getLookupTable(nPts=n_pts)
     elif name in pg.colormap.listMaps():
-        colors = pg.get(name).getLookupTable(nPts=n_pts, alpha=False)
+        colors = pg.get(name).getLookupTable(nPts=n_pts)
     else:
         raise KeyError("Color map not found.")
 
