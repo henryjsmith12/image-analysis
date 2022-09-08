@@ -14,6 +14,8 @@ class ImageTool(DockArea):
 
         self.data = None
         self.data_min, self.data_max = None, None
+        self.color_map_max = 1
+        self.color_bar_3d = None
 
         self.plot_3d = ImagePlot(parent=self)
         self.plot_2d = ImagePlot(parent=self)
@@ -68,44 +70,78 @@ class ImageTool(DockArea):
         x_coords: list=None,
         y_coords: list=None
     ):
+        
         if self.data is None:
             self.data = data
             self.data_min, self.data_max = np.amin(data), np.amax(data)
-        
+            
+            image = np.copy(image)
+            image[image > self.color_map_max] = self.data_max
+            image = image / self.data_max
+
             self.plot_3d._setLabels(x=x_label, y=y_label)
+            self.plot_3d._setImage(image=image)
+            self.plot_3d._setCoordinates(x=x_coords, y=y_coords)
             self.plot_3d._setImage(image=image)
             self.plot_3d._setCoordinates(x=x_coords, y=y_coords)
 
             self.controller._setColorMap()
         else:
+            image = np.copy(image)
+            image[image > self.color_map_max] = self.color_map_max
+            image = image / self.color_map_max
+
             self.plot_3d._setLabels(x=x_label, y=y_label)
             self.plot_3d._setImage(image=image)
             self.plot_3d._setCoordinates(x=x_coords, y=y_coords)
 
+            self.color_bar_3d.setLevels((0, self.color_map_max))
+
+
     def _setColorMap(self, color_map):
         self.plot_3d.setColorMap(color_map)
-        
-        color_bar_3d = pg.ColorBarItem(
-            values=(self.data_min, self.data_max),
-            cmap=color_map,
-            interactive=False,
-            width=15,
-            orientation="h"
-        )
-        
-        color_bar_3d.setImageItem(
-            img=self.plot_3d.image,
-            insert_in=self.plot_3d.getView()
-        )
+
+        if self.color_bar_3d is not None:
+            self.color_bar_3d.setCmap(color_map)
+        else:
+            self.color_bar_3d = pg.ColorBarItem(
+                values=(0, self.color_map_max),
+                cmap=color_map,
+                interactive=False,
+                width=15,
+                orientation="h"
+            )
+            self.color_bar_3d.setImageItem(
+                img=self.plot_3d.image,
+                insert_in=self.plot_3d.getView()
+            )
         
     def _getMouseCoordinates(self, x, y):
+
+        from imageanalysis.ui.data_view.gridded_data import GriddedDataWidget
+        from imageanalysis.ui.data_view.raw_data import RawDataWidget
+        
+        h, k, l, value = None, None, None, None
         if x is not None:
-            h, k, l = None, None, None
-            print(x, y)
-        else:
-            h, k, l = None, None, None
-        #self.controller._setMouseInfo(h=h, k=k, l=l, value=value)
-        ...
+            if type(self.parent) == RawDataWidget:
+                i = self.parent.controller.slice_index
+                h, k, l = self.parent.scan.rsm[i, x, y]
+                value = self.parent.scan.raw_image_data[i, x, y]
+            elif type(self.parent) == GriddedDataWidget:
+                dim_order = self.parent.controller.dim_order
+                data = np.transpose(self.data, dim_order)
+                i = self.parent.controller.slice_index
+                value = data[x, y, i]
+                h = self.parent.scan.gridded_image_coords[0, [x, y, i][dim_order.index(0)]]
+                k = self.parent.scan.gridded_image_coords[1, [x, y, i][dim_order.index(1)]]
+                l = self.parent.scan.gridded_image_coords[2, [x, y, i][dim_order.index(2)]]
+          
+        self.controller._setMouseInfo(h=h, k=k, l=l, value=value)
+
+    def _setColorMapMax(self):
+        self.color_map_max = self.controller.color_map_ctrl.color_map_max
+        self.parent.controller._setImage()
+
 
 class ImageToolController(QtGui.QWidget):
 
@@ -115,25 +151,20 @@ class ImageToolController(QtGui.QWidget):
         self.image_tool = parent
 
         self.mouse_info_widget = MouseInfoWidget()
-        self.color_map_ctrl = ColorMapController()
-        self.plot_3d_ctrl = QtGui.QGroupBox()
-        self.plot_2d_ctrl = QtGui.QGroupBox()
-        self.plot_1d_ctrl = QtGui.QGroupBox()
+        self.color_map_ctrl = ColorMapController(parent=self)
 
         self.layout = QtGui.QVBoxLayout()
         self.setLayout(self.layout)
 
         self.layout.addWidget(self.mouse_info_widget)
         self.layout.addWidget(self.color_map_ctrl)
-        self.layout.addWidget(self.plot_3d_ctrl)
-        self.layout.addWidget(self.plot_2d_ctrl)
-        self.layout.addWidget(self.plot_1d_ctrl)
 
         self.color_map_ctrl.colorMapChanged.connect(self._setColorMap)
+        self.color_map_ctrl.colorMapBoundsChanged.connect(self.image_tool._setColorMapMax)
 
-    def _setMouseInfo(self):
+    def _setMouseInfo(self, h, k, l, value):
         # Calls mouse info
-        ...
+        self.mouse_info_widget._updateMouseInfo(h, k, l, value)
 
     def _setColorMap(self):
         color_map = self.color_map_ctrl.color_map
@@ -162,8 +193,9 @@ class ImagePlot(pg.ImageView):
 
     def _setImage(self, image: np.ndarray):
         self.image = image
+
         self.setImage(
-            img=image,
+            img=self.image,
             autoRange=False,
             autoLevels=False,
             transform=self.transform
@@ -213,7 +245,6 @@ class ImagePlot(pg.ImageView):
                 self.image_tool._getMouseCoordinates(x, y)
             else:
                 self.image_tool._getMouseCoordinates(None, None)
-
 
 class LinePlot(pg.PlotWidget):
 
@@ -269,7 +300,13 @@ class MouseInfoWidget(QtGui.QGroupBox):
         self.layout.setColumnStretch(5, 1)
 
     def _updateMouseInfo(self, h=None, k=None, l=None, value=None):
-        self.h_txt.setText(str(round(h, 5) or ""))
-        self.k_txt.setText(str(round(k, 5) or ""))
-        self.l_txt.setText(str(round(l, 5) or ""))
-        self.value_txt.setText(str(value or ""))
+        if h is not None:
+            self.h_txt.setText(str(round(h, 7)))
+            self.k_txt.setText(str(round(k, 7)))
+            self.l_txt.setText(str(round(l, 7) or ""))
+            self.value_txt.setText(str(round(value, 3)))
+        else:
+            self.h_txt.setText("")
+            self.k_txt.setText("")
+            self.l_txt.setText("")
+            self.value_txt.setText("")
