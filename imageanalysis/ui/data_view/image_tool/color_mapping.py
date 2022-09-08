@@ -8,13 +8,16 @@ class ColorMapController(QtGui.QGroupBox):
     """Allows user to apply a colormap to an image."""
 
     colorMapChanged = QtCore.pyqtSignal()
+    colorMapBoundsChanged = QtCore.pyqtSignal()
 
     def __init__(
-        self
+        self,
+        parent
     ) -> None:
         super(ColorMapController, self).__init__()
-        
+        self.parent = parent
         self.color_map = None
+        self.color_map_max = None
 
         self.setTitle("Color Map")
 
@@ -66,6 +69,15 @@ class ColorMapController(QtGui.QGroupBox):
         self.gamma_sbx.setSingleStep(0.1)
         self.gamma_sbx.hide()
         self.gamma_sbx.setValue(2.0)
+        self.max_value_lbl = QtGui.QLabel("Max: ")
+        self.max_value_lbl.setAlignment(
+            QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
+        )
+        self.max_value_sbx = QtGui.QSpinBox()
+        self.max_value_sbx.setMinimum(1)
+        self.max_value_sbx.setMaximum(1000000)
+        self.max_value_sbx.setSingleStep(1)
+        self.max_value_sbx.setValue(1)
 
         # Layout
         self.layout = QtGui.QGridLayout()
@@ -76,6 +88,8 @@ class ColorMapController(QtGui.QGroupBox):
         self.layout.addWidget(self.base_sbx, 2, 1)
         self.layout.addWidget(self.gamma_lbl, 2, 0)
         self.layout.addWidget(self.gamma_sbx, 2, 1)
+        self.layout.addWidget(self.max_value_lbl, 3, 0)
+        self.layout.addWidget(self.max_value_sbx, 3, 1)
 
         # Connections
         self.name_cbx.currentIndexChanged.connect(self._setColorMap)
@@ -84,8 +98,10 @@ class ColorMapController(QtGui.QGroupBox):
         self.n_pts_sbx.valueChanged.connect(self._setColorMap)
         self.base_sbx.valueChanged.connect(self._setColorMap)
         self.gamma_sbx.valueChanged.connect(self._setColorMap)
+        self.max_value_sbx.valueChanged.connect(self._setColorMapBounds)
 
         self._setColorMap()
+        self._setColorMapBounds()
 
     def _setColorMap(self):
         """Sets parameters for color map creation and emits signal."""
@@ -124,6 +140,10 @@ class ColorMapController(QtGui.QGroupBox):
             self.gamma_lbl.show()
             self.gamma_sbx.show()
 
+    def _setColorMapBounds(self):
+
+        self.color_map_max = self.max_value_sbx.value()
+        self.colorMapBoundsChanged.emit()
 
 def createColorMap(
     name: str,
