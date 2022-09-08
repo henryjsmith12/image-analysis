@@ -14,3 +14,13 @@ Basic color mapping.
 
 ### Added
 - ColorMapWidget for creating custom color maps
+
+## [0.1.2] - 2022-08-09
+Additional color mapping functions and mouse tracking.
+
+### Added
+- Option to change maximum pixel value of a color map.
+- Mouse info section that tracks HKL positions and intensity of a pixel when hovered over.
+
+### Fixed
+- Color bars now accurately represent an image's color map
