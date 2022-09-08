@@ -23,4 +23,4 @@ Additional color mapping functions and mouse tracking.
 - Mouse info section that tracks HKL positions and intensity of a pixel when hovered over.
 
 ### Fixed
-- Color bars now accurately represent an image's color map
+- Color bars now accurately represent an image's color map.
