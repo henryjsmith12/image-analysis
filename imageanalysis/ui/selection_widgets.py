@@ -4,7 +4,7 @@ See LICENSE file.
 """
 
 
-from pyqtgraph import QtGui
+from pyqtgraph import QtCore, QtGui
 
 from imageanalysis.io import \
     isValidProjectPath, getSPECPaths, getXMLPaths
@@ -156,8 +156,17 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.scan_point_count_txt = QtGui.QLineEdit()
         self.scan_point_count_txt.setReadOnly(True)
         self.scan_date_lbl = QtGui.QLabel()
+        self.scan_date_lbl.setAlignment(
+            QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
+        )
         self.scan_type_lbl = QtGui.QLabel()
+        self.scan_type_lbl.setAlignment(
+            QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
+        )
         self.scan_bounds_lbl = QtGui.QLabel()
+        self.scan_bounds_lbl.setAlignment(
+            QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
+        )
         self.gridding_options_gbx = QtGui.QGroupBox()
         self.gridding_options_gbx.setTitle("Gridding Options")
         self.min_lbl = QtGui.QLabel("Min")
@@ -204,9 +213,9 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.scan_details_gbx_layout.addWidget(
             self.scan_date_lbl, 1, 0, 1, 4)
         self.scan_details_gbx_layout.addWidget(
-            self.scan_type_lbl, 2, 0)
+            self.scan_type_lbl, 2, 0, 1, 2)
         self.scan_details_gbx_layout.addWidget(
-            self.scan_bounds_lbl, 2, 1, 1, 3)
+            self.scan_bounds_lbl, 2, 2, 1, 2)
         self.scan_details_gbx_layout.addWidget(
             self.gridding_options_gbx, 3, 0, 1, 4)
         self.scan_details_gbx_layout.addWidget(
