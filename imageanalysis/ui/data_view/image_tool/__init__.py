@@ -132,9 +132,9 @@ class ImageTool(DockArea):
                 data = np.transpose(self.data, dim_order)
                 i = self.parent.controller.slice_index
                 value = data[x, y, i]
-                h = self.parent.scan.gridded_image_coords[0, [x, y, i][dim_order.index(0)]]
-                k = self.parent.scan.gridded_image_coords[1, [x, y, i][dim_order.index(1)]]
-                l = self.parent.scan.gridded_image_coords[2, [x, y, i][dim_order.index(2)]]
+                h = self.parent.scan.gridded_image_coords[0][[x, y, i][dim_order.index(0)]]
+                k = self.parent.scan.gridded_image_coords[1][[x, y, i][dim_order.index(1)]]
+                l = self.parent.scan.gridded_image_coords[2][[x, y, i][dim_order.index(2)]]
           
         self.controller._setMouseInfo(h=h, k=k, l=l, value=value)
 
