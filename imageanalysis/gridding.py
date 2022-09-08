@@ -8,8 +8,6 @@ import numpy as np
 import xrayutilities as xu
 
 
-# TODO: Basic testing
-# TODO: Make arbitrary enough to use as a static function
 def gridScan(
     raw_image_data: np.ndarray,
     rsm: np.ndarray,
