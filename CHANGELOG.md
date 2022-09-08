@@ -19,8 +19,8 @@ Basic color mapping.
 Additional color mapping functions and mouse tracking.
 
 ### Added
-- Option to change maximum pixel value of a color map.
-- Mouse info section that tracks HKL positions and intensity of a pixel when hovered over.
+- Option to change maximum pixel value of a color map
+- Mouse info section that tracks HKL positions and intensity of a pixel when hovered over
 
 ### Fixed
 - Color bars now accurately represent an image's color map.
