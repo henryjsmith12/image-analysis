@@ -51,14 +51,14 @@ class MainWindow(QtGui.QWidget):
         )
         self.data_view_dock = Dock(
             name="DataView",
-            size=(4, 5),
+            size=(5, 5),
             widget=self.data_view,
             hideTitle=True,
             closable=False
         )
         self.plot_view_dock = Dock(
             name="PlotView",
-            size=(4, 5),
+            size=(5, 5),
             widget=self.plot_view,
             hideTitle=True,
             closable=False
@@ -67,8 +67,8 @@ class MainWindow(QtGui.QWidget):
         # Setting maximum size for selection docks
         self.project_selection_dock.setMaximumWidth(300)
         self.scan_selection_dock.setMaximumWidth(300)
-        self.data_view_dock.setStretch(4, 5)
-        self.plot_view_dock.setStretch(4, 5)
+        self.data_view_dock.setStretch(5, 5)
+        self.plot_view_dock.setStretch(5, 5)
 
         # Adds docks to dock area
         self.dock_area.addDock(self.project_selection_dock)
