@@ -20,45 +20,53 @@ class ImageTool(DockArea):
 
         self.parent = parent
         self.data = None
-        self.data_min, self.data_max = None, None
-        self.color_map_max = 1
+        self.data_range = None
+        self.color_map = None
         self.color_bar_3d = None
-
-        # Child widgets
-        self.plot_3d = ImagePlot(parent=self)
-        self.plot_2d = ImagePlot(parent=self)
-        self.plot_1d = LinePlot(parent=self)
-        self.controller = ImageToolController(parent=self)
+        self.color_bar_2d = None
+        self.color_map_range = None
 
         # Child docks
         self.plot_3d_dock = Dock(
             name="3D Image Plot",
             size=(10, 10),
-            widget=self.plot_3d,
+            widget=None,
             hideTitle=True,
             closable=False
         )
         self.plot_2d_dock = Dock(
             name="2D Image Plot",
             size=(10, 10),
-            widget=self.plot_2d,
+            widget=None,
             hideTitle=True,
             closable=False
         )
         self.plot_1d_dock = Dock(
             name="Line Plot",
             size=(10, 10),
-            widget=self.plot_1d,
+            widget=None,
             hideTitle=True,
             closable=False
         )
         self.controller_dock = Dock(
             name="Color Mapping",
             size=(10, 1),
-            widget=self.controller,
+            widget=None,
             hideTitle=True,
             closable=False
         )
+
+        self.plot_3d = ImagePlot(parent=self, dock=self.plot_3d_dock)
+        self.plot_2d = ImagePlot(parent=self, dock=self.plot_2d_dock)
+        self.plot_1d = LinePlot(parent=self, dock=self.plot_1d_dock)
+        self.controller = ImageToolController(parent=self, dock=self.controller_dock)
+        
+        self.plot_3d_dock.addWidget(self.plot_3d)
+        self.plot_2d_dock.addWidget(self.plot_2d)
+        self.plot_1d_dock.addWidget(self.plot_1d)
+        self.controller_dock.addWidget(self.controller)
+
+        # Adds docks to layout
         self.addDock(self.controller_dock)
         self.addDock(self.plot_3d_dock, "left", self.controller_dock)
         self.addDock(self.plot_2d_dock, "bottom", self.plot_3d_dock)
@@ -66,165 +74,181 @@ class ImageTool(DockArea):
         self.controller_dock.setMaximumWidth(200)
         self.controller_dock.setMinimumWidth(200)
 
-        # If ROI is activated, proper dock will show
-        self.plot_2d_dock.hide()
-        self.plot_1d_dock.hide()
+        self.plot_2d._hide()
+        self.plot_1d._hide()
 
     def _setImage(
         self,
-        image: np.ndarray,
         data: np.ndarray,
+        image: np.ndarray,
         x_label: str=None,
         y_label: str=None,
         x_coords: list=None,
         y_coords: list=None
     ) -> None:
-        """Displays an image from given parameters."""
 
         # For first runthrough
         if self.data is None:
             self.data = data
-            self.data_min, self.data_max = np.amin(data), np.amax(data)
+            self.data_range = (np.amin(data), np.amax(data))
 
-            # Creates a normalized image
-            image = np.copy(image)
-            image[image > self.color_map_max] = self.data_max
-            image = image / self.data_max
+        self.image = image
+        self.x_label = x_label
+        self.y_label = y_label
+        self.x_coords = x_coords
+        self.y_coords = y_coords
 
-            self.plot_3d._setLabels(x=x_label, y=y_label)
-            self.plot_3d._setImage(image=image)
-            self.plot_3d._setCoordinates(x=x_coords, y=y_coords)
-            self.plot_3d._setImage(image=image)
-            self.plot_3d._setCoordinates(x=x_coords, y=y_coords)
-
-            # Creates initial color map object
-            self.controller._setColorMap()
-        else:
-            image = np.copy(image)
-            image[image > self.color_map_max] = self.color_map_max
-            image = image / self.color_map_max
-
-            self.plot_3d._setLabels(x=x_label, y=y_label)
-            self.plot_3d._setImage(image=image)
-            self.plot_3d._setCoordinates(x=x_coords, y=y_coords)
-
-            # Adjusts color bar accordingly
-            self.color_bar_3d.setLevels((0, self.color_map_max))
-
-    def _setColorMap(self, color_map) -> None:
+        self.plot_3d._plot(
+            image=self.image,
+            x_label=self.x_label,
+            y_label=self.y_label,
+            x_coords=self.x_coords,
+            y_coords=self.y_coords,
+        )
+        self.controller._setColorMap()
+        
+    def _setColorMap(self, color_map, range) -> None:
         """Applies a color map and color bar object to the plots."""
-        self.plot_3d.setColorMap(color_map)
+        self.color_map = color_map
+        self.color_map_range = range
 
-        # First runthrough
-        if self.color_bar_3d is not None:
-            self.color_bar_3d.setCmap(color_map)
-        else:
-            # Creates color bar object
+        self.plot_3d.setColorMap(color_map)
+        if self.color_bar_3d is None:
             self.color_bar_3d = pg.ColorBarItem(
-                values=(0, self.color_map_max),
+                values=range,
                 cmap=color_map,
                 interactive=False,
                 width=15,
                 orientation="h"
             )
-            # Applies color bar to plot
             self.color_bar_3d.setImageItem(
                 img=self.plot_3d.image,
                 insert_in=self.plot_3d.getView()
             )
+        else:
+            self.color_bar_3d.setCmap(color_map)
+            self.color_bar_3d.setLevels(range)
 
-    def _getMouseCoordinates(self, x, y) -> None:
-        """Retrieves HKL coordinates from given mouse coordinates.
+        if self.plot_2d.isVisible():
+            self.plot_2d.setColorMap(color_map)
+            if self.color_bar_2d is None:
+                self.color_bar_2d = pg.ColorBarItem(
+                    values=range,
+                    cmap=color_map,
+                    interactive=False,
+                    width=15,
+                    orientation="h"
+                )
+                self.color_bar_2d.setImageItem(
+                    img=self.plot_2d.image,
+                    insert_in=self.plot_2d.getView()
+                )
+            else:
+                self.color_bar_2d.setCmap(color_map)
+                self.color_bar_2d.setLevels(range)
 
-        Coordinate calculation differs between the GriddedDataWidget and
-        RawDataWidget. Both retrievals are in this function."""
-
-        from imageanalysis.ui.data_view.gridded_data import \
-            GriddedDataWidget
-        from imageanalysis.ui.data_view.raw_data import \
-            RawDataWidget
-
-        h, k, l, value = None, None, None, None
-
-        # Checks if x and y coordinates are given
-        if x is not None and y is not None:
-            # RawDataWidget
-            if type(self.parent) == RawDataWidget:
-                i = self.parent.controller.slice_index
-                h, k, l = self.parent.scan.rsm[i, x, y]
-                value = self.parent.scan.raw_image_data[i, x, y]
-            # GriddedDataWidget
-            elif type(self.parent) == GriddedDataWidget:
-                dim_order = self.parent.controller.dim_order
-                data = np.transpose(self.data, dim_order)
-                i = self.parent.controller.slice_index
-                value = data[x, y, i]
-                coords = self.parent.scan.gridded_image_coords
-                h = coords[0][[x, y, i][dim_order.index(0)]]
-                k = coords[1][[x, y, i][dim_order.index(1)]]
-                l = coords[2][[x, y, i][dim_order.index(2)]]
-
-        # HKL and intensity information passed to ImageToolController
-        self.controller._setMouseInfo(h=h, k=k, l=l, value=value)
-
-    def _setColorMapMax(self):
-        """Sets a new color map maximum value and refreshes image."""\
-
-        self.color_map_max = self.controller.color_map_ctrl.color_map_max
-        self.parent.controller._setImage()
-
+        self.plot_3d._plot(
+            image=self.image,
+            x_label=self.x_label,
+            y_label=self.y_label,
+            x_coords=self.x_coords,
+            y_coords=self.y_coords,
+        )
 
 class ImageToolController(QtGui.QWidget):
     """Handles color mapping, mouse info, and ROI's."""
 
-    def __init__(self, parent) -> None:
-        super().__init__()
+    def __init__(self, parent, dock) -> None:
+        super(ImageToolController, self).__init__()
 
         self.image_tool = parent
+        self.dock = dock
 
+        from imageanalysis.ui.data_view.image_tool.roi import ROIController
         # Child widgets
         self.mouse_info_widget = MouseInfoWidget()
         self.color_map_ctrl = ColorMapController(parent=self)
+        self.plot_3d_roi_ctrl = ROIController(parent=self.image_tool.plot_3d, child=self.image_tool.plot_2d, title="Image Plot #1")
+        self.plot_2d_roi_ctrl = ROIController(parent=self.image_tool.plot_2d, child=self.image_tool.plot_1d, title="Image Plot #2")
+        self.plot_2d_roi_ctrl.hide()
 
         # Child layout
         self.layout = QtGui.QVBoxLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.mouse_info_widget)
         self.layout.addWidget(self.color_map_ctrl)
+        self.layout.addWidget(self.plot_3d_roi_ctrl)
+        self.layout.addWidget(self.plot_2d_roi_ctrl)
 
         # Connections
         self.color_map_ctrl.colorMapChanged.connect(self._setColorMap)
-        self.color_map_ctrl.colorMapBoundsChanged.connect(
-            self.image_tool._setColorMapMax
-        )
 
-    def _setMouseInfo(self, h, k, l, value) -> None:
-        """Passes HKL information to child MouseInfoWidget."""
+    def _setMouseInfo(self, x, y) -> None:
 
-        # Calls mouse info
-        self.mouse_info_widget._updateMouseInfo(h, k, l, value)
+        if x is None or y is None:
+            self.mouse_info_widget._setMouseInfo(None, None, None, None)
+        else:
+            from imageanalysis.ui.data_view.gridded_data import \
+            GriddedDataWidget
+            from imageanalysis.ui.data_view.raw_data import \
+                RawDataWidget
+
+            h, k, l, value = None, None, None, None
+
+            try:
+                # RawDataWidget
+                if type(self.image_tool.parent) == RawDataWidget:
+                    i = self.image_tool.parent.controller.slice_index
+                    h, k, l = self.image_tool.parent.scan.rsm[i, x, y]
+                    value = self.image_tool.parent.scan.raw_image_data[i, x, y]
+                # GriddedDataWidget
+                elif type(self.image_tool.parent) == GriddedDataWidget:
+                    dim_order = self.image_tool.parent.controller.dim_order
+                    data = np.transpose(self.image_tool.data, dim_order)
+                    i = self.image_tool.parent.controller.slice_index
+                    value = data[x, y, i]
+                    coords = self.image_tool.parent.scan.gridded_image_coords
+                    h = coords[0][[x, y, i][dim_order.index(0)]]
+                    k = coords[1][[x, y, i][dim_order.index(1)]]
+                    l = coords[2][[x, y, i][dim_order.index(2)]]
+            except: 
+                pass
+
+            # HKL and intensity information passed to ImageToolController
+            self.mouse_info_widget._setMouseInfo(h=h, k=k, l=l, value=value)
 
     def _setColorMap(self) -> None:
         """Applies color map from ColorMapController to ImageTool."""
 
-        color_map = self.color_map_ctrl.color_map
-        self.image_tool._setColorMap(color_map=color_map)
-
+        self.image_tool._setColorMap(
+            color_map=self.color_map_ctrl.color_map,
+            range=(0, self.color_map_ctrl.color_map_max)
+        )
 
 class ImagePlot(pg.ImageView):
     """An adapted pyqtgraph ImageView object."""
 
-    def __init__(self, parent) -> None:
+    updated = QtCore.pyqtSignal()
+
+    def __init__(self, parent, dock) -> None:
         super(ImagePlot, self).__init__(
             imageItem=pg.ImageItem(),
             view=pg.PlotItem()
         )
 
+        # Sets parent widget
         self.image_tool = parent
-        self.image = None
-        self.transform = None
-        self.x_coords, self.y_coords = None, None
+        self.controller = None
+        self.dock = dock
 
+        # Class variables for plotting
+        self.data = None
+        self.image = None
+        self.norm_image = None
+        self.x_label, self.y_label = None, None
+        self.x_coords, self.y_coords = None, None
+        self.transform = None
+        
         # Removing UI clutter
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
@@ -233,89 +257,131 @@ class ImagePlot(pg.ImageView):
         self.getView().ctrlMenu = None
 
         # Connections
-        self.getView().scene().sigMouseMoved.connect(self._getMouseInfo)
+        self.getView().scene().sigMouseMoved.connect(self._updateMousePoint)
 
-    def _setImage(self, image: np.ndarray) -> None:
-        """Sets image with a given transform."""
+    def _hide(self):
+        self.hide()
+        self.dock.hide()
+
+    def _show(self):
+        self.show()
+        self.dock.show()
+
+    def _plot(
+        self,
+        image: np.ndarray=None,
+        x_label: str=None,
+        y_label: str=None,
+        x_coords: np.ndarray=None,
+        y_coords: np.ndarray=None
+    ) -> None:
 
         self.image = image
 
+        self._setLabels(x_label, y_label)
+        self._setCoordinates(x_coords, y_coords)
+        self._normalizeImage()
         self.setImage(
-            img=self.image,
+            img=self.norm_image,
             autoRange=False,
             autoLevels=False,
             transform=self.transform
         )
 
-    def _setLabels(self, x: str=None, y: str=None) -> None:
-        """Sets label strings to respective axes."""
+        self.updated.emit()
 
-        if x is not None and type(x) == str:
-            self.getView().setLabel("bottom", x)
-        if y is not None and type(y) == str:
-            self.getView().setLabel("left", y)
+    def _normalizeImage(self) -> None:
 
-    def _setCoordinates(self, x=None, y=None):
-        """Sets proper bounds for image based on given coordinates."""
-
-        if self.image is not None:
-            self.transform = QtGui.QTransform()
-
-            if x is None:
-                x = np.linspace(
-                    start=0,
-                    stop=self.image.shape[0] - 1,
-                    num=self.image.shape[0],
-                    endpoint=False
-                )
-
-            if y is None:
-                y = np.linspace(
-                    start=0,
-                    stop=self.image.shape[1] - 1,
-                    num=self.image.shape[1],
-                    endpoint=False
-                )
-
-            scale = (x[1] - x[0], y[1] - y[0])
-            pos = (x[0], y[0])
-            self.transform.translate(*pos)
-            self.transform.scale(*scale)
-            self.x_coords, self.y_coords = x, y
+        image = np.copy(self.image)
+        if self.image_tool.color_map_range is None:
+            norm_max = 1
         else:
-            self.transform = None
+            norm_max = self.image_tool.color_map_range[-1]
+        image[image > norm_max] = norm_max
+        image = image / norm_max
+        self.norm_image = image
 
-    def _getMouseInfo(self, scene_point=None):
-        """Retrieves mouse information from a given pixel."""
+    def _setLabels(self, x_label, y_label):
+
+        if x_label is not None and type(x_label) == str:
+            self.x_label = x_label
+            self.getView().setLabel("bottom", x_label)
+        if y_label is not None and type(y_label) == str:
+            self.y_label = y_label
+            self.getView().setLabel("left", y_label)
+
+    def _setCoordinates(self, x_coords, y_coords):
+        
+        self.transform = QtGui.QTransform()
+        if x_coords is not None:
+            self.x_coords = x_coords
+        else:
+            self.x_coords = np.linspace(
+                start=0,
+                stop=self.image.shape[0] - 1,
+                num=self.image.shape[0],
+                endpoint=False
+            )
+
+        if y_coords is not None:
+            self.y_coords = y_coords
+        else:
+            self.y_coords = np.linspace(
+                start=0,
+                stop=self.image.shape[1] - 1,
+                num=self.image.shape[1],
+                endpoint=False
+            )
+
+        scale = (
+            self.x_coords[1] - self.x_coords[0], 
+            self.y_coords[1] - self.y_coords[0]
+        )
+        pos = (self.x_coords[0], self.y_coords[0])
+        self.transform.translate(*pos)
+        self.transform.scale(*scale)
+
+    def _updateMousePoint(self, scene_point=None):
+
+        if self.controller is None:
+            self.controller = self.image_tool.controller
 
         if scene_point is not None:
             view_point = self.getView().vb.mapSceneToView(scene_point)
-            x = int(
+            x_point = int(
                 self.image.shape[0] * (
                     (view_point.x() - self.x_coords[0]) /
                     (self.x_coords[-1] - self.x_coords[0])
                 )
             )
-            y = int(
+            y_point = int(
                 self.image.shape[1] * (
                     (view_point.y() - self.y_coords[0]) /
                     (self.y_coords[-1] - self.y_coords[0])
                 )
             )
-            if 0 <= x < self.image.shape[0] and 0 <= y < self.image.shape[1]:
-                self.image_tool._getMouseCoordinates(x, y)
+            if 0 <= x_point < self.image.shape[0] and \
+            0 <= y_point < self.image.shape[1]:
+                self.controller._setMouseInfo(x_point, y_point)
             else:
-                self.image_tool._getMouseCoordinates(None, None)
-
+                self.controller._setMouseInfo(None, None)
 
 class LinePlot(pg.PlotWidget):
     """Adapted pyqtgraph PlotWidget object"""
 
-    def __init__(self, parent) -> None:
+    def __init__(self, parent, dock) -> None:
         super().__init__()
 
         self.image_tool = parent
+        self.dock = dock
 
+    def _hide(self):
+        self.hide()
+        self.dock.hide()
+
+    def _show(self):
+        self.show()
+        self.dock.show()
 
 class MouseInfoWidget(QtGui.QGroupBox):
     """Handles displaying proper mouse location and associated values."""
@@ -360,7 +426,7 @@ class MouseInfoWidget(QtGui.QGroupBox):
         self.layout.setColumnStretch(4, 1)
         self.layout.setColumnStretch(5, 1)
 
-    def _updateMouseInfo(self, h=None, k=None, l=None, value=None) -> None:
+    def _setMouseInfo(self, h=None, k=None, l=None, value=None) -> None:
         """Sets values to respective textboxes."""
 
         if h is not None:
