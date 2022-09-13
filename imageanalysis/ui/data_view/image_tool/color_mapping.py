@@ -13,7 +13,6 @@ class ColorMapController(QtGui.QGroupBox):
     """Allows user to apply a colormap to an image."""
 
     colorMapChanged = QtCore.pyqtSignal()
-    colorMapBoundsChanged = QtCore.pyqtSignal()
 
     def __init__(
         self,
@@ -150,7 +149,7 @@ class ColorMapController(QtGui.QGroupBox):
         """Sets maximum pixel value for color map."""
 
         self.color_map_max = self.max_value_sbx.value()
-        self.colorMapBoundsChanged.emit()
+        self.colorMapChanged.emit()
 
 
 def createColorMap(
