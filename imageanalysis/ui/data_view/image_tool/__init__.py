@@ -15,6 +15,9 @@ from imageanalysis.ui.data_view.image_tool.color_mapping import \
 class ImageTool(DockArea):
     """Handles image visualization and manipulation."""
 
+    colorMapUpdated = QtCore.pyqtSignal()
+    imageUpdated = QtCore.pyqtSignal()
+
     def __init__(self, parent) -> None:
         super().__init__()
 
@@ -87,11 +90,6 @@ class ImageTool(DockArea):
         y_coords: list=None
     ) -> None:
 
-        # For first runthrough
-        if self.data is None:
-            self.data = data
-            self.data_range = (np.amin(data), np.amax(data))
-
         self.image = image
         self.x_label = x_label
         self.y_label = y_label
@@ -105,14 +103,19 @@ class ImageTool(DockArea):
             x_coords=self.x_coords,
             y_coords=self.y_coords,
         )
-        self.controller._setColorMap()
+
+        # For first runthrough
+        if self.data is None:
+            self.data = data
+            self.data_range = (np.amin(data), np.amax(data))
+            self.controller._setColorMap()
+
         
     def _setColorMap(self, color_map, range) -> None:
         """Applies a color map and color bar object to the plots."""
         self.color_map = color_map
         self.color_map_range = range
 
-        self.plot_3d.setColorMap(color_map)
         if self.color_bar_3d is None:
             self.color_bar_3d = pg.ColorBarItem(
                 values=range,
@@ -125,12 +128,11 @@ class ImageTool(DockArea):
                 img=self.plot_3d.image,
                 insert_in=self.plot_3d.getView()
             )
-        else:
-            self.color_bar_3d.setCmap(color_map)
-            self.color_bar_3d.setLevels(range)
+        self.plot_3d.setColorMap(color_map)
+        self.color_bar_3d.setCmap(color_map)
+        self.color_bar_3d.setLevels(range)
 
         if self.plot_2d.isVisible():
-            self.plot_2d.setColorMap(color_map)
             if self.color_bar_2d is None:
                 self.color_bar_2d = pg.ColorBarItem(
                     values=range,
@@ -143,10 +145,10 @@ class ImageTool(DockArea):
                     img=self.plot_2d.image,
                     insert_in=self.plot_2d.getView()
                 )
-            else:
-                self.color_bar_2d.setCmap(color_map)
-                self.color_bar_2d.setLevels(range)
-
+            self.plot_2d.setColorMap(color_map)
+            self.color_bar_2d.setCmap(color_map)
+            self.color_bar_2d.setLevels(range)
+            
         self.plot_3d._plot(
             image=self.image,
             x_label=self.x_label,
@@ -154,6 +156,8 @@ class ImageTool(DockArea):
             x_coords=self.x_coords,
             y_coords=self.y_coords,
         )
+
+        self.colorMapUpdated.emit()
 
 class ImageToolController(QtGui.QWidget):
     """Handles color mapping, mouse info, and ROI's."""
@@ -168,8 +172,18 @@ class ImageToolController(QtGui.QWidget):
         # Child widgets
         self.mouse_info_widget = MouseInfoWidget()
         self.color_map_ctrl = ColorMapController(parent=self)
-        self.plot_3d_roi_ctrl = ROIController(parent=self.image_tool.plot_3d, child=self.image_tool.plot_2d, title="Image Plot #1")
-        self.plot_2d_roi_ctrl = ROIController(parent=self.image_tool.plot_2d, child=self.image_tool.plot_1d, title="Image Plot #2")
+        self.plot_3d_roi_ctrl = ROIController(
+            parent_plot=self.image_tool.plot_3d,
+            child_plot=self.image_tool.plot_2d,
+            image_tool=self.image_tool,
+            title="Image Plot #1"
+        )
+        self.plot_2d_roi_ctrl = ROIController(
+            parent_plot=self.image_tool.plot_2d,
+            child_plot=self.image_tool.plot_1d,
+            image_tool=self.image_tool,
+            title="Image Plot #2"
+        )
         self.plot_2d_roi_ctrl.hide()
 
         # Child layout
@@ -277,6 +291,10 @@ class ImagePlot(pg.ImageView):
     ) -> None:
 
         self.image = image
+        self.x_label = x_label
+        self.y_label = y_label
+        self.x_coords = x_coords
+        self.y_coords = y_coords
 
         self._setLabels(x_label, y_label)
         self._setCoordinates(x_coords, y_coords)

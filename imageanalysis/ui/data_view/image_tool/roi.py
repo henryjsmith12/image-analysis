@@ -7,14 +7,16 @@ class ROIController(QtGui.QGroupBox):
 
     def __init__(
         self, 
-        parent,
-        child,
+        parent_plot,
+        child_plot,
+        image_tool,
         title=None
     ) -> None:
         super().__init__()
 
-        self.parent_plot = parent
-        self.child_plot = child
+        self.parent_plot = parent_plot
+        self.child_plot = child_plot
+        self.image_tool = image_tool
         self.setTitle(title)
 
         self.roi = None
@@ -39,7 +41,6 @@ class ROIController(QtGui.QGroupBox):
         self.layout.addWidget(self.roi_details_gbx, 1, 0, 1, 2)
 
         self.roi_type_cbx.currentTextChanged.connect(self._changeROIType)
-        
 
     def _changeROIType(self):
         if self.roi_type_cbx.currentText() == "none":
@@ -59,11 +60,15 @@ class ROIController(QtGui.QGroupBox):
             self.child_plot._show()
             self.roi_details_gbx.show()
             self.roi._getSlice()
-    
+            self.parent_plot.image_tool.controller._setColorMap()
 
 class LineSegmentROI(pg.LineSegmentROI):
 
-    def __init__(self, parent, child) -> None:
+    def __init__(
+        self, 
+        parent, 
+        child
+    ) -> None:
 
         self.parent_plot = parent
         self.child_plot = child
@@ -77,7 +82,7 @@ class LineSegmentROI(pg.LineSegmentROI):
         )
 
         self.sigRegionChanged.connect(self._getSlice)
-        self.parent_plot.updated.connect(self._getSlice)
+        self.image_tool.colorMapUpdated.connect(self._getSlice)
 
     def _center(self):
         x_1, y_1 = self.parent_plot.x_coords[0], self.parent_plot.y_coords[0]
@@ -110,7 +115,7 @@ class LineSegmentROI(pg.LineSegmentROI):
 
             self.child_plot._plot(
                 image=slice, 
-                x_label="Point"
+                x_label="t"
             )
 
         # GriddedDataWidget
