@@ -3,6 +3,8 @@ import pyqtgraph as pg
 from pyqtgraph import QtGui
 
 
+# TODO: Updated documentation
+
 class ROIController(QtGui.QGroupBox):
 
     def __init__(

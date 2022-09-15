@@ -12,6 +12,8 @@ from imageanalysis.ui.data_view.image_tool.color_mapping import \
     ColorMapController
 
 
+# TODO: Updated documentation
+
 class ImageTool(DockArea):
     """Handles image visualization and manipulation."""
 

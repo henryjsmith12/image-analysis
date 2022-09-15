@@ -9,6 +9,8 @@ from pyqtgraph import QtCore, QtGui
 from sklearn import preprocessing
 
 
+# TODO: Updated documentation
+
 class ColorMapController(QtGui.QGroupBox):
     """Allows user to apply a colormap to an image."""
 
