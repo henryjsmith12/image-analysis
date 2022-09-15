@@ -197,7 +197,7 @@ class ScanSelectionWidget(QtGui.QWidget):
             sbx.setRange(-100, 100)
             sbx.setSingleStep(0.001)
         for sbx in [self.h_n_sbx, self.k_n_sbx, self.l_n_sbx]:
-            sbx.setRange(10, 1000)
+            sbx.setRange(10, 750)
 
         # Scan details GroupBox layout
         self.scan_details_gbx_layout = QtGui.QGridLayout()
