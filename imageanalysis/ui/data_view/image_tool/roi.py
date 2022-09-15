@@ -107,9 +107,13 @@ class LineSegmentROI(pg.LineSegmentROI):
         if type(self.image_tool.parent) == RawDataWidget:
             data = self.image_tool.parent.scan.raw_image_data
             slice = []
+
             for i in range(data.shape[0]):
                 for x, y in zip(self.x_coords, self.y_coords):
-                    slice.append(data[i, x, y])
+                    if 0 <= x < data.shape[1] and 0 <= y < data.shape[2]:
+                        slice.append(data[i, x, y])
+                    else:
+                        slice.append(0)
 
             slice = np.array(slice).reshape((data.shape[0], len(self.x_coords)))
 
@@ -125,7 +129,10 @@ class LineSegmentROI(pg.LineSegmentROI):
             slice = []
             for i in range(data.shape[2]):
                 for x, y in zip(self.x_coords, self.y_coords):
-                    slice.append(data[x, y, i])
+                    if 0 <= x < data.shape[0] and 0 <= y < data.shape[1]:
+                        slice.append(data[x, y, i])
+                    else:
+                        slice.append(0)
 
             slice = np.array(slice).reshape((data.shape[2], len(self.x_coords)))
             
