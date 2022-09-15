@@ -6,6 +6,7 @@ See LICENSE file.
 
 from pyqtgraph import QtGui
 from pyqtgraph.dockarea import Dock, DockArea
+import sys
 
 from imageanalysis.ui.data_view import DataView
 from imageanalysis.ui.plot_view import PlotView
@@ -97,3 +98,28 @@ class MainWindow(QtGui.QWidget):
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.dock_area)
+
+        # Keyboard shortcuts
+        self.close_app_shortcut = QtGui.QShortcut(QtGui.QKeySequence.Close, self)
+        self.quit_app_shortcut = QtGui.QShortcut(QtGui.QKeySequence.Quit, self)
+        self.full_screen_shortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+F"), self)
+        self.maximize_shortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+="), self)
+        self.minimize_shortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+-"), self)
+
+        self.quit_app_shortcut.activated.connect(self._closeApp)
+        self.close_app_shortcut.activated.connect(self._closeApp)
+        self.full_screen_shortcut.activated.connect(self._fullScreen)
+        self.maximize_shortcut.activated.connect(self._maximize)
+        self.minimize_shortcut.activated.connect(self._minimize)
+
+    def _closeApp(self):
+        sys.exit()
+
+    def _fullScreen(self):
+        self.showFullScreen()
+
+    def _maximize(self):
+        self.showMaximized()
+
+    def _minimize(self):
+        self.showMinimized()
