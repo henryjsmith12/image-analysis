@@ -89,6 +89,7 @@ class LineSegmentROI(pg.LineSegmentROI):
         x_2, y_2 = self.parent_plot.x_coords[-1], self.parent_plot.y_coords[-1]
         self.movePoint(self.getHandles()[0], (x_1, y_1))
         self.movePoint(self.getHandles()[1], (x_2, y_2))
+        self.parent_plot.autoRange()
 
     def _getSlice(self):
 
