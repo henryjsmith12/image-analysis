@@ -197,7 +197,7 @@ class ImageToolController(QtGui.QWidget):
         # Connections
         self.color_map_ctrl.colorMapChanged.connect(self._setColorMap)
 
-    def _setMouseInfo(self, x, y) -> None:
+    def _setMouseInfo(self, x, y, sender) -> None:
 
         if x is None or y is None:
             self.mouse_info_widget._setMouseInfo(None, None, None, None)
@@ -212,19 +212,25 @@ class ImageToolController(QtGui.QWidget):
             try:
                 # RawDataWidget
                 if type(self.image_tool.parent) == RawDataWidget:
-                    i = self.image_tool.parent.controller.slice_index
-                    h, k, l = self.image_tool.parent.scan.rsm[i, x, y]
-                    value = self.image_tool.parent.scan.raw_image_data[i, x, y]
+                    if sender == self.image_tool.plot_3d:
+                        i = self.image_tool.parent.controller.slice_index
+                        h, k, l = self.image_tool.parent.scan.rsm[i, x, y]
+                        value = self.image_tool.parent.scan.raw_image_data[i, x, y]
+                    elif sender == self.image_tool.plot_2d:
+                        h, k, l, value = None, None, None, None
                 # GriddedDataWidget
                 elif type(self.image_tool.parent) == GriddedDataWidget:
-                    dim_order = self.image_tool.parent.controller.dim_order
-                    data = np.transpose(self.image_tool.data, dim_order)
-                    i = self.image_tool.parent.controller.slice_index
-                    value = data[x, y, i]
-                    coords = self.image_tool.parent.scan.gridded_image_coords
-                    h = coords[0][[x, y, i][dim_order.index(0)]]
-                    k = coords[1][[x, y, i][dim_order.index(1)]]
-                    l = coords[2][[x, y, i][dim_order.index(2)]]
+                    if sender == self.image_tool.plot_3d:
+                        dim_order = self.image_tool.parent.controller.dim_order
+                        data = np.transpose(self.image_tool.data, dim_order)
+                        i = self.image_tool.parent.controller.slice_index
+                        value = data[x, y, i]
+                        coords = self.image_tool.parent.scan.gridded_image_coords
+                        h = coords[0][[x, y, i][dim_order.index(0)]]
+                        k = coords[1][[x, y, i][dim_order.index(1)]]
+                        l = coords[2][[x, y, i][dim_order.index(2)]]
+                    elif sender == self.image_tool.plot_2d:
+                        h, k, l, value = None, None, None, None
             except: 
                 pass
 
@@ -380,9 +386,9 @@ class ImagePlot(pg.ImageView):
             )
             if 0 <= x_point < self.image.shape[0] and \
             0 <= y_point < self.image.shape[1]:
-                self.controller._setMouseInfo(x_point, y_point)
+                self.controller._setMouseInfo(x_point, y_point, sender=self)
             else:
-                self.controller._setMouseInfo(None, None)
+                self.controller._setMouseInfo(None, None, sender=self)
 
 class LinePlot(pg.PlotWidget):
     """Adapted pyqtgraph PlotWidget object"""
