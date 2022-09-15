@@ -23,8 +23,8 @@ class MainWindow(QtGui.QWidget):
         super(MainWindow, self).__init__()
 
         # Window attributes
-        self.setMinimumSize(900, 700)
-        self.setGeometry(0, 50, 900, 700)
+        self.setMinimumSize(1000, 800)
+        self.setGeometry(100, 100, 1000, 800)
         self.setWindowTitle("image-analysis")
 
         # Child widgets
