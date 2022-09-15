@@ -114,18 +114,20 @@ class LineSegmentROI(pg.LineSegmentROI):
                         slice.append(data[i, x, y])
                     else:
                         slice.append(0)
-
             slice = np.array(slice).reshape((data.shape[0], len(self.x_coords)))
-
             self.child_plot._plot(
                 image=slice, 
-                x_label="t"
+                x_label="t",
+                y_axis=False
             )
 
         # GriddedDataWidget
         elif type(self.image_tool.parent) == GriddedDataWidget:
             dim_order = self.image_tool.parent.controller.dim_order
             data = np.transpose(self.image_tool.data, dim_order)
+            x_label = ["H", "K", "L"][dim_order[2]]
+            x_coords = self.image_tool.parent.controller.coords[dim_order[2]]
+
             slice = []
             for i in range(data.shape[2]):
                 for x, y in zip(self.x_coords, self.y_coords):
@@ -133,11 +135,12 @@ class LineSegmentROI(pg.LineSegmentROI):
                         slice.append(data[x, y, i])
                     else:
                         slice.append(0)
-
             slice = np.array(slice).reshape((data.shape[2], len(self.x_coords)))
-            
             self.child_plot._plot(
-                image=slice
+                image=slice,
+                x_label=x_label,
+                x_coords=x_coords,
+                y_axis=False
             )
 
 
