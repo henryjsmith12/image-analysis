@@ -132,6 +132,10 @@ class GriddedDataController(QtGui.QWidget):
         self.layout.itemAt(1).widget()._setEnabled(False)
         self.layout.itemAt(2).widget()._setEnabled(True)
 
+        if self.image_tool.controller.plot_3d_roi_ctrl.roi is not None:
+            self.image_tool.controller.plot_3d_roi_ctrl.roi._center()
+        self.image_tool.plot_3d.autoRange()
+
     def _setImage(self) -> None:
         """Loads image in connected image tool."""
 
