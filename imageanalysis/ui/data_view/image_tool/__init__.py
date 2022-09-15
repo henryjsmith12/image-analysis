@@ -293,7 +293,9 @@ class ImagePlot(pg.ImageView):
         x_label: str=None,
         y_label: str=None,
         x_coords: np.ndarray=None,
-        y_coords: np.ndarray=None
+        y_coords: np.ndarray=None,
+        x_axis: bool=True,
+        y_axis: bool=True
     ) -> None:
 
         self.image = image
@@ -312,6 +314,16 @@ class ImagePlot(pg.ImageView):
             transform=self.transform
         )
 
+        if x_axis:
+            self.getView().showAxis("bottom")
+        else:
+            self.getView().hideAxis("bottom")
+
+        if y_axis:
+            self.getView().showAxis("left")
+        else:
+            self.getView().hideAxis("left")
+            
         self.updated.emit()
 
     def _normalizeImage(self) -> None:
