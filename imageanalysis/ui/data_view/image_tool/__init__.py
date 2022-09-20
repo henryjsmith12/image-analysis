@@ -375,6 +375,7 @@ class ImagePlot(pg.ImageView):
         else:
             norm_max = self.image_tool.color_map_range[-1]
         image[image > norm_max] = norm_max
+        image[image == 0] = np.NAN
         image = image / norm_max
         self.norm_image = image
 
