@@ -64,14 +64,10 @@ class MainWindow(QtGui.QWidget):
             hideTitle=True,
             closable=False
         )
-
-        # Setting maximum size for selection docks
         self.project_selection_dock.setMaximumWidth(300)
         self.scan_selection_dock.setMaximumWidth(300)
         self.data_view_dock.setStretch(5, 5)
         self.plot_view_dock.setStretch(5, 5)
-
-        # Adds docks to dock area
         self.dock_area.addDock(self.project_selection_dock)
         self.dock_area.addDock(
             self.scan_selection_dock,
@@ -105,21 +101,24 @@ class MainWindow(QtGui.QWidget):
         self.full_screen_shortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+F"), self)
         self.maximize_shortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+="), self)
         self.minimize_shortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+-"), self)
-
         self.quit_app_shortcut.activated.connect(self._closeApp)
         self.close_app_shortcut.activated.connect(self._closeApp)
         self.full_screen_shortcut.activated.connect(self._fullScreen)
         self.maximize_shortcut.activated.connect(self._maximize)
         self.minimize_shortcut.activated.connect(self._minimize)
 
-    def _closeApp(self):
+    def _closeApp(self) -> None:
+        """Exits application"""
         sys.exit()
 
-    def _fullScreen(self):
+    def _fullScreen(self) -> None:
+        """Displays window in full screen"""
         self.showFullScreen()
 
-    def _maximize(self):
+    def _maximize(self) -> None:
+        """Maximizes window size"""
         self.showMaximized()
 
-    def _minimize(self):
+    def _minimize(self) -> None:
+        """Minimizes window"""
         self.showMinimized()
