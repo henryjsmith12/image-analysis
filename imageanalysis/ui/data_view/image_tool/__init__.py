@@ -21,7 +21,7 @@ class ImageTool(DockArea):
     imageUpdated = QtCore.pyqtSignal()
 
     def __init__(self, parent) -> None:
-        super().__init__()
+        super(ImageTool, self).__init__()
 
         self.parent = parent
         self.data = None
@@ -61,11 +61,16 @@ class ImageTool(DockArea):
             closable=False
         )
 
+        # Child widgets
         self.plot_3d = ImagePlot(parent=self, dock=self.plot_3d_dock)
         self.plot_2d = ImagePlot(parent=self, dock=self.plot_2d_dock)
         self.plot_1d = LinePlot(parent=self, dock=self.plot_1d_dock)
-        self.controller = ImageToolController(parent=self, dock=self.controller_dock)
+        self.controller = ImageToolController(
+            parent=self, 
+            dock=self.controller_dock
+        )
         
+        # Adds widgets to docks
         self.plot_3d_dock.addWidget(self.plot_3d)
         self.plot_2d_dock.addWidget(self.plot_2d)
         self.plot_1d_dock.addWidget(self.plot_1d)
@@ -79,6 +84,8 @@ class ImageTool(DockArea):
         self.controller_dock.setMaximumWidth(220)
         self.controller_dock.setMinimumWidth(220)
 
+        # Hides 2D and 1D plots
+        # Will be made visible when an ROI is added
         self.plot_2d._hide()
         self.plot_1d._hide()
 
@@ -91,6 +98,7 @@ class ImageTool(DockArea):
         x_coords: list=None,
         y_coords: list=None
     ) -> None:
+        """Sets an image with given parameters to the 3D ImagePlot"""
 
         self.image = image
         self.x_label = x_label
@@ -107,18 +115,25 @@ class ImageTool(DockArea):
         )
 
         # For first runthrough
+        # Applies a color map to the image
         if self.data is None:
             self.data = data
             self.data_range = (np.amin(data), np.amax(data))
             self.controller._setColorMap()
-
-        
-    def _setColorMap(self, color_map, range) -> None:
+   
+    def _setColorMap(
+        self, 
+        color_map: pg.ColorMap, 
+        range: tuple
+    ) -> None:
         """Applies a color map and color bar object to the plots."""
+
         self.color_map = color_map
         self.color_map_range = range
 
+        # For first runthrough
         if self.color_bar_3d is None:
+            # Creates color bar for plot
             self.color_bar_3d = pg.ColorBarItem(
                 values=range,
                 cmap=color_map,
@@ -130,8 +145,10 @@ class ImageTool(DockArea):
                 img=self.plot_3d.image,
                 insert_in=self.plot_3d.getView()
             )
+        # Applys color map to plot
         self.plot_3d.setColorMap(color_map)
         self.color_bar_3d.setCmap(color_map)
+        # Adjusts color map range in color bar
         self.color_bar_3d.setLevels(range)
 
         if self.plot_2d.isVisible():
@@ -296,11 +313,11 @@ class ImagePlot(pg.ImageView):
         # Connections
         self.getView().scene().sigMouseMoved.connect(self._updateMousePoint)
 
-    def _hide(self):
+    def _hide(self) -> None:
         self.hide()
         self.dock.hide()
 
-    def _show(self):
+    def _show(self) -> None:
         self.show()
         self.dock.show()
 
@@ -354,7 +371,7 @@ class ImagePlot(pg.ImageView):
         image = image / norm_max
         self.norm_image = image
 
-    def _setLabels(self, x_label, y_label):
+    def _setLabels(self, x_label, y_label) -> None:
 
         if x_label is not None and type(x_label) == str:
             self.x_label = x_label
@@ -363,7 +380,7 @@ class ImagePlot(pg.ImageView):
             self.y_label = y_label
             self.getView().setLabel("left", y_label)
 
-    def _setCoordinates(self, x_coords, y_coords):
+    def _setCoordinates(self, x_coords, y_coords) -> None:
         
         self.transform = QtGui.QTransform()
         if x_coords is not None:
@@ -394,7 +411,7 @@ class ImagePlot(pg.ImageView):
         self.transform.translate(*pos)
         self.transform.scale(*scale)
 
-    def _updateMousePoint(self, scene_point=None):
+    def _updateMousePoint(self, scene_point=None) -> None:
 
         if self.controller is None:
             self.controller = self.image_tool.controller
@@ -413,11 +430,14 @@ class ImagePlot(pg.ImageView):
                     (self.y_coords[-1] - self.y_coords[0])
                 )
             )
-            if 0 <= x_point < self.image.shape[0] and \
-            0 <= y_point < self.image.shape[1]:
+            if (
+                0 <= x_point < self.image.shape[0] and
+                0 <= y_point < self.image.shape[1]
+            ):
                 self.controller._setMouseInfo(x_point, y_point, sender=self)
             else:
                 self.controller._setMouseInfo(None, None, sender=self)
+
 
 class LinePlot(pg.PlotWidget):
     """Adapted pyqtgraph PlotWidget object"""
@@ -428,13 +448,18 @@ class LinePlot(pg.PlotWidget):
         self.image_tool = parent
         self.dock = dock
 
-    def _hide(self):
+    def _hide(self) -> None:
+        """Hides plot and dock."""
+
         self.hide()
         self.dock.hide()
 
-    def _show(self):
+    def _show(self) -> None:
+        """Shows plot and dock."""
+
         self.show()
         self.dock.show()
+
 
 class MouseInfoWidget(QtGui.QGroupBox):
     """Handles displaying proper mouse location and associated values."""
@@ -482,7 +507,7 @@ class MouseInfoWidget(QtGui.QGroupBox):
     def _setMouseInfo(self, h=None, k=None, l=None, value=None) -> None:
         """Sets values to respective textboxes."""
 
-        if h is not None:
+        if value is not None:
             self.h_txt.setText(str(round(h, 7)))
             self.k_txt.setText(str(round(k, 7)))
             self.l_txt.setText(str(round(l, 7) or ""))
