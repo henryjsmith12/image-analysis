@@ -88,7 +88,7 @@ class RawDataController(QtGui.QWidget):
         # Display first image
         self._setImage()
 
-    def _setSliceIndex(self):
+    def _setSliceIndex(self) -> None:
         """Sets index for slice in view."""
 
         sender = self.sender()
@@ -101,11 +101,11 @@ class RawDataController(QtGui.QWidget):
         self.slice_index = index
         self._setImage()
 
-    def _setImage(self):
+    def _setImage(self) -> None:
         """Sets image for connected ImageTool."""
 
         image = self.data[self.slice_index]
         self.image_tool._setImage(
-            image=image, 
+            image=image,
             data=self.data
         )
