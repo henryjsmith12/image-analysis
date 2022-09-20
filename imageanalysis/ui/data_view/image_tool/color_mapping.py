@@ -3,24 +3,21 @@
 See LICENSE file.
 """
 
+
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtCore, QtGui
 from sklearn import preprocessing
 
 
-# TODO: Updated documentation
-
 class ColorMapController(QtGui.QGroupBox):
     """Allows user to apply a colormap to an image."""
 
     colorMapChanged = QtCore.pyqtSignal()
 
-    def __init__(
-        self,
-        parent
-    ) -> None:
+    def __init__(self, parent) -> None:
         super(ColorMapController, self).__init__()
+
         self.parent = parent
         self.color_map = None
         self.color_map_max = None
@@ -110,7 +107,7 @@ class ColorMapController(QtGui.QGroupBox):
         self._setColorMap()
         self._setColorMapBounds()
 
-    def _setColorMap(self):
+    def _setColorMap(self) -> None:
         """Sets parameters for color map creation and emits signal."""
 
         self.name = self.name_cbx.currentText()
@@ -128,7 +125,7 @@ class ColorMapController(QtGui.QGroupBox):
 
         self.colorMapChanged.emit()
 
-    def _toggleScaleOptions(self):
+    def _toggleScaleOptions(self) -> None:
         """Hides/shows respective options for each color map scale."""
 
         if self.scale_cbx.currentText() == "linear":
@@ -147,7 +144,7 @@ class ColorMapController(QtGui.QGroupBox):
             self.gamma_lbl.show()
             self.gamma_sbx.show()
 
-    def _setColorMapBounds(self):
+    def _setColorMapBounds(self) -> None:
         """Sets maximum pixel value for color map."""
 
         self.color_map_max = self.max_value_sbx.value()
