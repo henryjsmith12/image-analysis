@@ -15,6 +15,7 @@ def gridScan(
 ) -> tuple:
     """Creates a gridded array of raw image data from RSM coordinates."""
 
+    # See structures.py for grid_params creation
     h_min = grid_params["H"]["min"]
     k_min = grid_params["K"]["min"]
     l_min = grid_params["L"]["min"]
@@ -39,9 +40,8 @@ def gridScan(
     )
     gridder(h, k, l, raw_image_data)
 
-    # gridded_image_data.shape: (h_n, k_n, l_n)
-    # coords.shape: (3, length)
     gridded_image_data = gridder.data
+    # TODO: Handle mismatched coordinate lengths
     coords = np.array([gridder.xaxis, gridder.yaxis, gridder.zaxis])
 
     return gridded_image_data, coords
