@@ -16,11 +16,24 @@ Basic color mapping.
 - ColorMapWidget for creating custom color maps
 
 ## [0.1.2] - 2022-08-09
-Additional color mapping functions and mouse tracking.
+Additional color mapping functions and mouse tracking
 
 ### Added
 - Option to change maximum pixel value of a color map
 - Mouse info section that tracks HKL positions and intensity of a pixel when hovered over
 
 ### Fixed
-- Color bars now accurately represent an image's color map.
+- Color bars now accurately represent an image's color map
+
+## [0.1.3] - 2022-20-09
+Line segment ROI's and QOL fixes
+
+### Added
+- Line segment ROI objects that can be added to the main ImagePlot that will produce a 2D slice of the contained pixels
+- Basic keyboard shortcuts (Close: Ctrl+W or Ctrl+Q, Minimize: Ctrl+-, Full Screen: Ctrl+Shift+F)
+
+### Fixed
+- Faster color mapping
+- Gridded Data: Image is automatically scaled when dimension order changes
+- Error handling for mouse tracking
+- Maximum direction pixel count for gridding decreased from 1000px to 750px

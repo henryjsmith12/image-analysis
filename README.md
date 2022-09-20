@@ -1,7 +1,7 @@
 # image-analysis
 Python-based software for XRD data analysis. Allows users to analyze SPEC data, raw XRD scan images, and reciprocal space-converted datasets.
 
-![image-analysis v0.1.1 GUI](https://github.com/henryjsmith12/image-analysis/blob/main/screenshots/readme_gui.png?raw=true)
+![image-analysis v0.1.3 GUI](https://github.com/henryjsmith12/image-analysis/blob/main/screenshots/readme_gui.png?raw=true)
 
 ## Getting Started
 
@@ -94,7 +94,7 @@ python imageanalysis.py
 
 The GUI on startup should look like this:
 
-![Empty image-analysis v0.1.1 GUI](https://github.com/henryjsmith12/image-analysis/blob/main/screenshots/readme_empty_gui.png?raw=true)
+![Empty image-analysis GUI](https://github.com/henryjsmith12/image-analysis/blob/main/screenshots/readme_empty_gui.png?raw=true)
 
 ### Projects
 
@@ -112,6 +112,5 @@ See [`LICENSE.txt`](https://github.com/henryjsmith12/image-analysis/blob/main/LI
 [Henry Smith](https://www.linkedin.com/in/henry-smith-5956a0189/) - Co-op Student Technical at Argonne National Laboratory
 
 ## Support
-
 * [Report bugs here](https://github.com/henryjsmith12/image-analysis/issues)
 * Email author at [smithh@anl.gov](smithh@anl.gov)
