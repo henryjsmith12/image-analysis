@@ -234,9 +234,6 @@ class ImageToolController(QtGui.QWidget):
         # Connections
         self.color_map_ctrl.colorMapChanged.connect(self._setColorMap)
 
-        print(self.scroll_area_widget.sizePolicy().verticalPolicy())
-        print(self.scroll_area_widget.sizePolicy().horizontalPolicy())
-
     def _setMouseInfo(self, x, y, sender) -> None:
 
         if x is None or y is None:
