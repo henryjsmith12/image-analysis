@@ -78,6 +78,7 @@ def isValidInstrumentXMLFile(path: str) -> bool:
 
     try:
         instrument_reader = InstForXrayutilitiesReader(path)
+        # Raises an error if getSampleCircleDirections() is empty
         sc = instrument_reader.getSampleCircleDirections()
     except:
         return False
@@ -90,6 +91,7 @@ def isValidDetectorXMLFile(path: str) -> bool:
 
     try:
         detector_reader = DetectorGeometryForXrayutilitiesReader(path)
+        # Raises an error if getDetectors() is empty
         detector = detector_reader.getDetectors()[0]
     except:
         return False
