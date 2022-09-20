@@ -4,9 +4,8 @@ See LICENSE file.
 """
 
 
-import sys
-
 from pyqtgraph import QtGui
+import sys
 
 from imageanalysis.ui.main_window import MainWindow
 
