@@ -3,8 +3,8 @@
 ### ROI's
 - [ ] Line segment ROI
     - [X] 3D -> 2D
-    - [ ] 3D -> 1D
-    - [ ] 2D -> 1D
+    - [ ] 3D -> 1D (v0.1.4)
+    - [ ] 2D -> 1D (v0.1.4)
 - [ ] Rectangular ROI
 - [ ] Radial ROI
 - [ ] Polygon ROI
@@ -14,6 +14,7 @@
 
 ### Scriptability
 - [ ] The ability to script ROI applications
+- [ ] Replicate ROI positions and plot results with MatPlotLib
 
 ### Bluesky Compatibility
 - [ ] Local databroker usage for 6-ID-B
