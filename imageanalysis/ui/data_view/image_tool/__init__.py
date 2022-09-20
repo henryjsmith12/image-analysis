@@ -66,10 +66,10 @@ class ImageTool(DockArea):
         self.plot_2d = ImagePlot(parent=self, dock=self.plot_2d_dock)
         self.plot_1d = LinePlot(parent=self, dock=self.plot_1d_dock)
         self.controller = ImageToolController(
-            parent=self, 
+            parent=self,
             dock=self.controller_dock
         )
-        
+
         # Adds widgets to docks
         self.plot_3d_dock.addWidget(self.plot_3d)
         self.plot_2d_dock.addWidget(self.plot_2d)
@@ -120,10 +120,10 @@ class ImageTool(DockArea):
             self.data = data
             self.data_range = (np.amin(data), np.amax(data))
             self.controller._setColorMap()
-   
+
     def _setColorMap(
-        self, 
-        color_map: pg.ColorMap, 
+        self,
+        color_map: pg.ColorMap,
         range: tuple
     ) -> None:
         """Applies a color map and color bar object to the plots."""
@@ -167,7 +167,7 @@ class ImageTool(DockArea):
             self.plot_2d.setColorMap(color_map)
             self.color_bar_2d.setCmap(color_map)
             self.color_bar_2d.setLevels(range)
-            
+
         self.plot_3d._plot(
             image=self.image,
             x_label=self.x_label,
@@ -178,15 +178,21 @@ class ImageTool(DockArea):
 
         self.colorMapUpdated.emit()
 
+
 class ImageToolController(QtGui.QWidget):
     """Handles color mapping, mouse info, and ROI's."""
 
-    def __init__(self, parent, dock) -> None:
+    def __init__(
+        self,
+        parent: ImageTool,
+        dock: Dock
+    ) -> None:
         super(ImageToolController, self).__init__()
 
         self.image_tool = parent
         self.dock = dock
 
+        # Imported here to avoid circular imports
         from imageanalysis.ui.data_view.image_tool.roi import ROIController
 
         # Scroll area
@@ -237,7 +243,7 @@ class ImageToolController(QtGui.QWidget):
             self.mouse_info_widget._setMouseInfo(None, None, None, None)
         else:
             from imageanalysis.ui.data_view.gridded_data import \
-            GriddedDataWidget
+                GriddedDataWidget
             from imageanalysis.ui.data_view.raw_data import \
                 RawDataWidget
 
@@ -248,24 +254,27 @@ class ImageToolController(QtGui.QWidget):
                 if type(self.image_tool.parent) == RawDataWidget:
                     if sender == self.image_tool.plot_3d:
                         i = self.image_tool.parent.controller.slice_index
-                        h, k, l = self.image_tool.parent.scan.rsm[i, x, y]
-                        value = self.image_tool.parent.scan.raw_image_data[i, x, y]
+                        scan = self.image_tool.parent.scan
+                        h, k, l = scan.rsm[i, x, y]
+                        value = scan.raw_image_data[i, x, y]
                     elif sender == self.image_tool.plot_2d:
                         h, k, l, value = None, None, None, None
                 # GriddedDataWidget
                 elif type(self.image_tool.parent) == GriddedDataWidget:
                     if sender == self.image_tool.plot_3d:
-                        dim_order = self.image_tool.parent.controller.dim_order
+                        ctrl = self.image_tool.parent.controller
+                        dim_order = ctrl.dim_order
                         data = np.transpose(self.image_tool.data, dim_order)
-                        i = self.image_tool.parent.controller.slice_index
+                        i = ctrl.slice_index
                         value = data[x, y, i]
-                        coords = self.image_tool.parent.scan.gridded_image_coords
+                        scan = self.image_tool.parent.scan
+                        coords = scan.gridded_image_coords
                         h = coords[0][[x, y, i][dim_order.index(0)]]
                         k = coords[1][[x, y, i][dim_order.index(1)]]
                         l = coords[2][[x, y, i][dim_order.index(2)]]
                     elif sender == self.image_tool.plot_2d:
                         h, k, l, value = None, None, None, None
-            except: 
+            except:
                 pass
 
             # HKL and intensity information passed to ImageToolController
@@ -278,6 +287,7 @@ class ImageToolController(QtGui.QWidget):
             color_map=self.color_map_ctrl.color_map,
             range=(0, self.color_map_ctrl.color_map_max)
         )
+
 
 class ImagePlot(pg.ImageView):
     """An adapted pyqtgraph ImageView object."""
@@ -302,7 +312,7 @@ class ImagePlot(pg.ImageView):
         self.x_label, self.y_label = None, None
         self.x_coords, self.y_coords = None, None
         self.transform = None
-        
+
         # Removing UI clutter
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
@@ -357,7 +367,7 @@ class ImagePlot(pg.ImageView):
             self.getView().showAxis("left")
         else:
             self.getView().hideAxis("left")
-            
+
         self.updated.emit()
 
     def _normalizeImage(self) -> None:
@@ -381,7 +391,7 @@ class ImagePlot(pg.ImageView):
             self.getView().setLabel("left", y_label)
 
     def _setCoordinates(self, x_coords, y_coords) -> None:
-        
+
         self.transform = QtGui.QTransform()
         if x_coords is not None:
             self.x_coords = x_coords
@@ -404,7 +414,7 @@ class ImagePlot(pg.ImageView):
             )
 
         scale = (
-            self.x_coords[1] - self.x_coords[0], 
+            self.x_coords[1] - self.x_coords[0],
             self.y_coords[1] - self.y_coords[0]
         )
         pos = (self.x_coords[0], self.y_coords[0])
