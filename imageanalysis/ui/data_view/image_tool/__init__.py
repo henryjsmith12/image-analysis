@@ -76,8 +76,8 @@ class ImageTool(DockArea):
         self.addDock(self.plot_3d_dock, "left", self.controller_dock)
         self.addDock(self.plot_2d_dock, "bottom", self.plot_3d_dock)
         self.addDock(self.plot_1d_dock, "bottom", self.plot_2d_dock)
-        self.controller_dock.setMaximumWidth(200)
-        self.controller_dock.setMinimumWidth(200)
+        self.controller_dock.setMaximumWidth(220)
+        self.controller_dock.setMinimumWidth(220)
 
         self.plot_2d._hide()
         self.plot_1d._hide()
@@ -171,6 +171,14 @@ class ImageToolController(QtGui.QWidget):
         self.dock = dock
 
         from imageanalysis.ui.data_view.image_tool.roi import ROIController
+
+        # Scroll area
+        self.scroll_area = QtGui.QScrollArea()
+        self.scroll_area.setWidgetResizable(True)
+        self.scroll_area_widget = QtGui.QWidget()
+        self.scroll_area_layout = QtGui.QVBoxLayout()
+        self.scroll_area_widget.setLayout(self.scroll_area_layout)
+
         # Child widgets
         self.mouse_info_widget = MouseInfoWidget()
         self.color_map_ctrl = ColorMapController(parent=self)
@@ -191,13 +199,20 @@ class ImageToolController(QtGui.QWidget):
         # Child layout
         self.layout = QtGui.QVBoxLayout()
         self.setLayout(self.layout)
-        self.layout.addWidget(self.mouse_info_widget)
-        self.layout.addWidget(self.color_map_ctrl)
-        self.layout.addWidget(self.plot_3d_roi_ctrl)
-        self.layout.addWidget(self.plot_2d_roi_ctrl)
+        self.layout.addWidget(self.scroll_area)
+
+        self.scroll_area_layout.addWidget(self.mouse_info_widget)
+        self.scroll_area_layout.addWidget(self.color_map_ctrl)
+        self.scroll_area_layout.addWidget(self.plot_3d_roi_ctrl)
+        self.scroll_area_layout.addWidget(self.plot_2d_roi_ctrl)
+        self.scroll_area.setWidget(self.scroll_area_widget)
+        self.scroll_area_widget.setFixedWidth(190)
 
         # Connections
         self.color_map_ctrl.colorMapChanged.connect(self._setColorMap)
+
+        print(self.scroll_area_widget.sizePolicy().verticalPolicy())
+        print(self.scroll_area_widget.sizePolicy().horizontalPolicy())
 
     def _setMouseInfo(self, x, y, sender) -> None:
 
