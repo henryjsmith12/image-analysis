@@ -33,7 +33,5 @@ Line segment ROI's and QOL fixes
 - Basic keyboard shortcuts (Close: Ctrl+W or Ctrl+Q, Minimize: Ctrl+-, Full Screen: Ctrl+Shift+F)
 
 ### Fixed
-- Faster color mapping
+- More efficient color mapping
 - Gridded Data: Image is automatically scaled when dimension order changes
-- Error handling for mouse tracking
-- Maximum direction pixel count for gridding decreased from 1000px to 750px
