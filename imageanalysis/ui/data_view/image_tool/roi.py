@@ -79,7 +79,7 @@ class ROIController(QtGui.QGroupBox):
             self.roi._getSlice()
             self.parent_plot.image_tool.controller._setColorMap()
 
-
+# TODO: Differentiate between 2d and 3d images
 class LineSegmentROI(pg.LineSegmentROI):
     """An altered version of pyqtgraph's LineSegmentROI."""
 
@@ -167,3 +167,5 @@ class LineSegmentROI(pg.LineSegmentROI):
                 x_coords=x_coords,
                 y_axis=False
             )
+
+# TODO: Create RectROI with matching functions to LineROI
