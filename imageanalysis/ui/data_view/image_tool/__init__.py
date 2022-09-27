@@ -62,8 +62,8 @@ class ImageTool(DockArea):
         )
 
         # Child widgets
-        self.plot_3d = ImagePlot(parent=self, dock=self.plot_3d_dock)
-        self.plot_2d = ImagePlot(parent=self, dock=self.plot_2d_dock)
+        self.plot_3d = ImagePlot(parent=self, dock=self.plot_3d_dock, n_dim=3)
+        self.plot_2d = ImagePlot(parent=self, dock=self.plot_2d_dock, n_dim=2)
         self.plot_1d = LinePlot(parent=self, dock=self.plot_1d_dock)
         self.controller = ImageToolController(
             parent=self,
@@ -291,7 +291,7 @@ class ImagePlot(pg.ImageView):
 
     updated = QtCore.pyqtSignal()
 
-    def __init__(self, parent, dock) -> None:
+    def __init__(self, parent, dock, n_dim) -> None:
         super(ImagePlot, self).__init__(
             imageItem=pg.ImageItem(),
             view=pg.PlotItem()
@@ -301,6 +301,7 @@ class ImagePlot(pg.ImageView):
         self.image_tool = parent
         self.controller = None
         self.dock = dock
+        self.n_dim = n_dim
 
         # Class variables for plotting
         self.data = None
@@ -467,6 +468,19 @@ class LinePlot(pg.PlotWidget):
 
         self.show()
         self.dock.show()
+
+    def _plot(
+        self,
+        data: np.ndarray=None,
+        x_label: str=None,
+        y_label: str=None,
+        x_coords: np.ndarray=None,
+        y_coords: np.ndarray=None,
+        x_axis: bool=True,
+        y_axis: bool=True
+    ) -> None:
+
+        self.plot(data, clear=True)
 
 
 class MouseInfoWidget(QtGui.QGroupBox):
