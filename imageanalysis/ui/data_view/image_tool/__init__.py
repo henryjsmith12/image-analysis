@@ -305,7 +305,7 @@ class ImagePlot(pg.ImageView):
 
         # Class variables for plotting
         self.data = None
-        self.image = None
+        self.image_data = None
         self.norm_image = None
         self.x_label, self.y_label = None, None
         self.x_coords, self.y_coords = None, None
@@ -340,7 +340,7 @@ class ImagePlot(pg.ImageView):
         y_axis: bool=True
     ) -> None:
 
-        self.image = image
+        self.image_data = image
         self.x_label = x_label
         self.y_label = y_label
         self.x_coords = x_coords
@@ -349,12 +349,14 @@ class ImagePlot(pg.ImageView):
         self._setLabels(x_label, y_label)
         self._setCoordinates(x_coords, y_coords)
         self._normalizeImage()
+
         self.setImage(
             img=self.norm_image,
             autoRange=False,
             autoLevels=False,
             transform=self.transform
         )
+        
 
         if x_axis:
             self.getView().showAxis("bottom")
@@ -370,7 +372,7 @@ class ImagePlot(pg.ImageView):
 
     def _normalizeImage(self) -> None:
 
-        image = np.copy(self.image)
+        image = np.copy(self.image_data)
         if self.image_tool.color_map_range is None:
             norm_max = 1
         else:
@@ -397,8 +399,8 @@ class ImagePlot(pg.ImageView):
         else:
             self.x_coords = np.linspace(
                 start=0,
-                stop=self.image.shape[0] - 1,
-                num=self.image.shape[0],
+                stop=self.image_data.shape[0] - 1,
+                num=self.image_data.shape[0],
                 endpoint=False
             )
 
@@ -407,8 +409,8 @@ class ImagePlot(pg.ImageView):
         else:
             self.y_coords = np.linspace(
                 start=0,
-                stop=self.image.shape[1] - 1,
-                num=self.image.shape[1],
+                stop=self.image_data.shape[1] - 1,
+                num=self.image_data.shape[1],
                 endpoint=False
             )
 
@@ -428,20 +430,20 @@ class ImagePlot(pg.ImageView):
         if scene_point is not None:
             view_point = self.getView().vb.mapSceneToView(scene_point)
             x_point = int(
-                self.image.shape[0] * (
+                self.image_data.shape[0] * (
                     (view_point.x() - self.x_coords[0]) /
                     (self.x_coords[-1] - self.x_coords[0])
                 )
             )
             y_point = int(
-                self.image.shape[1] * (
+                self.image_data.shape[1] * (
                     (view_point.y() - self.y_coords[0]) /
                     (self.y_coords[-1] - self.y_coords[0])
                 )
             )
             if (
-                0 <= x_point < self.image.shape[0] and
-                0 <= y_point < self.image.shape[1]
+                0 <= x_point < self.image_data.shape[0] and
+                0 <= y_point < self.image_data.shape[1]
             ):
                 self.controller._setMouseInfo(x_point, y_point, sender=self)
             else:

@@ -63,6 +63,8 @@ class ROIController(QtGui.QGroupBox):
                 self.roi = None
             self.child_plot._hide()
             self.roi_details_gbx.hide()
+            if self.parent_plot.n_dim == 3:
+                self.parent_plot.image_tool.controller.plot_2d_roi_ctrl.hide()
         elif self.roi_type_cbx.currentText() == "line":
             self.parent_plot.removeItem(self.roi)
             self.roi = LineSegmentROI(
@@ -78,8 +80,10 @@ class ROIController(QtGui.QGroupBox):
             self.roi_details_gbx.show()
             self.roi._getSlice()
             self.parent_plot.image_tool.controller._setColorMap()
+            if self.parent_plot.n_dim == 3:
+                self.parent_plot.image_tool.controller.plot_2d_roi_ctrl.show()
 
-# TODO: Differentiate between 2d and 3d images
+
 class LineSegmentROI(pg.LineSegmentROI):
     """An altered version of pyqtgraph's LineSegmentROI."""
 
@@ -115,57 +119,86 @@ class LineSegmentROI(pg.LineSegmentROI):
     def _getSlice(self) -> None:
         """Retrieves and plots slice data."""
 
-        data, coords = self.getArrayRegion(
-            data=self.parent_plot.image_tool.data,
-            img=self.parent_plot.getImageItem(),
-            returnMappedCoords=True
-        )
-        self.x_coords, self.y_coords = coords.astype(int)
+        # Get slice data and coordinates
+        # Check parent type (grid or raw)
+        # Check parent_plot n_dim (3 or 2)
+        # 
 
         from imageanalysis.ui.data_view.gridded_data import \
             GriddedDataWidget
         from imageanalysis.ui.data_view.raw_data import \
             RawDataWidget
 
+        data, coords = self.getArrayRegion(
+            data=self.parent_plot.image_tool.data,
+            img=self.parent_plot.getImageItem(),
+            returnMappedCoords=True
+        )
+        self.x_coords, self.y_coords = coords.astype(int)
+        
         if type(self.image_tool.parent) == RawDataWidget:
-            data = self.image_tool.parent.scan.raw_image_data
-            slice = []
+            if self.parent_plot.n_dim == 3:
+                data = self.image_tool.parent.scan.raw_image_data
+                slice = []
 
-            for i in range(data.shape[0]):
-                for x, y in zip(self.x_coords, self.y_coords):
-                    if 0 <= x < data.shape[1] and 0 <= y < data.shape[2]:
-                        slice.append(data[i, x, y])
-                    else:
-                        slice.append(0)
-            slice_array = np.array(slice)
-            slice = slice_array.reshape((data.shape[0], len(self.x_coords)))
-            self.child_plot._plot(
-                image=slice,
-                x_label="t",
-                y_axis=False
-            )
+                for i in range(data.shape[0]):
+                    for x, y in zip(self.x_coords, self.y_coords):
+                        if 0 <= x < data.shape[1] and 0 <= y < data.shape[2]:
+                            slice.append(data[i, x, y])
+                        else:
+                            slice.append(0)
+                slice_array = np.array(slice)
+                slice = slice_array.reshape((data.shape[0], len(self.x_coords)))
+                
+                self.child_plot._plot(
+                    image=slice,
+                    x_label="t",
+                    y_axis=False
+                )
 
-        # GriddedDataWidget
-        elif type(self.image_tool.parent) == GriddedDataWidget:
-            dim_order = self.image_tool.parent.controller.dim_order
-            data = np.transpose(self.image_tool.data, dim_order)
-            x_label = ["H", "K", "L"][dim_order[2]]
-            x_coords = self.image_tool.parent.controller.coords[dim_order[2]]
+            elif self.parent_plot.n_dim == 2:
+                data = self.parent_plot.image_data
 
-            slice = []
-            for i in range(data.shape[2]):
+                slice = []
                 for x, y in zip(self.x_coords, self.y_coords):
                     if 0 <= x < data.shape[0] and 0 <= y < data.shape[1]:
-                        slice.append(data[x, y, i])
+                        slice.append(data[x, y])
                     else:
                         slice.append(0)
-            slice_array = np.array(slice)
-            slice = slice_array.reshape((data.shape[2], len(self.x_coords)))
-            self.child_plot._plot(
-                image=slice,
-                x_label=x_label,
-                x_coords=x_coords,
-                y_axis=False
-            )
+                self.child_plot._plot(slice)
 
-# TODO: Create RectROI with matching functions to LineROI
+        elif type(self.image_tool.parent) == GriddedDataWidget:
+            if self.parent_plot.n_dim == 3:
+                dim_order = self.image_tool.parent.controller.dim_order
+                data = np.transpose(self.image_tool.data, dim_order)
+                x_label = ["H", "K", "L"][dim_order[2]]
+                x_coords = self.image_tool.parent.controller.coords[dim_order[2]]
+
+                slice = []
+                for i in range(data.shape[2]):
+                    for x, y in zip(self.x_coords, self.y_coords):
+                        if 0 <= x < data.shape[0] and 0 <= y < data.shape[1]:
+                            slice.append(data[x, y, i])
+                        else:
+                            slice.append(0)
+                slice_array = np.array(slice)
+                slice = slice_array.reshape((data.shape[2], len(self.x_coords)))
+                self.child_plot._plot(
+                    image=slice,
+                    x_label=x_label,
+                    x_coords=x_coords,
+                    y_axis=False
+                )
+            elif self.parent_plot.n_dim == 2:
+                data = self.parent_plot.image_data
+
+                slice = []
+                for x, y in zip(self.x_coords, self.y_coords):
+                    if 0 <= x < data.shape[0] and 0 <= y < data.shape[1]:
+                        slice.append(data[x, y])
+                    else:
+                        slice.append(0)
+
+                slice = np.array(slice)
+                self.child_plot._plot(slice)
+        
