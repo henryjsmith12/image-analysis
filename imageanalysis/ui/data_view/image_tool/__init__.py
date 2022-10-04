@@ -317,6 +317,7 @@ class ImagePlot(pg.ImageView):
         self.ui.menuBtn.hide()
         self.getView().setAspectLocked(False)
         self.getView().ctrlMenu = None
+        self.getView().showGrid(x=True, y=True, alpha=0.5)
 
         # Connections
         self.getView().scene().sigMouseMoved.connect(self._updateMousePoint)
@@ -357,7 +358,6 @@ class ImagePlot(pg.ImageView):
             transform=self.transform
         )
         
-
         if x_axis:
             self.getView().showAxis("bottom")
         else:
@@ -483,6 +483,16 @@ class LinePlot(pg.PlotWidget):
     ) -> None:
 
         self.plot(data, clear=True)
+
+        if x_axis:
+            self.showAxis("bottom")
+        else:
+            self.hideAxis("bottom")
+
+        if y_axis:
+            self.showAxis("left")
+        else:
+            self.hideAxis("left")
 
 
 class MouseInfoWidget(QtGui.QGroupBox):
