@@ -36,6 +36,11 @@ Line segment ROI's and QOL fixes
 - More efficient color mapping
 - Gridded Data: Image is automatically scaled when dimension order changes
 
-## [0.1.4] - 2022-10
-Line segment ROI improvements
+## [0.1.4] - 2022-10-07
+Line segment ROI improvements.
 
+### Added
+- 2D to 1D ROI slicing capabilities for both raw and gridded data.
+
+### Fixed
+- Pixels with a value of 0 are now represented as blank pixels.
