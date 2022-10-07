@@ -12,8 +12,6 @@ from imageanalysis.ui.data_view.image_tool.color_mapping import \
     ColorMapController
 
 
-# TODO: Updated documentation
-
 class ImageTool(DockArea):
     """Handles image visualization and manipulation."""
 
@@ -323,10 +321,14 @@ class ImagePlot(pg.ImageView):
         self.getView().scene().sigMouseMoved.connect(self._updateMousePoint)
 
     def _hide(self) -> None:
+        """Hides plot and parent dock."""
+
         self.hide()
         self.dock.hide()
 
     def _show(self) -> None:
+        """Shows plot and parent dock."""
+
         self.show()
         self.dock.show()
 
@@ -340,6 +342,7 @@ class ImagePlot(pg.ImageView):
         x_axis: bool=True,
         y_axis: bool=True
     ) -> None:
+        """Normalizes and plots image with proper labels and axes."""
 
         self.image_data = image
         self.x_label = x_label
@@ -371,6 +374,7 @@ class ImagePlot(pg.ImageView):
         self.updated.emit()
 
     def _normalizeImage(self) -> None:
+        """Normalizes image values for color mapping."""
 
         image = np.copy(self.image_data)
         if self.image_tool.color_map_range is None:
@@ -383,6 +387,7 @@ class ImagePlot(pg.ImageView):
         self.norm_image = image
 
     def _setLabels(self, x_label, y_label) -> None:
+        """Sets x and y axis labels."""
 
         if x_label is not None and type(x_label) == str:
             self.x_label = x_label
@@ -392,6 +397,7 @@ class ImagePlot(pg.ImageView):
             self.getView().setLabel("left", y_label)
 
     def _setCoordinates(self, x_coords, y_coords) -> None:
+        """Adjusts image position and scaling."""
 
         self.transform = QtGui.QTransform()
         if x_coords is not None:
@@ -423,6 +429,7 @@ class ImagePlot(pg.ImageView):
         self.transform.scale(*scale)
 
     def _updateMousePoint(self, scene_point=None) -> None:
+        """Updates mouse coordinates."""
 
         if self.controller is None:
             self.controller = self.image_tool.controller
@@ -481,6 +488,7 @@ class LinePlot(pg.PlotWidget):
         x_axis: bool=True,
         y_axis: bool=True
     ) -> None:
+        """Plots data points as a line."""
 
         self.plot(data, clear=True)
 
