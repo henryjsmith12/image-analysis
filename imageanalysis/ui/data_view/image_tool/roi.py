@@ -9,8 +9,6 @@ import pyqtgraph as pg
 from pyqtgraph import QtGui
 
 
-# TODO: Updated documentation
-
 class ROIController(QtGui.QGroupBox):
     """Handles ROI items for an ImagePlot."""
 
@@ -27,7 +25,6 @@ class ROIController(QtGui.QGroupBox):
         self.child_plot = child_plot
         self.image_tool = image_tool
         self.setTitle(title)
-
         self.roi = None
 
         # Child widgets
@@ -54,6 +51,7 @@ class ROIController(QtGui.QGroupBox):
         # Signals
         self.roi_type_cbx.currentTextChanged.connect(self._changeROIType)
 
+    # TODO: Refactor this function to work with more than Line Segments
     def _changeROIType(self) -> None:
         """Changes ROI type in ImagePlot"""
 
@@ -119,11 +117,6 @@ class LineSegmentROI(pg.LineSegmentROI):
     def _getSlice(self) -> None:
         """Retrieves and plots slice data."""
 
-        # Get slice data and coordinates
-        # Check parent type (grid or raw)
-        # Check parent_plot n_dim (3 or 2)
-        # 
-
         from imageanalysis.ui.data_view.gridded_data import \
             GriddedDataWidget
         from imageanalysis.ui.data_view.raw_data import \
@@ -156,6 +149,10 @@ class LineSegmentROI(pg.LineSegmentROI):
                     y_axis=False
                 )
 
+                if self.image_tool.plot_1d.isVisible():
+                    self.image_tool.controller.plot_2d_roi_ctrl.roi._getSlice()
+
+
             elif self.parent_plot.n_dim == 2:
                 data = self.parent_plot.image_data
 
@@ -165,7 +162,7 @@ class LineSegmentROI(pg.LineSegmentROI):
                         slice.append(data[x, y])
                     else:
                         slice.append(0)
-                self.child_plot._plot(slice)
+                self.child_plot._plot(data=slice, x_axis=False)
 
         elif type(self.image_tool.parent) == GriddedDataWidget:
             if self.parent_plot.n_dim == 3:
@@ -189,6 +186,10 @@ class LineSegmentROI(pg.LineSegmentROI):
                     x_coords=x_coords,
                     y_axis=False
                 )
+
+                if self.image_tool.plot_1d.isVisible():
+                    self.image_tool.controller.plot_2d_roi_ctrl.roi._getSlice()
+                    
             elif self.parent_plot.n_dim == 2:
                 data = self.parent_plot.image_data
 
@@ -200,5 +201,4 @@ class LineSegmentROI(pg.LineSegmentROI):
                         slice.append(0)
 
                 slice = np.array(slice)
-                self.child_plot._plot(slice)
-        
+                self.child_plot._plot(data=slice, x_axis=False)
