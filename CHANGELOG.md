@@ -36,7 +36,7 @@ Line segment ROI's and QOL fixes
 - More efficient color mapping
 - Gridded Data: Image is automatically scaled when dimension order changes
 
-## [0.1.4] - 2022-10-07
+## [0.1.4] - 2022-07-10
 Line segment ROI improvements.
 
 ### Added
