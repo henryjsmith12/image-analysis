@@ -182,4 +182,11 @@ class Scan:
 class Curve:
     """Describes a 1-D line of values with coordinates and metadata."""
 
-    ...
+    def __init__(
+        self, 
+        data: np.ndarray, 
+        labels: list, 
+        coords: list, 
+        metadata: dict=None
+    ) -> None:
+        ...
