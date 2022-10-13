@@ -3,6 +3,7 @@
 See LICENSE file.
 """
 
+from ctypes import alignment
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtCore, QtGui
@@ -313,6 +314,7 @@ class ImagePlot(pg.ImageView):
         self.ui.histogram.hide()
         self.ui.roiBtn.hide()
         self.ui.menuBtn.hide()
+
         self.getView().setAspectLocked(False)
         self.getView().ctrlMenu = None
         self.getView().showGrid(x=True, y=True, alpha=0.5)
@@ -456,6 +458,17 @@ class ImagePlot(pg.ImageView):
             else:
                 self.controller._setMouseInfo(None, None, sender=self)
 
+    def _setCoordinateIntervals(self, coords, labels):
+        
+        if len(coords) == 3 and len(labels) == 3:
+            l1, l2, l3 = labels
+            c1, c2, c3 = coords
+            
+            self.getView().setTitle(f"{l1}: ({round(c1[0], 5)}, {round(c1[-1], 5)})<br>{l2}: ({round(c2[0], 5)}, {round(c2[-1], 5)})<br>{l3}: ({round(c3[0], 5)}, {round(c3[-1], 5)})", justify="right")
+
+            self.intervals = {
+                l1: c1, l2: c2, l3: c3
+            }
 
 class LinePlot(pg.PlotWidget):
     """Adapted pyqtgraph PlotWidget object"""
@@ -502,6 +515,17 @@ class LinePlot(pg.PlotWidget):
         else:
             self.hideAxis("left")
 
+    def _setCoordinateIntervals(self, coords, labels):
+        
+        if len(coords) == 3 and len(labels) == 3:
+            l1, l2, l3 = labels
+            c1, c2, c3 = coords
+            
+            self.setTitle(f"{l1}: ({round(c1[0], 5)}, {round(c1[-1], 5)})<br>{l2}: ({round(c2[0], 5)}, {round(c2[-1], 5)})<br>{l3}: ({round(c3[0], 5)}, {round(c3[-1], 5)})", justify="right")
+
+            self.intervals = {
+                l1: c1, l2: c2, l3: c3
+            }
 
 class MouseInfoWidget(QtGui.QGroupBox):
     """Handles displaying proper mouse location and associated values."""
