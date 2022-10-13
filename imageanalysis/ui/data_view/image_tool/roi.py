@@ -132,14 +132,21 @@ class LineSegmentROI(pg.LineSegmentROI):
         if type(self.image_tool.parent) == RawDataWidget:
             if self.parent_plot.n_dim == 3:
                 data = self.image_tool.parent.scan.raw_image_data
+                coords = [np.linspace(0, data.shape[1]-1, data.shape[1]), np.linspace(0, data.shape[2]-1, data.shape[2]), np.linspace(0, data.shape[0]-1, data.shape[0])]
+                self.parent_plot._setCoordinateIntervals(coords, ["x", "y", "t"])
                 slice = []
-
+                slice_coords = [[], [], []]
                 for i in range(data.shape[0]):
                     for x, y in zip(self.x_coords, self.y_coords):
                         if 0 <= x < data.shape[1] and 0 <= y < data.shape[2]:
                             slice.append(data[i, x, y])
                         else:
                             slice.append(0)
+                slice_coords[0] = self.x_coords
+                slice_coords[1] = self.y_coords
+                slice_coords[2] = range(data.shape[0])
+                self.child_plot._setCoordinateIntervals(slice_coords, ["x", "y", "t"])
+                            
                 slice_array = np.array(slice)
                 slice = slice_array.reshape((data.shape[0], len(self.x_coords)))
                 
@@ -157,11 +164,20 @@ class LineSegmentROI(pg.LineSegmentROI):
                 data = self.parent_plot.image_data
 
                 slice = []
+                slice_coords = [[], [], []]
                 for x, y in zip(self.x_coords, self.y_coords):
                     if 0 <= x < data.shape[0] and 0 <= y < data.shape[1]:
                         slice.append(data[x, y])
+                        slice_coords[2].append(self.parent_plot.intervals["t"][x])
+                        slice_coords[0].append(self.parent_plot.intervals["x"][y])
+                        slice_coords[1].append(self.parent_plot.intervals["y"][y])
                     else:
                         slice.append(0)
+                
+                
+                
+                self.child_plot._setCoordinateIntervals(slice_coords, ["x", "y", "t"])
+
                 self.child_plot._plot(data=slice, x_axis=False)
 
         elif type(self.image_tool.parent) == GriddedDataWidget:
@@ -172,14 +188,23 @@ class LineSegmentROI(pg.LineSegmentROI):
                 x_coords = self.image_tool.parent.controller.coords[dim_order[2]]
 
                 slice = []
+                slice_coords = [[], [], []]
                 for i in range(data.shape[2]):
                     for x, y in zip(self.x_coords, self.y_coords):
                         if 0 <= x < data.shape[0] and 0 <= y < data.shape[1]:
                             slice.append(data[x, y, i])
+                            slice_coords[0].append(self.image_tool.parent.controller.coords[dim_order[0]][x])
+                            slice_coords[1].append(self.image_tool.parent.controller.coords[dim_order[1]][y])
                         else:
                             slice.append(0)
+                slice_coords[2] = x_coords
+                slice_coords[0], slice_coords[1], slice_coords[2] = slice_coords[dim_order[0]], slice_coords[dim_order[1]], slice_coords[dim_order[2]]
+                self.child_plot._setCoordinateIntervals(slice_coords, ["H", "K", "L"])
+
                 slice_array = np.array(slice)
                 slice = slice_array.reshape((data.shape[2], len(self.x_coords)))
+
+
                 self.child_plot._plot(
                     image=slice,
                     x_label=x_label,
@@ -192,13 +217,20 @@ class LineSegmentROI(pg.LineSegmentROI):
                     
             elif self.parent_plot.n_dim == 2:
                 data = self.parent_plot.image_data
-
+                dim_order = self.image_tool.parent.controller.dim_order
                 slice = []
+                slice_coords = [[], [], []]
                 for x, y in zip(self.x_coords, self.y_coords):
                     if 0 <= x < data.shape[0] and 0 <= y < data.shape[1]:
                         slice.append(data[x, y])
+                        slice_coords[2].append(self.parent_plot.intervals["L"][x])
+                        slice_coords[0].append(self.parent_plot.intervals["H"][y])
+                        slice_coords[1].append(self.parent_plot.intervals["K"][y])
                     else:
                         slice.append(0)
+
+                slice_coords[0], slice_coords[1], slice_coords[2] = slice_coords[dim_order[0]], slice_coords[dim_order[1]], slice_coords[dim_order[2]]
+                self.child_plot._setCoordinateIntervals(slice_coords, ["H", "K", "L"])
 
                 slice = np.array(slice)
                 self.child_plot._plot(data=slice, x_axis=False)
