@@ -67,7 +67,7 @@ class MainWindow(QtGui.QWidget):
         self.project_selection_dock.setMaximumWidth(300)
         self.scan_selection_dock.setMaximumWidth(300)
         self.data_view_dock.setStretch(5, 5)
-        self.plot_view_dock.setStretch(5, 5)
+        self.plot_view_dock.setStretch(2.5, 5)
         self.dock_area.addDock(self.project_selection_dock)
         self.dock_area.addDock(
             self.scan_selection_dock,
@@ -89,6 +89,11 @@ class MainWindow(QtGui.QWidget):
             "top",
             self.scan_selection_dock
         )
+        '''self.dock_area.addDock(
+            self.plot_view_dock,
+            "right",
+            self.data_view_dock
+        )'''
 
         # Layout
         self.layout = QtGui.QGridLayout()
