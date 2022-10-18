@@ -8,3 +8,4 @@ scikit-learn
 spec2nexus
 tifffile
 xrayutilities
+vtk
