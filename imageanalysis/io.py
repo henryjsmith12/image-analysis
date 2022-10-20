@@ -127,9 +127,8 @@ def getXMLPaths(path: str) -> list:
 
 
 def numpyToVTK(array: np.ndarray, coords, path) -> str:
+    """Converts and saves numpy array to VTK image data."""
 
-    print(array.shape)
-    print(np.amax(array))
     data_array = numpy_support.numpy_to_vtk(array.flatten(order="F"))
     image_data = vtk.vtkImageData()
 
