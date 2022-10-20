@@ -98,7 +98,11 @@ class ROIController(QtGui.QGroupBox):
                 coords = self.image_tool.parent.controller.coords
             else:
                 data = self.image_tool.parent.scan.raw_image_data
-                coords = [np.linspace(0, data.shape[1]-1, data.shape[1]), np.linspace(0, data.shape[2]-1, data.shape[2]), np.linspace(0, data.shape[0]-1, data.shape[0])]
+                coords = [
+                    np.linspace(0, data.shape[1]-1, data.shape[1]), 
+                    np.linspace(0, data.shape[2]-1, data.shape[2]), 
+                    np.linspace(0, data.shape[0]-1, data.shape[0])
+                ]
 
             numpyToVTK(array=array, coords=coords, path=path)
         except Exception as ex:
@@ -107,7 +111,6 @@ class ROIController(QtGui.QGroupBox):
             msg.setWindowTitle("Error")
             msg.setText(str(ex))
             msg.exec_()
-
 
 
 class LineSegmentROI(pg.LineSegmentROI):
@@ -160,7 +163,11 @@ class LineSegmentROI(pg.LineSegmentROI):
         if type(self.image_tool.parent) == RawDataWidget:
             if self.parent_plot.n_dim == 3:
                 data = self.image_tool.parent.scan.raw_image_data
-                coords = [np.linspace(0, data.shape[1]-1, data.shape[1]), np.linspace(0, data.shape[2]-1, data.shape[2]), np.linspace(0, data.shape[0]-1, data.shape[0])]
+                coords = [
+                    np.linspace(0, data.shape[1]-1, data.shape[1]), 
+                    np.linspace(0, data.shape[2]-1, data.shape[2]), 
+                    np.linspace(0, data.shape[0]-1, data.shape[0])
+                ]
                 self.parent_plot._setCoordinateIntervals(coords, ["x", "y", "t"])
                 slice = []
                 slice_coords = [[], [], []]
