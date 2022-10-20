@@ -459,12 +459,19 @@ class ImagePlot(pg.ImageView):
                 self.controller._setMouseInfo(None, None, sender=self)
 
     def _setCoordinateIntervals(self, coords, labels):
+        """Adds coord intervals to plot."""
         
         if len(coords) == 3 and len(labels) == 3:
             l1, l2, l3 = labels
             c1, c2, c3 = coords
             
-            self.getView().setTitle(f"{l1}: ({round(c1[0], 5)}, {round(c1[-1], 5)})<br>{l2}: ({round(c2[0], 5)}, {round(c2[-1], 5)})<br>{l3}: ({round(c3[0], 5)}, {round(c3[-1], 5)})", justify="right")
+            str_1 = f"{l1}: ({round(c1[0], 5)}, {round(c1[-1], 5)})"
+            str_2 = f"{l2}: ({round(c2[0], 5)}, {round(c2[-1], 5)})"
+            str_3 = f"{l3}: ({round(c3[0], 5)}, {round(c3[-1], 5)})"
+
+            self.getView().setTitle(
+                f"{str_1}<br>{str_2}<br>{str_3}", justify="right"
+            )
 
             self.intervals = {
                 l1: c1, l2: c2, l3: c3
