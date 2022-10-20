@@ -3,7 +3,7 @@
 See LICENSE file.
 """
 
-from ctypes import alignment
+
 import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtCore, QtGui
@@ -208,13 +208,13 @@ class ImageToolController(QtGui.QWidget):
             parent_plot=self.image_tool.plot_3d,
             child_plot=self.image_tool.plot_2d,
             image_tool=self.image_tool,
-            title="Image Plot #1"
+            title="3D"
         )
         self.plot_2d_roi_ctrl = ROIController(
             parent_plot=self.image_tool.plot_2d,
             child_plot=self.image_tool.plot_1d,
             image_tool=self.image_tool,
-            title="Image Plot #2"
+            title="2D"
         )
         self.plot_2d_roi_ctrl.hide()
 
@@ -470,6 +470,7 @@ class ImagePlot(pg.ImageView):
                 l1: c1, l2: c2, l3: c3
             }
 
+
 class LinePlot(pg.PlotWidget):
     """Adapted pyqtgraph PlotWidget object"""
 
@@ -526,6 +527,7 @@ class LinePlot(pg.PlotWidget):
             self.intervals = {
                 l1: c1, l2: c2, l3: c3
             }
+
 
 class MouseInfoWidget(QtGui.QGroupBox):
     """Handles displaying proper mouse location and associated values."""
