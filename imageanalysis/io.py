@@ -4,7 +4,10 @@ See LICENSE file.
 """
 
 
+import numpy as np
 import os
+import vtk
+from vtk.util import numpy_support
 
 from rsMap3D.datasource.DetectorGeometryForXrayutilitiesReader import \
     DetectorGeometryForXrayutilitiesReader  # isValidDetectorXMLFile
@@ -121,3 +124,27 @@ def getXMLPaths(path: str) -> list:
             xml_paths.append(item)
 
     return xml_paths
+
+
+def numpyToVTK(array: np.ndarray, coords, path) -> str:
+
+    print(array.shape)
+    print(np.amax(array))
+    data_array = numpy_support.numpy_to_vtk(array.flatten(order="F"))
+    image_data = vtk.vtkImageData()
+
+    qx_0, qy_0, qz_0 = coords[0][0], coords[1][0], coords[2][0]
+    del_qx = coords[0][1] - coords[0][0]
+    del_qy = coords[1][1] - coords[1][0]
+    del_qz = coords[2][1] - coords[2][0]
+
+    image_data.SetOrigin(qx_0, qy_0, qz_0)
+    image_data.SetSpacing(del_qx, del_qy, del_qz)
+    image_data.SetDimensions(*array.shape)
+
+    image_data.GetPointData().SetScalars(data_array)
+
+    writer = vtk.vtkXMLImageDataWriter()
+    writer.SetFileName(path)
+    writer.SetInputData(image_data)
+    writer.Write()
