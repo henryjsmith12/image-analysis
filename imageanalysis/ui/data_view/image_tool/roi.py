@@ -8,6 +8,9 @@ import numpy as np
 import pyqtgraph as pg
 from pyqtgraph import QtGui
 
+from imageanalysis.io import numpyToVTK
+
+
 
 class ROIController(QtGui.QGroupBox):
     """Handles ROI items for an ImagePlot."""
@@ -40,6 +43,7 @@ class ROIController(QtGui.QGroupBox):
         self.roi_details_gbx_layout.addWidget(self.center_btn, 0, 0)
         self.roi_details_gbx_layout.addWidget(self.calc_type_cbx, 1, 0)
         self.roi_details_gbx.hide()
+        self.export_btn = QtGui.QPushButton("Export Data (VTK)")
 
         # Layout
         self.layout = QtGui.QGridLayout()
@@ -47,9 +51,12 @@ class ROIController(QtGui.QGroupBox):
         self.layout.addWidget(self.roi_type_lbl, 0, 0)
         self.layout.addWidget(self.roi_type_cbx, 0, 1)
         self.layout.addWidget(self.roi_details_gbx, 1, 0, 1, 2)
+        if self.parent_plot.n_dim == 3:
+            self.layout.addWidget(self.export_btn, 2, 0, 1, 2)
 
         # Signals
         self.roi_type_cbx.currentTextChanged.connect(self._changeROIType)
+        self.export_btn.clicked.connect(self._export)
 
     # TODO: Refactor this function to work with more than Line Segments
     def _changeROIType(self) -> None:
@@ -80,6 +87,27 @@ class ROIController(QtGui.QGroupBox):
             self.parent_plot.image_tool.controller._setColorMap()
             if self.parent_plot.n_dim == 3:
                 self.parent_plot.image_tool.controller.plot_2d_roi_ctrl.show()
+
+    def _export(self):
+        from imageanalysis.ui.data_view.gridded_data import GriddedDataWidget
+
+        path = QtGui.QFileDialog.getSaveFileName(self, "Save VTK Image Data")[0] + ".vti"
+        try:
+            array = self.image_tool.data
+            if type(self.image_tool.parent) == GriddedDataWidget:
+                coords = self.image_tool.parent.controller.coords
+            else:
+                data = self.image_tool.parent.scan.raw_image_data
+                coords = [np.linspace(0, data.shape[1]-1, data.shape[1]), np.linspace(0, data.shape[2]-1, data.shape[2]), np.linspace(0, data.shape[0]-1, data.shape[0])]
+
+            numpyToVTK(array=array, coords=coords, path=path)
+        except Exception as ex:
+            msg = QtGui.QMessageBox()
+            msg.setIcon(QtGui.QMessageBox.Critical)
+            msg.setWindowTitle("Error")
+            msg.setText(str(ex))
+            msg.exec_()
+
 
 
 class LineSegmentROI(pg.LineSegmentROI):
