@@ -20,10 +20,12 @@ setup(
         "numpy",
         "PyQt5",
         "pyqtgraph",
+        "pyRestTable",
         "rsMap3D",
         "spec2nexus",
         "tifffile",
-        "xrayutilities"
+        "xrayutilities",
+        "vtk"
     ],
     url=URL,
     keywords=["python", "pyqtgraph", "image-analysis", "xrd"]
