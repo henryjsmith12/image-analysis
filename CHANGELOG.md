@@ -44,3 +44,12 @@ Line segment ROI improvements.
 
 ### Fixed
 - Pixels with a value of 0 are now represented as blank pixels.
+
+## [0.1.5] - 2022-20-10
+Coordinate intervals and 3D image exporting
+
+### Added
+- Coordinate intervals to all image plots
+- Ability to export 3D images to VTK image data format
+- Generalized function for converting 3D numpy arrays to .vti (VTK) files
+

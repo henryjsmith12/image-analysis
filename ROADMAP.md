@@ -9,10 +9,10 @@
 - [ ] Polygon ROI (v0.2)
 
 ### Curves & PlotView
-- [ ] Basic GUI and ability to display various curve items (v0.1.5)
+- [ ] Basic GUI and ability to display various curve items (v0.1.6)
 
 ### Scriptability
-- [ ] The ability to script ROI applications (v0.1.6)
+- [ ] The ability to script ROI applications (v0.1.7)
 - [ ] Replicate ROI positions and plot results with MatPlotLib (v0.1.7 or v0.1.8)
 
 ### Bluesky Compatibility

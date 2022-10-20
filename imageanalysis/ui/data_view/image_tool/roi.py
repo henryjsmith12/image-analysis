@@ -89,6 +89,8 @@ class ROIController(QtGui.QGroupBox):
                 self.parent_plot.image_tool.controller.plot_2d_roi_ctrl.show()
 
     def _export(self):
+        """Exports data from imagetool."""
+        
         from imageanalysis.ui.data_view.gridded_data import GriddedDataWidget
 
         path = QtGui.QFileDialog.getSaveFileName(self, "Save VTK Image Data")[0] + ".vti"
