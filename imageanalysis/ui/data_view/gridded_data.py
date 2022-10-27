@@ -14,8 +14,9 @@ from imageanalysis.ui.data_view.image_tool import ImageTool
 class GriddedDataWidget(DockArea):
     """Allows users to view gridded image data from a scan."""
 
-    def __init__(self, scan: Scan) -> None:
+    def __init__(self, scan: Scan, parent=None) -> None:
         super(GriddedDataWidget, self).__init__()
+        self.parent = parent
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
