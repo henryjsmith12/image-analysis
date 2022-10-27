@@ -15,11 +15,11 @@ from imageanalysis.ui.data_view.gridded_data import GriddedDataWidget
 from imageanalysis.ui.data_view.raw_data import RawDataWidget
 
 
-class PlotView(QtGui.QWidget):
+class CurveView(QtGui.QWidget):
     """Houses a tab widget for DataViewTab objects."""
 
     def __init__(self, parent=None) -> None:
-        super(PlotView, self).__init__()
+        super(CurveView, self).__init__()
         self.parent = parent
 
         self.curves = []

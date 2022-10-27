@@ -9,6 +9,7 @@ import pyqtgraph as pg
 from pyqtgraph import QtGui
 
 from imageanalysis.io import numpyToVTK
+from imageanalysis.structures import Curve
 
 
 
@@ -216,6 +217,15 @@ class LineSegmentROI(pg.LineSegmentROI):
                 self.child_plot._setCoordinateIntervals(slice_coords, ["x", "y", "t"])
 
                 self.child_plot._plot(data=slice, x_axis=False)
+
+                curve = Curve(
+                    data=slice,
+                    labels=["x", "y", "t"],
+                    coords=slice_coords,
+                    metadata=None
+                )
+                self.image_tool.parent.parent.parent.parent.plot_view._addCurve(curve)
+
 
         elif type(self.image_tool.parent) == GriddedDataWidget:
             if self.parent_plot.n_dim == 3:

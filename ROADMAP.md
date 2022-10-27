@@ -8,7 +8,7 @@
 - [ ] Radial ROI (v0.2)
 - [ ] Polygon ROI (v0.2)
 
-### Curves & PlotView
+### Curves & CurveView
 - [ ] Basic GUI and ability to display various curve items (v0.1.6)
 
 ### Scriptability
