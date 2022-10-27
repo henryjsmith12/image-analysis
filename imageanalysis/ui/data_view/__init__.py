@@ -14,8 +14,9 @@ from imageanalysis.ui.data_view.raw_data import RawDataWidget
 class DataView(QtGui.QTabWidget):
     """Houses a tab widget for DataViewTab objects."""
 
-    def __init__(self) -> None:
+    def __init__(self, parent=None) -> None:
         super(DataView, self).__init__()
+        self.parent = parent
 
         self.scan_list = []
         self.setTabsClosable(True)
@@ -25,7 +26,7 @@ class DataView(QtGui.QTabWidget):
         """Adds new DataViewTab."""
 
         tab_title = str(scan.number)
-        self.addTab(DataViewTab(scan=scan), tab_title)
+        self.addTab(DataViewTab(scan=scan, parent=self), tab_title)
 
     def _closeTab(self, index: int) -> None:
         """Closes DataViewTab at specific index."""
@@ -38,8 +39,9 @@ class DataView(QtGui.QTabWidget):
 class DataViewTab(QtGui.QWidget):
     """Houses various widgets to view data with."""
 
-    def __init__(self, scan: Scan) -> None:
+    def __init__(self, scan: Scan, parent=None) -> None:
         super(DataViewTab, self).__init__()
+        self.parent=parent
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
 
@@ -47,8 +49,8 @@ class DataViewTab(QtGui.QWidget):
 
         # Child widgets
         self.tab_widget = QtGui.QTabWidget()
-        self.tab_widget.addTab(RawDataWidget(scan=scan), "Raw")
-        self.tab_widget.addTab(GriddedDataWidget(scan=scan), "Gridded")
+        self.tab_widget.addTab(RawDataWidget(scan=scan, parent=self), "Raw")
+        self.tab_widget.addTab(GriddedDataWidget(scan=scan, parent=self), "Gridded")
 
         # Layout
         self.layout = QtGui.QGridLayout()
