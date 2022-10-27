@@ -189,4 +189,8 @@ class Curve:
         coords: list, 
         metadata: dict=None
     ) -> None:
-        ...
+
+        self.data = data
+        self.labels = labels
+        self.coords = coords
+        self.metadata = metadata
