@@ -31,8 +31,8 @@ class MainWindow(QtGui.QWidget):
         # Child widgets
         self.project_selection_widget = ProjectSelectionWidget(parent=self)
         self.scan_selection_widget = ScanSelectionWidget(parent=self)
-        self.data_view = DataView()
-        self.plot_view = PlotView()
+        self.data_view = DataView(parent=self)
+        self.plot_view = PlotView(parent=self)
 
         # Docks
         self.dock_area = DockArea()
@@ -89,11 +89,11 @@ class MainWindow(QtGui.QWidget):
             "top",
             self.scan_selection_dock
         )
-        '''self.dock_area.addDock(
+        self.dock_area.addDock(
             self.plot_view_dock,
             "right",
             self.data_view_dock
-        )'''
+        )
 
         # Layout
         self.layout = QtGui.QGridLayout()
