@@ -119,8 +119,8 @@ class Scan:
         ]
 
         # Normalization factors from SPEC
-        monitor_norm_factors = self.spec_scan.data["Ion_Ch_2"] * 200000
-        filter_norm_factors = self.spec_scan.data["transm"] * 1
+        monitor_norm_factors = [i / 200000 for i in self.spec_scan.data["Ion_Ch_2"]]
+        filter_norm_factors = self.spec_scan.data["transm"]
 
         images = []
         # Retrieve image data from paths
