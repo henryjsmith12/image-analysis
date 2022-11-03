@@ -15,6 +15,7 @@ setup(
     description=DESCRIPTION,
     long_description=LONG_DESCRIPTION,
     packages=find_packages(),
+    python_requires="==3.8",
     install_requires=[
         "matplotlib",
         "numpy",
