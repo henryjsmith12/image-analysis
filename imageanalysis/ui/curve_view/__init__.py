@@ -26,7 +26,7 @@ class CurveView(QtGui.QWidget):
 
         # Widgets
         self.curve_plot = CurvePlot(parent=self)
-        self.curve_list_widget = CurveListWidget(parent=self)
+        self.curve_ctrl = CurveController(parent=self)
 
         # Docks
         self.dock_area = DockArea()
@@ -37,16 +37,16 @@ class CurveView(QtGui.QWidget):
             hideTitle=True,
             closable=False
         )
-        self.curve_list_dock = Dock(
-            name="Select Scan",
+        self.curve_ctrl_dock = Dock(
+            name="Curve Controller",
             size=(1, 2),
-            widget=self.curve_list_widget,
+            widget=self.curve_ctrl,
             hideTitle=True,
             closable=False
         )
         self.dock_area.addDock(self.curve_plot_dock)
         self.dock_area.addDock(
-            self.curve_list_dock,
+            self.curve_ctrl_dock,
             "bottom",
             self.curve_plot_dock
         )
@@ -57,19 +57,26 @@ class CurveView(QtGui.QWidget):
 
     def _addCurve(self, curve: Curve) -> None:
         self.curves.append(curve)
-        self.curve_list_widget._addCurve(curve)
+        self.curve_ctrl._addCurve(curve)
         
 
-class CurveListWidget(QtGui.QWidget):
+# TODO: Rename to curve controller
+class CurveController(QtGui.QWidget):
+
+    plot_axis_updated = QtCore.pyqtSignal()
+
     def __init__(self, parent=None) -> None:
         super().__init__()
         self.parent = parent
         self.curve_plot = parent.curve_plot
 
+        self.x_axis_lbl = QtGui.QLabel("x-axis: ")
+        self.x_axis_cbx = QtGui.QComboBox()
+        self.x_axis_options = ["Index", "x", "y", "t", "H", "K", "L"]
+        self.x_axis_cbx.addItems(self.x_axis_options)
         self.curve_list_items = []
-
-        self.curve_table = QtGui.QTableWidget(1, 5)
-        self.curve_table.setHorizontalHeaderLabels(["Show", "Color", "Type", "Scan", "x-axis"])
+        self.curve_table = QtGui.QTableWidget(0, 5)
+        self.curve_table.setHorizontalHeaderLabels(["Show", "Color", "Type", "Scan", ""])
 
         self.curve_table.horizontalHeader().setSectionResizeMode(0, QtGui.QHeaderView.ResizeToContents)
         self.curve_table.horizontalHeader().setSectionResizeMode(1, QtGui.QHeaderView.ResizeToContents)
@@ -77,21 +84,29 @@ class CurveListWidget(QtGui.QWidget):
         self.curve_table.horizontalHeader().setSectionResizeMode(3, QtGui.QHeaderView.ResizeToContents)
         self.curve_table.horizontalHeader().setSectionResizeMode(4, QtGui.QHeaderView.Stretch)
 
-
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
-        self.layout.addWidget(self.curve_table)
+        self.layout.addWidget(self.x_axis_lbl, 0, 0)
+        self.layout.addWidget(self.x_axis_cbx, 0, 1)
+        self.layout.addWidget(self.curve_table, 1, 0, 7, 2)
+
+        self.x_axis_cbx.currentTextChanged.connect(self._updatePlotAxis)
 
     def _addCurve(self, curve: Curve) -> None:
         cli = CurveListItem(curve=curve, parent=self)
         self.curve_list_items.append(cli)
+        self.curve_table.insertRow(self.curve_table.rowCount())
 
         self.curve_table.setCellWidget(self.curve_list_items.index(cli), 0, cli.vis_chkbx)
         self.curve_table.setCellWidget(self.curve_list_items.index(cli), 1, cli.color_btn)
         self.curve_table.setCellWidget(self.curve_list_items.index(cli), 2, QtGui.QLabel(cli.type))
         self.curve_table.setCellWidget(self.curve_list_items.index(cli), 3, QtGui.QLabel(cli.scan))
-        self.curve_table.setCellWidget(self.curve_list_items.index(cli), 4, cli.coord_type_cbx)
+        self.curve_table.setCellWidget(self.curve_list_items.index(cli), 4, cli.delete_btn)
     
+    def _updatePlotAxis(self):
+        for cli in self.curve_list_items:
+            cli._toggleCoordinates()
+
 
 class CurveListItem:
     def __init__(self, curve: Curve, parent) -> None:
@@ -103,11 +118,12 @@ class CurveListItem:
         self.vis_chkbx.setChecked(True)
         self.color_btn = pg.ColorButton(
             color=(
-                randint(0, 200),
-                randint(0, 200),
-                randint(0, 200)
+                randint(0, 255),
+                randint(0, 255),
+                randint(0, 255)
             )
         )
+        self.delete_btn = QtGui.QPushButton("Delete")
         self.type = ""
         self.scan = ""
         self.coords = {
@@ -117,25 +133,46 @@ class CurveListItem:
             curve.labels[2]: curve.coords[2]
         }
 
-        self.coord_type_cbx = QtGui.QComboBox()
-        self.coord_type_cbx.addItems(self.coords.keys())
+        self.plot_data_item = pg.PlotDataItem()
+        self.plot_data_item.setPen(pg.mkPen(self.color_btn.color(), width=2))
+        self._toggleCoordinates()
+        
 
-        self.plot_data_item = ...
+        self.curve_plot.addItem(self.plot_data_item)
 
-        self.curve_plot.plot(
-            x=self.coords[self.coord_type_cbx.currentText()],
-            y=curve.data, 
-            pen=pg.mkPen(self.color_btn.color(), width=1.5)
-        )
+        self.vis_chkbx.stateChanged.connect(self._toggleVisibility)
+        self.color_btn.sigColorChanged.connect(self._toggleColor)
+        self.delete_btn.clicked.connect(self._delete)
 
     def _toggleColor(self):
-        ...
+        color = self.color_btn.color()
+        pen = pg.mkPen(color, width=2)
+        self.plot_data_item.setPen(pen)
 
     def _toggleVisibility(self):
-        ...
+        if self.vis_chkbx.isChecked():
+            self.plot_data_item.show()
+        else:
+            self.plot_data_item.hide()
 
-    def _toggleCoordinateType(self):
-        ...
+    def _toggleCoordinates(self):
+        x_coords = self.parent.x_axis_cbx.currentText()
+        if x_coords in self.coords.keys():
+            self.plot_data_item.show()
+            self.plot_data_item.setData(
+                x=self.coords[x_coords],
+                y=self.curve.data
+            )
+        else:
+            self.plot_data_item.hide()
+
+    def _delete(self):
+        self.curve_plot.removeItem(self.plot_data_item)
+        item_index = self.parent.curve_list_items.index(self)
+        self.parent.curve_table.removeRow(item_index)
+        self.parent.curve_list_items.pop(item_index)
+        del(self)
+
 
 class CurvePlot(pg.PlotWidget):
     def __init__(self, parent=None, background='w'):
@@ -144,5 +181,3 @@ class CurvePlot(pg.PlotWidget):
 
 class CurvePlotController(QtGui.QWidget):
     ...
-
-
