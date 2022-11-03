@@ -216,7 +216,13 @@ class ImageToolController(QtGui.QWidget):
             image_tool=self.image_tool,
             title="2D"
         )
+        self.plot_1d_roi_ctrl = ROIController(
+            parent_plot=self.image_tool.plot_1d,
+            image_tool=self.image_tool,
+            title="1D"
+        )
         self.plot_2d_roi_ctrl.hide()
+        self.plot_1d_roi_ctrl.hide()
 
         # Child layout
         self.layout = QtGui.QVBoxLayout()
@@ -227,6 +233,7 @@ class ImageToolController(QtGui.QWidget):
         self.scroll_area_layout.addWidget(self.color_map_ctrl)
         self.scroll_area_layout.addWidget(self.plot_3d_roi_ctrl)
         self.scroll_area_layout.addWidget(self.plot_2d_roi_ctrl)
+        self.scroll_area_layout.addWidget(self.plot_1d_roi_ctrl)
         self.scroll_area.setWidget(self.scroll_area_widget)
         self.scroll_area_widget.setFixedWidth(190)
 
@@ -486,6 +493,7 @@ class LinePlot(pg.PlotWidget):
 
         self.image_tool = parent
         self.dock = dock
+        self.n_dim = 1
 
     def _hide(self) -> None:
         """Hides plot and dock."""
@@ -586,7 +594,7 @@ class MouseInfoWidget(QtGui.QGroupBox):
             self.h_txt.setText(str(round(h, 7)))
             self.k_txt.setText(str(round(k, 7)))
             self.l_txt.setText(str(round(l, 7) or ""))
-            self.value_txt.setText(str(round(value, 3)))
+            self.value_txt.setText(str(int(value)))
         else:
             self.h_txt.setText("")
             self.k_txt.setText("")
