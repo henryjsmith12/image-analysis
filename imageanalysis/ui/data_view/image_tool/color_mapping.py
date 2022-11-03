@@ -80,7 +80,7 @@ class ColorMapController(QtGui.QGroupBox):
         self.max_value_sbx.setMinimum(1)
         self.max_value_sbx.setMaximum(1000000)
         self.max_value_sbx.setSingleStep(1)
-        self.max_value_sbx.setValue(1)
+        self.max_value_sbx.setValue(1000)
 
         # Layout
         self.layout = QtGui.QGridLayout()
