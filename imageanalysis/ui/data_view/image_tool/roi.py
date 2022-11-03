@@ -19,8 +19,8 @@ class ROIController(QtGui.QGroupBox):
     def __init__(
         self,
         parent_plot,
-        child_plot,
-        image_tool,
+        child_plot=None,
+        image_tool=None,
         title: str=None
     ) -> None:
         super().__init__()
@@ -45,19 +45,28 @@ class ROIController(QtGui.QGroupBox):
         self.roi_details_gbx_layout.addWidget(self.calc_type_cbx, 1, 0)
         self.roi_details_gbx.hide()
         self.export_btn = QtGui.QPushButton("Export Data (VTK)")
+        self.add_curve_btn = QtGui.QPushButton("Add to Curve View")
+        self.export_1d_btn = QtGui.QPushButton("Export Data (CSV)")
 
         # Layout
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
-        self.layout.addWidget(self.roi_type_lbl, 0, 0)
-        self.layout.addWidget(self.roi_type_cbx, 0, 1)
-        self.layout.addWidget(self.roi_details_gbx, 1, 0, 1, 2)
+        if self.parent_plot.n_dim > 1:
+            self.layout.addWidget(self.roi_type_lbl, 0, 0)
+            self.layout.addWidget(self.roi_type_cbx, 0, 1)
+            self.layout.addWidget(self.roi_details_gbx, 1, 0, 1, 2)
+        else:
+            self.layout.addWidget(self.add_curve_btn, 0, 0)
+            #self.layout.addWidget(self.export_1d_btn, 1, 0)
+            
+
         if self.parent_plot.n_dim == 3:
             self.layout.addWidget(self.export_btn, 2, 0, 1, 2)
 
         # Signals
         self.roi_type_cbx.currentTextChanged.connect(self._changeROIType)
         self.export_btn.clicked.connect(self._export)
+        self.add_curve_btn.clicked.connect(self._addToCurveView)
 
     # TODO: Refactor this function to work with more than Line Segments
     def _changeROIType(self) -> None:
@@ -71,6 +80,8 @@ class ROIController(QtGui.QGroupBox):
             self.roi_details_gbx.hide()
             if self.parent_plot.n_dim == 3:
                 self.parent_plot.image_tool.controller.plot_2d_roi_ctrl.hide()
+            if self.parent_plot.n_dim == 2:
+                self.parent_plot.image_tool.controller.plot_1d_roi_ctrl.hide()
         elif self.roi_type_cbx.currentText() == "line":
             self.parent_plot.removeItem(self.roi)
             self.roi = LineSegmentROI(
@@ -88,6 +99,9 @@ class ROIController(QtGui.QGroupBox):
             self.parent_plot.image_tool.controller._setColorMap()
             if self.parent_plot.n_dim == 3:
                 self.parent_plot.image_tool.controller.plot_2d_roi_ctrl.show()
+            if self.parent_plot.n_dim == 2:
+                self.parent_plot.image_tool.controller.plot_1d_roi_ctrl.show()
+
 
     def _export(self):
         """Exports data from imagetool."""
@@ -115,6 +129,17 @@ class ROIController(QtGui.QGroupBox):
             msg.setText(str(ex))
             msg.exec_()
 
+
+    def _addToCurveView(self):
+        if self.roi is None:
+            self.roi = self.parent_plot.image_tool.controller.plot_2d_roi_ctrl.roi
+        curve = Curve(
+            data=self.roi.data,
+            labels=self.roi.labels,
+            coords=self.roi.coords,
+            metadata=None
+        )
+        self.image_tool.parent.parent.parent.parent.plot_view._addCurve(curve)
 
 class LineSegmentROI(pg.LineSegmentROI):
     """An altered version of pyqtgraph's LineSegmentROI."""
@@ -194,6 +219,10 @@ class LineSegmentROI(pg.LineSegmentROI):
                     y_axis=False
                 )
 
+                self.data = slice
+                self.labels = ["x", "y", "t"]
+                self.coords = slice_coords
+
                 if self.image_tool.plot_1d.isVisible():
                     self.image_tool.controller.plot_2d_roi_ctrl.roi._getSlice()
 
@@ -218,13 +247,9 @@ class LineSegmentROI(pg.LineSegmentROI):
 
                 self.child_plot._plot(data=slice, x_axis=False)
 
-                curve = Curve(
-                    data=slice,
-                    labels=["x", "y", "t"],
-                    coords=slice_coords,
-                    metadata=None
-                )
-                self.image_tool.parent.parent.parent.parent.plot_view._addCurve(curve)
+                self.data = slice
+                self.labels = ["x", "y", "t"]
+                self.coords = slice_coords
 
 
         elif type(self.image_tool.parent) == GriddedDataWidget:
@@ -259,6 +284,10 @@ class LineSegmentROI(pg.LineSegmentROI):
                     y_axis=False
                 )
 
+                self.data = slice
+                self.labels = ["H", "K", "L"]
+                self.coords = slice_coords
+
                 if self.image_tool.plot_1d.isVisible():
                     self.image_tool.controller.plot_2d_roi_ctrl.roi._getSlice()
                     
@@ -281,3 +310,7 @@ class LineSegmentROI(pg.LineSegmentROI):
 
                 slice = np.array(slice)
                 self.child_plot._plot(data=slice, x_axis=False)
+
+                self.data = slice
+                self.labels = ["H", "K", "L"]
+                self.coords = slice_coords
