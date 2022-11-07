@@ -22,6 +22,8 @@ class CurveView(QtGui.QWidget):
         super(CurveView, self).__init__()
         self.parent = parent
 
+        self.setEnabled(False)
+
         self.curves = []
 
         # Widgets
@@ -75,14 +77,12 @@ class CurveController(QtGui.QWidget):
         self.x_axis_options = ["Index", "x", "y", "t", "H", "K", "L"]
         self.x_axis_cbx.addItems(self.x_axis_options)
         self.curve_list_items = []
-        self.curve_table = QtGui.QTableWidget(0, 5)
-        self.curve_table.setHorizontalHeaderLabels(["Show", "Color", "Type", "Scan", ""])
+        self.curve_table = QtGui.QTableWidget(0, 3)
+        self.curve_table.setHorizontalHeaderLabels(["Show", "Color", ""])
 
         self.curve_table.horizontalHeader().setSectionResizeMode(0, QtGui.QHeaderView.ResizeToContents)
         self.curve_table.horizontalHeader().setSectionResizeMode(1, QtGui.QHeaderView.ResizeToContents)
-        self.curve_table.horizontalHeader().setSectionResizeMode(2, QtGui.QHeaderView.ResizeToContents)
-        self.curve_table.horizontalHeader().setSectionResizeMode(3, QtGui.QHeaderView.ResizeToContents)
-        self.curve_table.horizontalHeader().setSectionResizeMode(4, QtGui.QHeaderView.Stretch)
+        self.curve_table.horizontalHeader().setSectionResizeMode(2, QtGui.QHeaderView.Stretch)
 
         self.layout = QtGui.QGridLayout()
         self.setLayout(self.layout)
@@ -99,9 +99,7 @@ class CurveController(QtGui.QWidget):
 
         self.curve_table.setCellWidget(self.curve_list_items.index(cli), 0, cli.vis_chkbx)
         self.curve_table.setCellWidget(self.curve_list_items.index(cli), 1, cli.color_btn)
-        self.curve_table.setCellWidget(self.curve_list_items.index(cli), 2, QtGui.QLabel(cli.type))
-        self.curve_table.setCellWidget(self.curve_list_items.index(cli), 3, QtGui.QLabel(cli.scan))
-        self.curve_table.setCellWidget(self.curve_list_items.index(cli), 4, cli.delete_btn)
+        self.curve_table.setCellWidget(self.curve_list_items.index(cli), 2, cli.delete_btn)
     
     def _updatePlotAxis(self):
         for cli in self.curve_list_items:
