@@ -344,6 +344,7 @@ class ScanSelectionWidget(QtGui.QWidget):
             scan._loadRawImageData()
             scan._gridRawImageData()
             self.main_window.data_view._addScan(scan=scan)
+            self.main_window.plot_view.setEnabled(True)
         else:
             msg = QtGui.QMessageBox()
             msg.setIcon(QtGui.QMessageBox.Critical)
