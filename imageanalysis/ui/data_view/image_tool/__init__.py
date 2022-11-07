@@ -324,7 +324,6 @@ class ImagePlot(pg.ImageView):
 
         self.getView().setAspectLocked(False)
         self.getView().ctrlMenu = None
-        self.getView().showGrid(x=True, y=True, alpha=0.5)
 
         # Connections
         self.getView().scene().sigMouseMoved.connect(self._updateMousePoint)
