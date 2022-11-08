@@ -5,8 +5,9 @@ See LICENSE file.
 
 
 import numpy as np
+from PyQt5 import QtWidgets
 import pyqtgraph as pg
-from pyqtgraph import QtCore, QtGui
+from pyqtgraph import QtCore
 from pyqtgraph.dockarea import Dock, DockArea
 from random import randint
 
@@ -15,7 +16,7 @@ from imageanalysis.ui.data_view.gridded_data import GriddedDataWidget
 from imageanalysis.ui.data_view.raw_data import RawDataWidget
 
 
-class CurveView(QtGui.QWidget):
+class CurveView(QtWidgets.QWidget):
     """Houses a tab widget for DataViewTab objects."""
 
     def __init__(self, parent=None) -> None:
@@ -52,7 +53,7 @@ class CurveView(QtGui.QWidget):
             "bottom",
             self.curve_plot_dock
         )
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.dock_area)
 
@@ -63,7 +64,7 @@ class CurveView(QtGui.QWidget):
         
 
 # TODO: Rename to curve controller
-class CurveController(QtGui.QWidget):
+class CurveController(QtWidgets.QWidget):
 
     plot_axis_updated = QtCore.pyqtSignal()
 
@@ -72,19 +73,19 @@ class CurveController(QtGui.QWidget):
         self.parent = parent
         self.curve_plot = parent.curve_plot
 
-        self.x_axis_lbl = QtGui.QLabel("x-axis: ")
-        self.x_axis_cbx = QtGui.QComboBox()
+        self.x_axis_lbl = QtWidgets.QLabel("x-axis: ")
+        self.x_axis_cbx = QtWidgets.QComboBox()
         self.x_axis_options = ["Index", "x", "y", "t", "H", "K", "L"]
         self.x_axis_cbx.addItems(self.x_axis_options)
         self.curve_list_items = []
-        self.curve_table = QtGui.QTableWidget(0, 3)
+        self.curve_table = QtWidgets.QTableWidget(0, 3)
         self.curve_table.setHorizontalHeaderLabels(["Show", "Color", ""])
 
-        self.curve_table.horizontalHeader().setSectionResizeMode(0, QtGui.QHeaderView.ResizeToContents)
-        self.curve_table.horizontalHeader().setSectionResizeMode(1, QtGui.QHeaderView.ResizeToContents)
-        self.curve_table.horizontalHeader().setSectionResizeMode(2, QtGui.QHeaderView.Stretch)
+        self.curve_table.horizontalHeader().setSectionResizeMode(0, QtWidgets.QHeaderView.ResizeToContents)
+        self.curve_table.horizontalHeader().setSectionResizeMode(1, QtWidgets.QHeaderView.ResizeToContents)
+        self.curve_table.horizontalHeader().setSectionResizeMode(2, QtWidgets.QHeaderView.Stretch)
 
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.x_axis_lbl, 0, 0)
         self.layout.addWidget(self.x_axis_cbx, 0, 1)
@@ -112,7 +113,7 @@ class CurveListItem:
         self.parent = parent
         self.curve_plot = parent.curve_plot
 
-        self.vis_chkbx = QtGui.QCheckBox()
+        self.vis_chkbx = QtWidgets.QCheckBox()
         self.vis_chkbx.setChecked(True)
         self.color_btn = pg.ColorButton(
             color=(
@@ -121,7 +122,7 @@ class CurveListItem:
                 randint(0, 255)
             )
         )
-        self.delete_btn = QtGui.QPushButton("Delete")
+        self.delete_btn = QtWidgets.QPushButton("Delete")
         self.type = ""
         self.scan = ""
         self.coords = {
@@ -177,5 +178,5 @@ class CurvePlot(pg.PlotWidget):
         super().__init__(parent, background)
 
 
-class CurvePlotController(QtGui.QWidget):
+class CurvePlotController(QtWidgets.QWidget):
     ...
