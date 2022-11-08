@@ -3,15 +3,15 @@
 See LICENSE file.
 """
 
-
-from pyqtgraph import QtCore, QtGui
+from PyQt5 import QtWidgets
+from pyqtgraph import QtCore
 
 from imageanalysis.io import \
     isValidProjectPath, getSPECPaths, getXMLPaths
 from imageanalysis.structures import Project, Scan
 
 
-class ProjectSelectionWidget(QtGui.QWidget):
+class ProjectSelectionWidget(QtWidgets.QWidget):
     """Handles project and project-dependent file selection."""
 
     def __init__(self, parent) -> None:
@@ -26,22 +26,22 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.detector_path = None
 
         # Child widgets
-        self.project_btn = QtGui.QPushButton("Select Project")
-        self.project_txt = QtGui.QLineEdit()
+        self.project_btn = QtWidgets.QPushButton("Select Project")
+        self.project_txt = QtWidgets.QLineEdit()
         self.project_txt.setReadOnly(True)
-        self.project_files_gbx = QtGui.QGroupBox()
+        self.project_files_gbx = QtWidgets.QGroupBox()
         self.project_files_gbx.setEnabled(False)
-        self.spec_lbl = QtGui.QLabel("SPEC Source:")
-        self.spec_cbx = QtGui.QComboBox()
-        self.instrument_lbl = QtGui.QLabel("Instrument:")
-        self.instrument_cbx = QtGui.QComboBox()
-        self.detector_lbl = QtGui.QLabel("Detector:")
-        self.detector_cbx = QtGui.QComboBox()
-        self.load_project_btn = QtGui.QPushButton("Load Project")
+        self.spec_lbl = QtWidgets.QLabel("SPEC Source:")
+        self.spec_cbx = QtWidgets.QComboBox()
+        self.instrument_lbl = QtWidgets.QLabel("Instrument:")
+        self.instrument_cbx = QtWidgets.QComboBox()
+        self.detector_lbl = QtWidgets.QLabel("Detector:")
+        self.detector_cbx = QtWidgets.QComboBox()
+        self.load_project_btn = QtWidgets.QPushButton("Load Project")
         self.load_project_btn.setEnabled(False)
 
         # Project files GroupBox layout
-        self.project_files_gbx_layout = QtGui.QGridLayout()
+        self.project_files_gbx_layout = QtWidgets.QGridLayout()
         self.project_files_gbx.setLayout(self.project_files_gbx_layout)
         self.project_files_gbx_layout.addWidget(self.spec_lbl, 0, 0)
         self.project_files_gbx_layout.addWidget(self.spec_cbx, 0, 1)
@@ -52,7 +52,7 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.project_files_gbx_layout.addWidget(self.load_project_btn, 3, 1)
 
         # Main layout
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.project_btn, 0, 0)
         self.layout.addWidget(self.project_txt, 0, 1)
@@ -74,7 +74,7 @@ class ProjectSelectionWidget(QtGui.QWidget):
     def _selectProject(self) -> None:
         """Allows user to select a project directory."""
 
-        project_path = QtGui.QFileDialog.getExistingDirectory(
+        project_path = QtWidgets.QFileDialog.getExistingDirectory(
             self, "Select Project"
         )
 
@@ -88,8 +88,8 @@ class ProjectSelectionWidget(QtGui.QWidget):
                 self._populateProjectFilesGroupbox()
             else:
                 self.project_files_gbx.setEnabled(False)
-                msg = QtGui.QMessageBox()
-                msg.setIcon(QtGui.QMessageBox.Critical)
+                msg = QtWidgets.QMessageBox()
+                msg.setIcon(QtWidgets.QMessageBox.Critical)
                 msg.setWindowTitle("Error")
                 msg.setText("Invalid project directory.")
                 msg.exec_()
@@ -134,7 +134,7 @@ class ProjectSelectionWidget(QtGui.QWidget):
         self.main_window.scan_selection_widget._loadProject(project=project)
 
 
-class ScanSelectionWidget(QtGui.QWidget):
+class ScanSelectionWidget(QtWidgets.QWidget):
     """Handles scan selection and loading."""
 
     def __init__(self, parent) -> None:
@@ -146,46 +146,46 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.project = None
 
         # Child widgets
-        self.scan_lstw = QtGui.QListWidget()
-        self.scan_details_gbx = QtGui.QGroupBox()
+        self.scan_lstw = QtWidgets.QListWidget()
+        self.scan_details_gbx = QtWidgets.QGroupBox()
         self.scan_details_gbx.setEnabled(False)
-        self.scan_number_lbl = QtGui.QLabel("Scan:")
-        self.scan_number_txt = QtGui.QLineEdit()
+        self.scan_number_lbl = QtWidgets.QLabel("Scan:")
+        self.scan_number_txt = QtWidgets.QLineEdit()
         self.scan_number_txt.setReadOnly(True)
-        self.scan_point_count_lbl = QtGui.QLabel("# Points:")
-        self.scan_point_count_txt = QtGui.QLineEdit()
+        self.scan_point_count_lbl = QtWidgets.QLabel("# Points:")
+        self.scan_point_count_txt = QtWidgets.QLineEdit()
         self.scan_point_count_txt.setReadOnly(True)
-        self.scan_date_lbl = QtGui.QLabel()
+        self.scan_date_lbl = QtWidgets.QLabel()
         self.scan_date_lbl.setAlignment(
             QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
         )
-        self.scan_type_lbl = QtGui.QLabel()
+        self.scan_type_lbl = QtWidgets.QLabel()
         self.scan_type_lbl.setAlignment(
             QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
         )
-        self.scan_bounds_lbl = QtGui.QLabel()
+        self.scan_bounds_lbl = QtWidgets.QLabel()
         self.scan_bounds_lbl.setAlignment(
             QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
         )
-        self.gridding_options_gbx = QtGui.QGroupBox()
+        self.gridding_options_gbx = QtWidgets.QGroupBox()
         self.gridding_options_gbx.setTitle("Gridding Options")
-        self.min_lbl = QtGui.QLabel("Min")
-        self.max_lbl = QtGui.QLabel("Max")
-        self.n_lbl = QtGui.QLabel("n")
-        self.h_lbl = QtGui.QLabel("H:")
-        self.h_min_sbx = QtGui.QDoubleSpinBox()
-        self.h_max_sbx = QtGui.QDoubleSpinBox()
-        self.h_n_sbx = QtGui.QSpinBox()
-        self.k_lbl = QtGui.QLabel("K:")
-        self.k_min_sbx = QtGui.QDoubleSpinBox()
-        self.k_max_sbx = QtGui.QDoubleSpinBox()
-        self.k_n_sbx = QtGui.QSpinBox()
-        self.l_lbl = QtGui.QLabel("L:")
-        self.l_min_sbx = QtGui.QDoubleSpinBox()
-        self.l_max_sbx = QtGui.QDoubleSpinBox()
-        self.l_n_sbx = QtGui.QSpinBox()
-        self.reset_btn = QtGui.QPushButton("Reset")
-        self.load_scan_btn = QtGui.QPushButton("Load Scan")
+        self.min_lbl = QtWidgets.QLabel("Min")
+        self.max_lbl = QtWidgets.QLabel("Max")
+        self.n_lbl = QtWidgets.QLabel("n")
+        self.h_lbl = QtWidgets.QLabel("H:")
+        self.h_min_sbx = QtWidgets.QDoubleSpinBox()
+        self.h_max_sbx = QtWidgets.QDoubleSpinBox()
+        self.h_n_sbx = QtWidgets.QSpinBox()
+        self.k_lbl = QtWidgets.QLabel("K:")
+        self.k_min_sbx = QtWidgets.QDoubleSpinBox()
+        self.k_max_sbx = QtWidgets.QDoubleSpinBox()
+        self.k_n_sbx = QtWidgets.QSpinBox()
+        self.l_lbl = QtWidgets.QLabel("L:")
+        self.l_min_sbx = QtWidgets.QDoubleSpinBox()
+        self.l_max_sbx = QtWidgets.QDoubleSpinBox()
+        self.l_n_sbx = QtWidgets.QSpinBox()
+        self.reset_btn = QtWidgets.QPushButton("Reset")
+        self.load_scan_btn = QtWidgets.QPushButton("Load Scan")
 
         # SpinBox properties
         for sbx in [
@@ -200,7 +200,7 @@ class ScanSelectionWidget(QtGui.QWidget):
             sbx.setRange(10, 750)
 
         # Scan details GroupBox layout
-        self.scan_details_gbx_layout = QtGui.QGridLayout()
+        self.scan_details_gbx_layout = QtWidgets.QGridLayout()
         self.scan_details_gbx.setLayout(self.scan_details_gbx_layout)
         self.scan_details_gbx_layout.addWidget(
             self.scan_number_lbl, 0, 0)
@@ -222,7 +222,7 @@ class ScanSelectionWidget(QtGui.QWidget):
             self.load_scan_btn, 4, 2, 1, 2)
 
         # gridding options GroupBox layout
-        self.gridding_options_gbx_layout = QtGui.QGridLayout()
+        self.gridding_options_gbx_layout = QtWidgets.QGridLayout()
         self.gridding_options_gbx.setLayout(self.gridding_options_gbx_layout)
         self.gridding_options_gbx_layout.addWidget(self.min_lbl, 0, 1)
         self.gridding_options_gbx_layout.addWidget(self.max_lbl, 0, 2)
@@ -242,7 +242,7 @@ class ScanSelectionWidget(QtGui.QWidget):
         self.gridding_options_gbx_layout.addWidget(self.reset_btn, 4, 0, 1, 4)
 
         # Layout
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.scan_lstw, 0, 0)
         self.layout.addWidget(self.scan_details_gbx, 1, 0)
@@ -346,8 +346,8 @@ class ScanSelectionWidget(QtGui.QWidget):
             self.main_window.data_view._addScan(scan=scan)
             self.main_window.plot_view.setEnabled(True)
         else:
-            msg = QtGui.QMessageBox()
-            msg.setIcon(QtGui.QMessageBox.Critical)
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
             msg.setWindowTitle("Error")
             msg.setText("Invalid gridding bounds.")
             msg.exec_()
