@@ -7,13 +7,11 @@ Python-based software for XRD data analysis. Allows users to analyze SPEC data, 
 
 ### Prerequisites
 
- - Python 3.8
+ - Python 3.8.13
 
 ### Installation
 
-`imageanalysis` can be installed as either a Python package with `pip` or directory with `git clone`. If you are installing the project as a directory, you should also create a virtual environment.
-
-#### PyPi
+`imageanalysis` can be installed as a Python package via `PyPI`. NOTE: You must be using the correct version of Python (3.8.13).
 
 ```
 pip install image-analysis
@@ -21,11 +19,11 @@ pip install image-analysis
 
 #### Cloning the Repository
 
+As an alternative option, you can clone the repository, which also includes a sample project with two scans.
+
 ```
 git clone https://github.com/henryjsmith12/image-analysis.git
 ```
-
-### Creating a Virtual Environment
 
 #### Conda Virtual Environment
 
@@ -45,34 +43,6 @@ git clone https://github.com/henryjsmith12/image-analysis.git
 
     ```
     cd image-analysis
-    ```
-
-#### Python Virtual Environment
-
-1. After cloning the repository, create the virtual environment.
-
-    ```
-    python -m venv ./image-analysis
-    ```
-
-    This will create a virtual environment in the the repository directory.
-
-2. Activate the virtual environment.
-
-   ```
-   source ./image-analysis/bin/activate
-   ```
-
-3. Change into the repository directory.
-
-    ```
-    cd image-analysis
-    ```
-
-4. Install the dependencies using `requirements.txt`.
-
-    ```
-    pip install -r requirements.txt
     ```
 
 ### Execution
