@@ -5,8 +5,9 @@ See LICENSE file.
 
 
 import numpy as np
+from PyQt5 import QtGui, QtWidgets
 import pyqtgraph as pg
-from pyqtgraph import QtCore, QtGui
+from pyqtgraph import QtCore
 from pyqtgraph.dockarea import Dock, DockArea
 
 from imageanalysis.ui.data_view.image_tool.color_mapping import \
@@ -138,7 +139,7 @@ class ImageTool(DockArea):
                 cmap=color_map,
                 interactive=False,
                 width=15,
-                orientation="h"
+                orientation="v"
             )
             self.color_bar_3d.setImageItem(
                 img=self.plot_3d.image,
@@ -146,7 +147,7 @@ class ImageTool(DockArea):
             )
         # Applys color map to plot
         self.plot_3d.setColorMap(color_map)
-        self.color_bar_3d.setCmap(color_map)
+        self.color_bar_3d.setColorMap(color_map)
         # Adjusts color map range in color bar
         self.color_bar_3d.setLevels(range)
 
@@ -157,14 +158,14 @@ class ImageTool(DockArea):
                     cmap=color_map,
                     interactive=False,
                     width=15,
-                    orientation="h"
+                    orientation="v"
                 )
                 self.color_bar_2d.setImageItem(
                     img=self.plot_2d.image,
                     insert_in=self.plot_2d.getView()
                 )
             self.plot_2d.setColorMap(color_map)
-            self.color_bar_2d.setCmap(color_map)
+            self.color_bar_2d.setColorMap(color_map)
             self.color_bar_2d.setLevels(range)
 
         self.plot_3d._plot(
@@ -178,7 +179,7 @@ class ImageTool(DockArea):
         self.colorMapUpdated.emit()
 
 
-class ImageToolController(QtGui.QWidget):
+class ImageToolController(QtWidgets.QWidget):
     """Handles color mapping, mouse info, and ROI's."""
 
     def __init__(
@@ -195,10 +196,10 @@ class ImageToolController(QtGui.QWidget):
         from imageanalysis.ui.data_view.image_tool.roi import ROIController
 
         # Scroll area
-        self.scroll_area = QtGui.QScrollArea()
+        self.scroll_area = QtWidgets.QScrollArea()
         self.scroll_area.setWidgetResizable(True)
-        self.scroll_area_widget = QtGui.QWidget()
-        self.scroll_area_layout = QtGui.QVBoxLayout()
+        self.scroll_area_widget = QtWidgets.QWidget()
+        self.scroll_area_layout = QtWidgets.QVBoxLayout()
         self.scroll_area_widget.setLayout(self.scroll_area_layout)
 
         # Child widgets
@@ -225,7 +226,7 @@ class ImageToolController(QtGui.QWidget):
         self.plot_1d_roi_ctrl.hide()
 
         # Child layout
-        self.layout = QtGui.QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.scroll_area)
 
@@ -299,7 +300,6 @@ class ImagePlot(pg.ImageView):
 
     def __init__(self, parent, dock, n_dim) -> None:
         super(ImagePlot, self).__init__(
-            imageItem=pg.ImageItem(),
             view=pg.PlotItem()
         )
 
@@ -543,33 +543,33 @@ class LinePlot(pg.PlotWidget):
             }
 
 
-class MouseInfoWidget(QtGui.QGroupBox):
+class MouseInfoWidget(QtWidgets.QGroupBox):
     """Handles displaying proper mouse location and associated values."""
 
     def __init__(self) -> None:
         super().__init__()
 
         # Child widgets
-        self.h_lbl, self.h_txt = QtGui.QLabel("H: "), QtGui.QLineEdit()
+        self.h_lbl, self.h_txt = QtWidgets.QLabel("H: "), QtWidgets.QLineEdit()
         self.h_lbl.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
         )
-        self.k_lbl, self.k_txt = QtGui.QLabel("K: "), QtGui.QLineEdit()
+        self.k_lbl, self.k_txt = QtWidgets.QLabel("K: "), QtWidgets.QLineEdit()
         self.k_lbl.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
         )
-        self.l_lbl, self.l_txt = QtGui.QLabel("L: "), QtGui.QLineEdit()
+        self.l_lbl, self.l_txt = QtWidgets.QLabel("L: "), QtWidgets.QLineEdit()
         self.l_lbl.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
         )
-        self.value_lbl = QtGui.QLabel("Value: ")
+        self.value_lbl = QtWidgets.QLabel("Value: ")
         self.value_lbl.setAlignment(
             QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter
         )
-        self.value_txt = QtGui.QLineEdit()
+        self.value_txt = QtWidgets.QLineEdit()
 
         # Layout
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.h_lbl, 0, 0)
         self.layout.addWidget(self.h_txt, 0, 1, 1, 5)
