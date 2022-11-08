@@ -50,8 +50,14 @@ class DataViewTab(QtWidgets.QWidget):
 
         # Child widgets
         self.tab_widget = QtWidgets.QTabWidget()
-        self.tab_widget.addTab(RawDataWidget(scan=scan, parent=self), "Raw")
-        self.tab_widget.addTab(GriddedDataWidget(scan=scan, parent=self), "Gridded")
+        self.tab_widget.addTab(
+            RawDataWidget(scan=scan, parent=self),
+            "Raw"
+        )
+        self.tab_widget.addTab(
+            GriddedDataWidget(scan=scan, parent=self), 
+            "Gridded"
+        )
 
         # Layout
         self.layout = QtWidgets.QGridLayout()
