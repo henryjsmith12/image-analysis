@@ -4,7 +4,7 @@ See LICENSE file.
 """
 
 
-from pyqtgraph import QtGui
+from PyQt5 import QtWidgets
 import sys
 
 from imageanalysis.ui.main_window import MainWindow
@@ -13,10 +13,11 @@ from imageanalysis.ui.main_window import MainWindow
 def run() -> None:
     """Package driver function."""
 
-    app = QtGui.QApplication(sys.argv)
+    app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     window.show()
     app.exec_()
 
 if __name__ == "__main__":
-    run()
+    sys.exit(run())
+    
