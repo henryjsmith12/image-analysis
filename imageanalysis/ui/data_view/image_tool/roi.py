@@ -12,7 +12,6 @@ from imageanalysis.io import numpyToVTK
 from imageanalysis.structures import Curve
 
 
-
 class ROIController(QtWidgets.QGroupBox):
     """Handles ROI items for an ImagePlot."""
 
