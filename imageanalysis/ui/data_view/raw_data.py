@@ -4,7 +4,8 @@ See LICENSE file.
 """
 
 
-from pyqtgraph import QtCore, QtGui
+from PyQt5 import QtWidgets
+from pyqtgraph import QtCore
 from pyqtgraph.dockarea import Dock, DockArea
 
 from imageanalysis.structures import Scan
@@ -50,7 +51,7 @@ class RawDataWidget(DockArea):
         self.addDock(self.image_tool_dock, "bottom", self.controller_dock)
 
 
-class RawDataController(QtGui.QWidget):
+class RawDataController(QtWidgets.QWidget):
     """Controls slice index for image in view."""
 
     def __init__(
@@ -69,13 +70,13 @@ class RawDataController(QtGui.QWidget):
         self.slice_index = 0
 
         # Child widgets
-        self.data_slider = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.data_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.data_slider.setMaximum(self.data.shape[0] - 1)
-        self.data_sbx = QtGui.QSpinBox()
+        self.data_sbx = QtWidgets.QSpinBox()
         self.data_sbx.setMaximum(self.data.shape[0] - 1)
 
         # Layout
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.data_slider, 0, 0, 1, 3)
         self.layout.addWidget(self.data_sbx, 0, 3, 1, 1)
