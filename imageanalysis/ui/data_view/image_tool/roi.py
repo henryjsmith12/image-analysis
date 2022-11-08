@@ -5,15 +5,15 @@ See LICENSE file.
 
 
 import numpy as np
+from PyQt5 import QtWidgets
 import pyqtgraph as pg
-from pyqtgraph import QtGui
 
 from imageanalysis.io import numpyToVTK
 from imageanalysis.structures import Curve
 
 
 
-class ROIController(QtGui.QGroupBox):
+class ROIController(QtWidgets.QGroupBox):
     """Handles ROI items for an ImagePlot."""
 
     def __init__(
@@ -32,24 +32,24 @@ class ROIController(QtGui.QGroupBox):
         self.roi = None
 
         # Child widgets
-        self.roi_type_lbl = QtGui.QLabel("ROI Type: ")
-        self.roi_type_cbx = QtGui.QComboBox()
+        self.roi_type_lbl = QtWidgets.QLabel("ROI Type: ")
+        self.roi_type_cbx = QtWidgets.QComboBox()
         self.roi_types = ["none", "line"]
         self.roi_type_cbx.addItems(self.roi_types)
-        self.roi_details_gbx = QtGui.QGroupBox()
-        self.roi_details_gbx_layout = QtGui.QGridLayout()
+        self.roi_details_gbx = QtWidgets.QGroupBox()
+        self.roi_details_gbx_layout = QtWidgets.QGridLayout()
         self.roi_details_gbx.setLayout(self.roi_details_gbx_layout)
-        self.center_btn = QtGui.QPushButton("Center")
-        self.calc_type_cbx = QtGui.QComboBox()
+        self.center_btn = QtWidgets.QPushButton("Center")
+        self.calc_type_cbx = QtWidgets.QComboBox()
         self.roi_details_gbx_layout.addWidget(self.center_btn, 0, 0)
         self.roi_details_gbx_layout.addWidget(self.calc_type_cbx, 1, 0)
         self.roi_details_gbx.hide()
-        self.export_btn = QtGui.QPushButton("Export Data (VTK)")
-        self.add_curve_btn = QtGui.QPushButton("Add to Curve View")
-        self.export_1d_btn = QtGui.QPushButton("Export Data (CSV)")
+        self.export_btn = QtWidgets.QPushButton("Export Data (VTK)")
+        self.add_curve_btn = QtWidgets.QPushButton("Add to Curve View")
+        self.export_1d_btn = QtWidgets.QPushButton("Export Data (CSV)")
 
         # Layout
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         if self.parent_plot.n_dim > 1:
             self.layout.addWidget(self.roi_type_lbl, 0, 0)
@@ -108,7 +108,7 @@ class ROIController(QtGui.QGroupBox):
         
         from imageanalysis.ui.data_view.gridded_data import GriddedDataWidget
 
-        path = QtGui.QFileDialog.getSaveFileName(self, "Save VTK Image Data")[0] + ".vti"
+        path = QtWidgets.QFileDialog.getSaveFileName(self, "Save VTK Image Data")[0] + ".vti"
         try:
             array = self.image_tool.data
             if type(self.image_tool.parent) == GriddedDataWidget:
@@ -123,8 +123,8 @@ class ROIController(QtGui.QGroupBox):
 
             numpyToVTK(array=array, coords=coords, path=path)
         except Exception as ex:
-            msg = QtGui.QMessageBox()
-            msg.setIcon(QtGui.QMessageBox.Critical)
+            msg = QtWidgets.QMessageBox()
+            msg.setIcon(QtWidgets.QMessageBox.Critical)
             msg.setWindowTitle("Error")
             msg.setText(str(ex))
             msg.exec_()
