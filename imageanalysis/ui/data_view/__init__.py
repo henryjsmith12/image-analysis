@@ -4,14 +4,15 @@ See LICENSE file.
 """
 
 
-from pyqtgraph import QtCore, QtGui
+from PyQt5 import QtWidgets
+from pyqtgraph import QtCore
 
 from imageanalysis.structures import Scan
 from imageanalysis.ui.data_view.gridded_data import GriddedDataWidget
 from imageanalysis.ui.data_view.raw_data import RawDataWidget
 
 
-class DataView(QtGui.QTabWidget):
+class DataView(QtWidgets.QTabWidget):
     """Houses a tab widget for DataViewTab objects."""
 
     def __init__(self, parent=None) -> None:
@@ -36,7 +37,7 @@ class DataView(QtGui.QTabWidget):
         self.removeTab(index)
 
 
-class DataViewTab(QtGui.QWidget):
+class DataViewTab(QtWidgets.QWidget):
     """Houses various widgets to view data with."""
 
     def __init__(self, scan: Scan, parent=None) -> None:
@@ -48,11 +49,11 @@ class DataViewTab(QtGui.QWidget):
         self.scan = scan
 
         # Child widgets
-        self.tab_widget = QtGui.QTabWidget()
+        self.tab_widget = QtWidgets.QTabWidget()
         self.tab_widget.addTab(RawDataWidget(scan=scan, parent=self), "Raw")
         self.tab_widget.addTab(GriddedDataWidget(scan=scan, parent=self), "Gridded")
 
         # Layout
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.tab_widget)
