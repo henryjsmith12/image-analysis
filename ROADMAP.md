@@ -9,7 +9,7 @@
 - [ ] Polygon ROI (v0.2)
 
 ### Curves & CurveView
-- [ ] Basic GUI and ability to display various curve items (v0.1.6)
+- [X] Basic GUI and ability to display various curve items (v0.1.6)
 
 ### Scriptability
 - [ ] The ability to script ROI applications (v0.1.7)

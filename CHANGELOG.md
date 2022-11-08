@@ -53,3 +53,12 @@ Coordinate intervals and 3D image exporting
 - Ability to export 3D images to VTK image data format
 - Generalized function for converting 3D numpy arrays to .vti (VTK) files
 
+## [0.1.6] - 2022-08-11
+Big fixes and basic curve plotting
+
+### Added
+- Ability to view sets of 1D curves in the newly added CurveView area
+
+### Fixed
+- Refactored pyqtgraph.QtGui objects to PyQt5.QtWidgets
+- Normalization factor for images
