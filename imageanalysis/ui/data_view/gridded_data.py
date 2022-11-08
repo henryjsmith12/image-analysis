@@ -158,7 +158,10 @@ class GriddedDataController(QtWidgets.QWidget):
             y_coords=y_coords
         )
 
-        self.image_tool.plot_3d._setCoordinateIntervals(coords=self.coords, labels=["H", "K", "L"])
+        self.image_tool.plot_3d._setCoordinateIntervals(
+            coords=self.coords, 
+            labels=["H", "K", "L"]
+        )
 
     def dragEnterEvent(self, e) -> None:
         """For dragging a dimension controller."""
