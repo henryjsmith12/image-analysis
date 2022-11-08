@@ -4,7 +4,7 @@ See LICENSE file.
 """
 
 
-from pyqtgraph import QtGui
+from PyQt5 import QtGui, QtWidgets
 from pyqtgraph.dockarea import Dock, DockArea
 import sys
 
@@ -14,7 +14,7 @@ from imageanalysis.ui.selection_widgets import \
     ProjectSelectionWidget, ScanSelectionWidget
 
 
-class MainWindow(QtGui.QWidget):
+class MainWindow(QtWidgets.QWidget):
     """Main window for application.
 
     Houses DockArea that contains child widgets.
@@ -96,16 +96,31 @@ class MainWindow(QtGui.QWidget):
         )
 
         # Layout
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.dock_area)
 
         # Keyboard shortcuts
-        self.close_app_shortcut = QtGui.QShortcut(QtGui.QKeySequence.Close, self)
-        self.quit_app_shortcut = QtGui.QShortcut(QtGui.QKeySequence.Quit, self)
-        self.full_screen_shortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+Shift+F"), self)
-        self.maximize_shortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+="), self)
-        self.minimize_shortcut = QtGui.QShortcut(QtGui.QKeySequence("Ctrl+-"), self)
+        self.close_app_shortcut = QtWidgets.QShortcut(
+            QtGui.QKeySequence.Close,
+            self
+        )
+        self.quit_app_shortcut = QtWidgets.QShortcut(
+            QtGui.QKeySequence.Quit,
+            self
+        )
+        self.full_screen_shortcut = QtWidgets.QShortcut(
+            QtGui.QKeySequence("Ctrl+Shift+F"),
+            self
+        )
+        self.maximize_shortcut = QtWidgets.QShortcut(
+            QtGui.QKeySequence("Ctrl+="),
+            self
+        )
+        self.minimize_shortcut = QtWidgets.QShortcut(
+            QtGui.QKeySequence("Ctrl+-"),
+            self
+        )
         self.quit_app_shortcut.activated.connect(self._closeApp)
         self.close_app_shortcut.activated.connect(self._closeApp)
         self.full_screen_shortcut.activated.connect(self._fullScreen)
