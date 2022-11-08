@@ -1,6 +1,6 @@
 name: ia-env
 dependencies:
-  - python=3.8
+  - python=3.8.13
   - pip
   - pip:
     - matplotlib==3.5.3
