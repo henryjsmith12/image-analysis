@@ -3,8 +3,10 @@
 See LICENSE file.
 """
 
+
 import numpy as np
-from pyqtgraph import QtCore, QtGui
+from PyQt5 import QtGui, QtWidgets
+from pyqtgraph import QtCore
 from pyqtgraph.dockarea import Dock, DockArea
 
 from imageanalysis.structures import Scan
@@ -50,7 +52,7 @@ class GriddedDataWidget(DockArea):
         self.addDock(self.image_tool_dock, "bottom", self.controller_dock)
 
 
-class GriddedDataController(QtGui.QWidget):
+class GriddedDataController(QtWidgets.QWidget):
     """Controls dimension order and index of gridded image slice in view."""
 
     # Signal changing dimension order
@@ -97,7 +99,7 @@ class GriddedDataController(QtGui.QWidget):
         self.l_ctrl._setEnabled(enabled=True)
 
         # Layout
-        self.layout = QtGui.QVBoxLayout()
+        self.layout = QtWidgets.QVBoxLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.h_ctrl)
         self.layout.addWidget(self.k_ctrl)
@@ -186,7 +188,7 @@ class GriddedDataController(QtGui.QWidget):
         self.dimensionOrderChanged.emit()
 
 
-class GriddedDimensionController(QtGui.QGroupBox):
+class GriddedDimensionController(QtWidgets.QGroupBox):
     """Child class for DataViewController.
 
     Three of these are created to control each dimension (H, K, L).
@@ -210,14 +212,14 @@ class GriddedDimensionController(QtGui.QGroupBox):
         self.coords = coords
 
         # Child widgets
-        self.dim_lbl = QtGui.QLabel(label)
-        self.dim_slider = QtGui.QSlider(QtCore.Qt.Horizontal)
+        self.dim_lbl = QtWidgets.QLabel(label)
+        self.dim_slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.dim_slider.setMaximum(len(coords) - 1)
-        self.dim_cbx = QtGui.QComboBox()
+        self.dim_cbx = QtWidgets.QComboBox()
         self.dim_cbx.addItems([str(round(i, 5)) for i in coords])
 
         # Layout
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.dim_lbl, 0, 0)
         self.layout.addWidget(self.dim_slider, 0, 1, 1, 5)
