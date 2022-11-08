@@ -3,6 +3,7 @@
 See LICENSE file.
 """
 
+
 from PyQt5 import QtWidgets
 from pyqtgraph import QtCore
 
@@ -131,7 +132,7 @@ class ProjectSelectionWidget(QtWidgets.QWidget):
             detector_path=self.detector_path
         )
         self.project = project
-        self.main_window.scan_selection_widget._loadProject(project=project)
+        self.main_window.scan_selection_widget._loadProject(project)
 
 
 class ScanSelectionWidget(QtWidgets.QWidget):
