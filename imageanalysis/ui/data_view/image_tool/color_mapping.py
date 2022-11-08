@@ -5,12 +5,13 @@ See LICENSE file.
 
 
 import numpy as np
+from PyQt5 import QtWidgets
 import pyqtgraph as pg
-from pyqtgraph import QtCore, QtGui
+from pyqtgraph import QtCore
 from sklearn import preprocessing
 
 
-class ColorMapController(QtGui.QGroupBox):
+class ColorMapController(QtWidgets.QGroupBox):
     """Allows user to apply a colormap to an image."""
 
     colorMapChanged = QtCore.pyqtSignal()
@@ -41,49 +42,49 @@ class ColorMapController(QtGui.QGroupBox):
         self.gamma = 2.0
 
         # Child widgets
-        self.name_cbx = QtGui.QComboBox()
+        self.name_cbx = QtWidgets.QComboBox()
         self.name_cbx.addItems(available_color_maps)
-        self.scale_cbx = QtGui.QComboBox()
+        self.scale_cbx = QtWidgets.QComboBox()
         self.scale_cbx.addItems(scales)
-        self.n_pts_lbl = QtGui.QLabel("# Points:")
-        self.n_pts_sbx = QtGui.QSpinBox()
+        self.n_pts_lbl = QtWidgets.QLabel("# Points:")
+        self.n_pts_sbx = QtWidgets.QSpinBox()
         self.n_pts_sbx.setMinimum(2)
         self.n_pts_sbx.setMaximum(256)
         self.n_pts_sbx.setValue(16)
-        self.base_lbl = QtGui.QLabel("Base:")
+        self.base_lbl = QtWidgets.QLabel("Base:")
         self.base_lbl.setAlignment(
             QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
         )
         self.base_lbl.hide()
-        self.base_sbx = QtGui.QDoubleSpinBox()
+        self.base_sbx = QtWidgets.QDoubleSpinBox()
         self.base_sbx.setMinimum(0.0001)
         self.base_sbx.setMaximum(1000)
         self.base_sbx.setSingleStep(0.1)
         self.base_sbx.hide()
         self.base_sbx.setValue(2.0)
-        self.gamma_lbl = QtGui.QLabel("Gamma:")
+        self.gamma_lbl = QtWidgets.QLabel("Gamma:")
         self.gamma_lbl.setAlignment(
             QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
         )
         self.gamma_lbl.hide()
-        self.gamma_sbx = QtGui.QDoubleSpinBox()
+        self.gamma_sbx = QtWidgets.QDoubleSpinBox()
         self.gamma_sbx.setMinimum(0.0001)
         self.gamma_sbx.setMaximum(1000)
         self.gamma_sbx.setSingleStep(0.1)
         self.gamma_sbx.hide()
         self.gamma_sbx.setValue(2.0)
-        self.max_value_lbl = QtGui.QLabel("Max: ")
+        self.max_value_lbl = QtWidgets.QLabel("Max: ")
         self.max_value_lbl.setAlignment(
             QtCore.Qt.AlignCenter | QtCore.Qt.AlignVCenter
         )
-        self.max_value_sbx = QtGui.QSpinBox()
+        self.max_value_sbx = QtWidgets.QSpinBox()
         self.max_value_sbx.setMinimum(1)
         self.max_value_sbx.setMaximum(1000000)
         self.max_value_sbx.setSingleStep(1)
         self.max_value_sbx.setValue(1000)
 
         # Layout
-        self.layout = QtGui.QGridLayout()
+        self.layout = QtWidgets.QGridLayout()
         self.setLayout(self.layout)
         self.layout.addWidget(self.name_cbx, 0, 0, 1, 2)
         self.layout.addWidget(self.scale_cbx, 1, 0, 1, 2)
@@ -163,9 +164,9 @@ def createColorMap(
     """Returns a color map object created from given parameters."""
 
     if name in pg.colormap.listMaps(source="matplotlib"):
-        colors = pg.getFromMatplotlib(name).getLookupTable(nPts=n_pts)
+        colors = pg.colormap.getFromMatplotlib(name).getLookupTable(nPts=n_pts)
     elif name in pg.colormap.listMaps(source="colorcet"):
-        colors = pg.getFromColorcet(name).getLookupTable(nPts=n_pts)
+        colors = pg.colormap.getFromColorcet(name).getLookupTable(nPts=n_pts)
     elif name in pg.colormap.listMaps():
         colors = pg.get(name).getLookupTable(nPts=n_pts)
     else:
