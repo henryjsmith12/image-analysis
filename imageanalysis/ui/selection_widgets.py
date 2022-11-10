@@ -265,12 +265,12 @@ class ScanSelectionWidget(QtWidgets.QWidget):
         """Sets project variable and loads scan numbers in list."""
         self.project = project
         self.scan_lstw.clear()
-        self.scan_lstw.addItems(self.project._getScanNumbers())
+        self.scan_lstw.addItems([str(key) for key in self.project.scans.keys()])
 
     def _getCurrentScan(self) -> Scan:
         """Returns Scan object of currently highlighted scan number."""
         scan_number = int(self.scan_lstw.currentItem().text())
-        scan = self.project.getScan(scan_number)
+        scan = self.project.scans[scan_number]
         return scan
 
     def _previewScan(self, scan=None) -> None:
