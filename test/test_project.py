@@ -1,6 +1,6 @@
 import pytest
 
-from imageanalysis.structures import Project, Scan
+from imageanalysis.structures import Project
 
 def test_project_creation_success():
     p = Project(
