@@ -111,7 +111,7 @@ class Project:
             raise NotADirectoryError(f"Path '{image_path}' not found.")
 
     def _createScans(self) -> None:
-        """Returns a dict of Scan objects created from SPEC and image data."""
+        """Creates a dict of Scan objects created from SPEC and image data."""
 
         scans = {}
 
@@ -121,28 +121,13 @@ class Project:
 
             if os.path.exists(scan_image_path):
                 scan = Scan(
-                    number=n,
-                    project=self
+                    project=self,
+                    image_path=scan_image_path,
+                    spec_scan=spec_scan
                 )
                 scans.update({int(n): scan})
 
         self.scans = scans
-
-    def _getScanNumbers(self):
-        """Returns list of scan numbers for project."""
-
-        scan_numbers = []
-        for n in self.spec_data.getScanNumbers():
-            scan_image_path = self.image_path + f"/S{str(n).zfill(3)}"
-            if os.path.exists(scan_image_path):
-                scan_numbers.append(n)
-
-        return scan_numbers
-
-    def getScan(self, n):
-        """Returns a Scan object for a given scan number"""
-
-        return self.scans[n]
 
 
 class Scan:
@@ -150,13 +135,14 @@ class Scan:
 
     def __init__(
         self,
-        number: int,
-        project: Project
+        project: Project,
+        image_path: str,
+        spec_scan: spec.SpecDataFileScan
     ) -> None:
 
-        self.number = number
+        self.number = spec_scan.scanNum
         self.project = project
-        self.spec_scan = self.project.spec_data.getScan(number)
+        self.spec_scan = self.project.spec_data.getScan(self.number)
         self.raw_image_data, self.rsm = None, None
         self.gridded_image_data, self.gridded_image_coords = None, None
         self.grid_parameters = {
@@ -240,8 +226,9 @@ class Scan:
         self.grid_parameters["L"]["n"] = 250
 
 '''
+
 class Scan:
-    """Houses data for a single scan."""
+    """Houses data for a scan."""
 
     project = None # Parent project
     image_path = None # Directory with raw images for scan
@@ -249,11 +236,11 @@ class Scan:
     number = None # Number assigned in SPEC data
     name = None # Visible name for scan
     raw_data = None # 3D NumPy array for raw image data
+    rsm = None # 4D NumPy array with reciprocal space map
     grid_data = None # 3D NumPy array for gridded image data
     grid_coords = None # 2D list of gridded coordinates for HKL, respectively
     grid_params = None # Parameters for gridding raw image data
-    rsm = None # 4D NumPy array with reciprocal space map
-
+    
     def __init__(
         self,
         project: Project,
@@ -265,28 +252,43 @@ class Scan:
         self.image_path = image_path
         self.spec_scan = spec_scan
         self.number = spec_scan.scanNum
-        self.name = f"5 ({project.name})"
+        self.name = f"{self.number} ({project.name})"
+
+    def loadRawData(self) -> None:
+        """Loads raw images from image path directory."""
+
+        image_files = []
+        for file in sorted(os.listdir(self.image_path)):
+            if self.project.name in file and file.endswith("tif"):
+                image_files.append(file)
+
+        for i in range(len(image_files)): 
+            basepath = image_files[i]
+            path = f"{self.image_path}/{basepath}"
+            image = self._readImageFromPath(path)
+            norm_image = self._normalizeRawImage(image)
 
 
-    def _loadRawData(self):
-        raw_data = ...
+    def _readImageFromPath(
+        self, 
+        path: str
+    ) -> np.ndarray:
+        img = Image.open(path)
 
-        self.raw_data = raw_data
-        ...
 
-    def _createRSM(self):
-        rsm = ...
+    def _normalizeRawImage(
+        self, 
+        image: np.ndarray, 
+        point: int
+    ) -> np.ndarray:
+        """Normalizes raw image with SPEC values."""
 
-        self.rsm = rsm
-        ...
+        monitor_norm_factor = self.spec_scan.data["Ion_Ch_2"][point] / 200000
+        filter_norm_factor = self.spec_scan.data["transm"]
+        norm_factor = monitor_norm_factor * filter_norm_factor
+        norm_image = image * norm_factor
 
-    def _createGriddedData(self):
-        grid_data = ...
-        grid_coords = ...
-
-        self.grid_data = grid_data
-        self.grid_coords = grid_coords
-        ...
+        return norm_image
 
 '''
 
