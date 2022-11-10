@@ -54,7 +54,7 @@ Coordinate intervals and 3D image exporting
 - Generalized function for converting 3D numpy arrays to .vti (VTK) files
 
 ## [0.1.6] - 2022-08-11
-Big fixes and basic curve plotting
+Bug fixes and basic curve plotting
 
 ### Added
 - Ability to view sets of 1D curves in the newly added CurveView area
