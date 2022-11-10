@@ -4,9 +4,8 @@ See LICENSE file.
 """
 
 
-import os
-
 import numpy as np
+import os
 from PIL import Image
 from spec2nexus import spec
 
@@ -14,10 +13,17 @@ from imageanalysis.gridding import gridScan
 from imageanalysis.mapping import mapScan
 
 
-# TODO: Allow Pathlib paths
-# TODO: Basic testing
 class Project:
-    """Houses SPEC/XML filepaths and Scans."""
+    """General object that handles SPEC data and configuration files."""
+
+    path = None # Absolute project path
+    spec_path = None # SPEC data file
+    detector_path = None # Detector config XML
+    instrument_path = None # Instrument config XML
+    image_path = None # Raw image directory
+    name = None # Visible project name
+    spec_data = None # spec2nexus.SpecDataFile for project
+    scans = None # Dict of Scan objects for project
 
     def __init__(
         self,
@@ -27,7 +33,41 @@ class Project:
         detector_path: str
     ) -> None:
 
-        # Basic parameter testing
+        # Parameters
+        self._validateParameters(
+            project_path, 
+            spec_path, 
+            instrument_path, 
+            detector_path
+        )
+        self.path = project_path
+        self.spec_path = spec_path
+        self.instrument_path = instrument_path
+        self.detector_path = detector_path
+
+        # Image path
+        image_path = self._getImagePath(project_path, spec_path)
+        self._validateImagePath(image_path)
+        self.image_path = image_path
+
+        # Name
+        self.name = os.path.basename(image_path)
+
+        # Creates SpecDataFile based on SPEC file contents
+        self.spec_data = spec.SpecDataFile(spec_path)
+
+        # Creates Scans
+        self._createScans()
+
+    def _validateParameters(
+        self,
+        project_path: str,
+        spec_path: str,
+        instrument_path: str,
+        detector_path: str
+    ) -> None:
+        """Basic validation for Project arguments."""
+
         if project_path is None or type(project_path) != str:
             raise ValueError("Invalid project path.")
         if spec_path is None or type(spec_path) != str:
@@ -45,29 +85,50 @@ class Project:
         if not os.path.exists(detector_path):
             raise FileNotFoundError(f"Path '{detector_path}' not found.")
 
-        # Path variables
-        self.path = project_path
-        self.spec_path = spec_path
-        self.instrument_path = instrument_path
-        self.detector_path = detector_path
+    def _getImagePath(
+        self, 
+        project_path: str, 
+        spec_path: str
+    ) -> str:
+        """Checks if image path directory is present in project path."""
 
-        spec_basename = os.path.basename(os.path.splitext(self.spec_path)[0])
-        image_path = f"{project_path}/images/{spec_basename}"
+        spec_basename = os.path.basename(spec_path)
+        spec_basename_without_ext = os.path.splitext(spec_basename)[0]
+        image_path = f"{project_path}/images/{spec_basename_without_ext}"
+        
         if os.path.exists(image_path):
-            self.image_path = image_path
+            return image_path
         else:
+            return None
+
+    def _validateImagePath(
+        self, 
+        image_path: str
+    ) -> None:
+        """Basic validation for image path directory"""
+
+        if image_path is None:
             raise NotADirectoryError(f"Path '{image_path}' not found.")
 
-        # SPEC data object
-        self.spec_data = spec.SpecDataFile(spec_path)
+    def _createScans(self) -> None:
+        """Returns a dict of Scan objects created from SPEC and image data."""
 
-        # Create Scans
-        self.scans = {}
-        for n in self.getScanNumbers():
-            scan = Scan(number=int(n), project=self)
-            self.scans.update({int(n): scan})
+        scans = {}
 
-    def getScanNumbers(self):
+        for n in self.spec_data.getScanNumbers():
+            scan_image_path = self.image_path + f"/S{str(n).zfill(3)}"
+            spec_scan = self.spec_data.getScan(n)
+
+            if os.path.exists(scan_image_path):
+                scan = Scan(
+                    number=n,
+                    project=self
+                )
+                scans.update({int(n): scan})
+
+        self.scans = scans
+
+    def _getScanNumbers(self):
         """Returns list of scan numbers for project."""
 
         scan_numbers = []
@@ -178,6 +239,56 @@ class Scan:
         self.grid_parameters["K"]["n"] = 250
         self.grid_parameters["L"]["n"] = 250
 
+'''
+class Scan:
+    """Houses data for a single scan."""
+
+    project = None # Parent project
+    image_path = None # Directory with raw images for scan
+    spec_scan = None # SpecDataFileScan
+    number = None # Number assigned in SPEC data
+    name = None # Visible name for scan
+    raw_data = None # 3D NumPy array for raw image data
+    grid_data = None # 3D NumPy array for gridded image data
+    grid_coords = None # 2D list of gridded coordinates for HKL, respectively
+    grid_params = None # Parameters for gridding raw image data
+    rsm = None # 4D NumPy array with reciprocal space map
+
+    def __init__(
+        self,
+        project: Project,
+        image_path: str,
+        spec_scan: spec.SpecDataFileScan
+    ) -> None:
+        
+        self.project = project
+        self.image_path = image_path
+        self.spec_scan = spec_scan
+        self.number = spec_scan.scanNum
+        self.name = f"5 ({project.name})"
+
+
+    def _loadRawData(self):
+        raw_data = ...
+
+        self.raw_data = raw_data
+        ...
+
+    def _createRSM(self):
+        rsm = ...
+
+        self.rsm = rsm
+        ...
+
+    def _createGriddedData(self):
+        grid_data = ...
+        grid_coords = ...
+
+        self.grid_data = grid_data
+        self.grid_coords = grid_coords
+        ...
+
+'''
 
 class Curve:
     """Describes a 1-D line of values with coordinates and metadata."""
