@@ -45,12 +45,12 @@ class ProjectSelectionWidget(QtWidgets.QWidget):
         self.project_files_gbx_layout = QtWidgets.QGridLayout()
         self.project_files_gbx.setLayout(self.project_files_gbx_layout)
         self.project_files_gbx_layout.addWidget(self.spec_lbl, 0, 0)
-        self.project_files_gbx_layout.addWidget(self.spec_cbx, 0, 1)
+        self.project_files_gbx_layout.addWidget(self.spec_cbx, 0, 1, 1, 2)
         self.project_files_gbx_layout.addWidget(self.instrument_lbl, 1, 0)
-        self.project_files_gbx_layout.addWidget(self.instrument_cbx, 1, 1)
+        self.project_files_gbx_layout.addWidget(self.instrument_cbx, 1, 1, 1, 2)
         self.project_files_gbx_layout.addWidget(self.detector_lbl, 2, 0)
-        self.project_files_gbx_layout.addWidget(self.detector_cbx, 2, 1)
-        self.project_files_gbx_layout.addWidget(self.load_project_btn, 3, 1)
+        self.project_files_gbx_layout.addWidget(self.detector_cbx, 2, 1, 1, 2)
+        self.project_files_gbx_layout.addWidget(self.load_project_btn, 3, 0, 1, 3)
 
         # Main layout
         self.layout = QtWidgets.QGridLayout()
@@ -108,6 +108,12 @@ class ProjectSelectionWidget(QtWidgets.QWidget):
         self.spec_cbx.addItems(spec_paths)
         self.instrument_cbx.addItems(xml_paths)
         self.detector_cbx.addItems(xml_paths)
+
+        for i in range(len(xml_paths)):
+            if "Instrument" in str(xml_paths[i]) or "instrument" in str(xml_paths[i]):
+                self.instrument_cbx.setCurrentIndex(i)
+            if "Detector" in str(xml_paths[i]) or "detector" in str(xml_paths[i]):
+                self.detector_cbx.setCurrentIndex(i)
 
     def _enableLoadProjectButton(self) -> None:
         """Sets path variables and enables 'Load Project' button."""
@@ -259,7 +265,7 @@ class ScanSelectionWidget(QtWidgets.QWidget):
         """Sets project variable and loads scan numbers in list."""
         self.project = project
         self.scan_lstw.clear()
-        self.scan_lstw.addItems(self.project.getScanNumbers())
+        self.scan_lstw.addItems(self.project._getScanNumbers())
 
     def _getCurrentScan(self) -> Scan:
         """Returns Scan object of currently highlighted scan number."""
