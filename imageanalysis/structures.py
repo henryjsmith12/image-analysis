@@ -129,104 +129,6 @@ class Project:
 
         self.scans = scans
 
-
-class Scan:
-    """Houses data for a single scan."""
-
-    def __init__(
-        self,
-        project: Project,
-        image_path: str,
-        spec_scan: spec.SpecDataFileScan
-    ) -> None:
-
-        self.number = spec_scan.scanNum
-        self.project = project
-        self.spec_scan = self.project.spec_data.getScan(self.number)
-        self.raw_image_data, self.rsm = None, None
-        self.gridded_image_data, self.gridded_image_coords = None, None
-        self.grid_parameters = {
-            "H": {"min": 0.0, "max": 0.0, "n": 250},
-            "K": {"min": 0.0, "max": 0.0, "n": 250},
-            "L": {"min": 0.0, "max": 0.0, "n": 250}
-        }
-
-    def _loadRawImageData(self) -> None:
-        """Retrieves raw images."""
-
-        scan_image_basepath = f"/S{str(self.number).zfill(3)}"
-        scan_image_path = f"{self.project.image_path}/{scan_image_basepath}"
-        image_paths = sorted(os.listdir(scan_image_path))
-        image_paths = [
-            p for p in image_paths if (
-                not p.startswith(".") and
-                not p.startswith("alignment") and
-                p.endswith("tif")
-            )
-        ]
-
-        # Normalization factors from SPEC
-        monitor_norm_factors = [i / 200000 for i in self.spec_scan.data["Ion_Ch_2"]]
-        filter_norm_factors = self.spec_scan.data["transm"]
-
-        images = []
-        # Retrieve image data from paths
-        for i in range(len(image_paths)):
-            img_path = f"{scan_image_path}/{image_paths[i]}"
-            norm_factor = filter_norm_factors[i] * monitor_norm_factors[i]
-            img = Image.open(img_path)
-            img_array = np.array(img).T / norm_factor
-            images.append(img_array)
-
-        self.raw_image_data = np.array(images)
-
-    def _mapRawImageData(self) -> None:
-        """Creates a reciprocal space map from given parameters"""
-
-        self.rsm = mapScan(
-            spec_scan=self.spec_scan,
-            instrument_path=self.project.instrument_path,
-            detector_path=self.project.detector_path
-        )
-        self._resetGridParameters()
-
-    def _gridRawImageData(self) -> None:
-        """Creates a gridded array from raw image data and a RSM."""
-
-        self.gridded_image_data, self.gridded_image_coords = gridScan(
-            raw_image_data=self.raw_image_data,
-            rsm=self.rsm,
-            grid_params=self.grid_parameters
-        )
-
-    def _setGridParameters(self, params: dict) -> None:
-        """Sets parameters for gridding."""
-
-        self.grid_parameters["H"]["min"] = params["H"]["min"]
-        self.grid_parameters["K"]["min"] = params["K"]["min"]
-        self.grid_parameters["L"]["min"] = params["L"]["min"]
-        self.grid_parameters["H"]["max"] = params["H"]["max"]
-        self.grid_parameters["K"]["max"] = params["K"]["max"]
-        self.grid_parameters["L"]["max"] = params["L"]["max"]
-        self.grid_parameters["H"]["n"] = params["H"]["n"]
-        self.grid_parameters["K"]["n"] = params["K"]["n"]
-        self.grid_parameters["L"]["n"] = params["L"]["n"]
-
-    def _resetGridParameters(self) -> None:
-        """Resets gridding parameters to defaults."""
-
-        self.grid_parameters["H"]["min"] = np.amin(self.rsm[:, :, :, 0])
-        self.grid_parameters["K"]["min"] = np.amin(self.rsm[:, :, :, 1])
-        self.grid_parameters["L"]["min"] = np.amin(self.rsm[:, :, :, 2])
-        self.grid_parameters["H"]["max"] = np.amax(self.rsm[:, :, :, 0])
-        self.grid_parameters["K"]["max"] = np.amax(self.rsm[:, :, :, 1])
-        self.grid_parameters["L"]["max"] = np.amax(self.rsm[:, :, :, 2])
-        self.grid_parameters["H"]["n"] = 250
-        self.grid_parameters["K"]["n"] = 250
-        self.grid_parameters["L"]["n"] = 250
-
-'''
-
 class Scan:
     """Houses data for a scan."""
 
@@ -253,28 +155,88 @@ class Scan:
         self.spec_scan = spec_scan
         self.number = spec_scan.scanNum
         self.name = f"{self.number} ({project.name})"
+        self.grid_params = {
+            "H": {"min": 0.0, "max": 0.0, "n": 250},
+            "K": {"min": 0.0, "max": 0.0, "n": 250},
+            "L": {"min": 0.0, "max": 0.0, "n": 250}
+        }
 
     def loadRawData(self) -> None:
         """Loads raw images from image path directory."""
 
+        # Determines image files to read
         image_files = []
         for file in sorted(os.listdir(self.image_path)):
             if self.project.name in file and file.endswith("tif"):
                 image_files.append(file)
 
+        # Reads and normalizes images
+        raw_images = []
         for i in range(len(image_files)): 
             basepath = image_files[i]
             path = f"{self.image_path}/{basepath}"
             image = self._readImageFromPath(path)
-            norm_image = self._normalizeRawImage(image)
+            norm_image = self._normalizeRawImage(image, point=i)
+            raw_images.append(norm_image)
 
+        self.raw_data = np.array(raw_images)
 
+    def map(self) -> None:
+        """Creates a reciprocal space map."""
+
+        self.rsm = mapScan(
+            spec_scan=self.spec_scan,
+            instrument_path=self.project.instrument_path,
+            detector_path=self.project.detector_path
+        )
+
+    def setGridSize(
+        self, 
+        h_n: int, 
+        k_n: int, 
+        l_n: int
+    ) -> None:
+        """Sets pixel count for each dimension of gridded data."""
+        
+        self.grid_params["H"]["n"] = h_n
+        self.grid_params["K"]["n"] = k_n
+        self.grid_params["L"]["n"] = l_n
+
+    def setGridBounds(
+        self,
+        h_min: float, h_max: float,
+        k_min: float, k_max: float,
+        l_min: float, l_max: float
+    ) -> None:
+        """Sets bounds for each dimension of gridded data."""
+        
+        self.grid_params["H"]["min"] = h_min
+        self.grid_params["K"]["min"] = k_min
+        self.grid_params["L"]["min"] = l_min
+        self.grid_params["H"]["max"] = h_max
+        self.grid_params["K"]["max"] = k_max
+        self.grid_params["L"]["max"] = l_max
+
+    def grid(self) -> None:
+        """Creates a 3D reconstruction of the raw data using a RSM."""
+
+        # Grids raw image data
+        self.grid_data, self.grid_coords = gridScan(
+            raw_image_data=self.raw_data,
+            rsm=self.rsm,
+            grid_params=self.grid_params
+        )
+    
     def _readImageFromPath(
         self, 
-        path: str
+        image_path: str
     ) -> np.ndarray:
-        img = Image.open(path)
+        """Reads image from given path."""
 
+        image = Image.open(image_path)
+        image_array = np.array(image).T
+
+        return image_array
 
     def _normalizeRawImage(
         self, 
@@ -284,13 +246,28 @@ class Scan:
         """Normalizes raw image with SPEC values."""
 
         monitor_norm_factor = self.spec_scan.data["Ion_Ch_2"][point] / 200000
-        filter_norm_factor = self.spec_scan.data["transm"]
+        filter_norm_factor = self.spec_scan.data["transm"][point]
         norm_factor = monitor_norm_factor * filter_norm_factor
         norm_image = image * norm_factor
 
         return norm_image
 
-'''
+    def _setGridParametersToRSM(self) -> None:
+        h = self.rsm[:, :, :, 0]
+        k = self.rsm[:, :, :, 1]
+        l = self.rsm[:, :, :, 2]
+
+        h_min, h_max = np.amin(h), np.amax(h)
+        k_min, k_max = np.amin(k), np.amax(k)
+        l_min, l_max = np.amin(l), np.amax(l)
+        
+        self.grid_params = {
+            "H": {"min": h_min, "max": h_max, "n": 250},
+            "K": {"min": k_min, "max": k_max, "n": 250},
+            "L": {"min": l_min, "max": l_max, "n": 250}
+        }
+
+''''''
 
 class Curve:
     """Describes a 1-D line of values with coordinates and metadata."""
