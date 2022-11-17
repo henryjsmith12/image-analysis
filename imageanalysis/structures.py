@@ -252,7 +252,12 @@ class Scan:
 
         return norm_image
 
-    def _setGridParametersToRSM(self) -> None:
+    def _setDefaultGridParameters(self) -> None:
+        """Changes grid parameters to default bounds and size.
+        
+        - Default bounds are the min/max bounds of current RSM
+        - Default size is (250, 250, 250)
+        """
         h = self.rsm[:, :, :, 0]
         k = self.rsm[:, :, :, 1]
         l = self.rsm[:, :, :, 2]
@@ -267,7 +272,6 @@ class Scan:
             "L": {"min": l_min, "max": l_max, "n": 250}
         }
 
-''''''
 
 class Curve:
     """Describes a 1-D line of values with coordinates and metadata."""
