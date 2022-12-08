@@ -136,6 +136,7 @@ class Scan:
     image_path = None # Directory with raw images for scan
     spec_scan = None # SpecDataFileScan
     number = None # Number assigned in SPEC data
+    n_pts = None # Number of points in scan
     name = None # Visible name for scan
     raw_data = None # 3D NumPy array for raw image data
     rsm = None # 4D NumPy array with reciprocal space map
@@ -154,11 +155,12 @@ class Scan:
         self.image_path = image_path
         self.spec_scan = spec_scan
         self.number = spec_scan.scanNum
+        self.n_pts = len(spec_scan.data[spec_scan.L[0]])
         self.name = f"{self.number} ({project.name})"
         self.grid_params = {
-            "H": {"min": 0.0, "max": 0.0, "n": 250},
-            "K": {"min": 0.0, "max": 0.0, "n": 250},
-            "L": {"min": 0.0, "max": 0.0, "n": 250}
+            "H": {"min": -4.0, "max": 4.0, "n": 250},
+            "K": {"min": -4.0, "max": 4.0, "n": 250},
+            "L": {"min": -4.0, "max": 4.0, "n": 250}
         }
 
     def loadRawData(self) -> None:
