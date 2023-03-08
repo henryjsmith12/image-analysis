@@ -9,7 +9,7 @@ import xrayutilities as xu
 
 
 def gridScan(
-    raw_image_data: np.ndarray,
+    raw_data: np.ndarray,
     rsm: np.ndarray,
     grid_params: dict
 ) -> tuple:
@@ -38,10 +38,10 @@ def gridScan(
         zmin=l_min, zmax=l_max,
         fixed=True
     )
-    gridder(h, k, l, raw_image_data)
+    gridder(h, k, l, raw_data)
 
-    gridded_image_data = gridder.data
+    grid_data = gridder.data
     # TODO: Handle mismatched coordinate lengths
     coords = np.array([gridder.xaxis, gridder.yaxis, gridder.zaxis])
 
-    return gridded_image_data, coords
+    return grid_data, coords

@@ -113,7 +113,7 @@ class ROIController(QtWidgets.QGroupBox):
             if type(self.image_tool.parent) == GriddedDataWidget:
                 coords = self.image_tool.parent.controller.coords
             else:
-                data = self.image_tool.parent.scan.raw_image_data
+                data = self.image_tool.parent.scan.raw_data
                 coords = [
                     np.linspace(0, data.shape[1]-1, data.shape[1]), 
                     np.linspace(0, data.shape[2]-1, data.shape[2]), 
@@ -189,7 +189,7 @@ class LineSegmentROI(pg.LineSegmentROI):
         
         if type(self.image_tool.parent) == RawDataWidget:
             if self.parent_plot.n_dim == 3:
-                data = self.image_tool.parent.scan.raw_image_data
+                data = self.image_tool.parent.scan.raw_data
                 coords = [
                     np.linspace(0, data.shape[1]-1, data.shape[1]), 
                     np.linspace(0, data.shape[2]-1, data.shape[2]), 

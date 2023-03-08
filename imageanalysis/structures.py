@@ -192,6 +192,8 @@ class Scan:
             detector_path=self.project.detector_path
         )
 
+        self._setDefaultGridParameters()
+
     def setGridSize(
         self, 
         h_n: int, 
@@ -224,7 +226,7 @@ class Scan:
 
         # Grids raw image data
         self.grid_data, self.grid_coords = gridScan(
-            raw_image_data=self.raw_data,
+            raw_data=self.raw_data,
             rsm=self.rsm,
             grid_params=self.grid_params
         )
@@ -273,7 +275,6 @@ class Scan:
             "K": {"min": k_min, "max": k_max, "n": 250},
             "L": {"min": l_min, "max": l_max, "n": 250}
         }
-
 
 class Curve:
     """Describes a 1-D line of values with coordinates and metadata."""

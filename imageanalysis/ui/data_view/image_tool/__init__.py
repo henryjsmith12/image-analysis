@@ -260,7 +260,7 @@ class ImageToolController(QtWidgets.QWidget):
                         i = self.image_tool.parent.controller.slice_index
                         scan = self.image_tool.parent.scan
                         h, k, l = scan.rsm[i, x, y]
-                        value = scan.raw_image_data[i, x, y]
+                        value = scan.raw_data[i, x, y]
                     elif sender == self.image_tool.plot_2d:
                         h, k, l, value = None, None, None, None
                 # GriddedDataWidget
@@ -272,7 +272,7 @@ class ImageToolController(QtWidgets.QWidget):
                         i = ctrl.slice_index
                         value = data[x, y, i]
                         scan = self.image_tool.parent.scan
-                        coords = scan.gridded_image_coords
+                        coords = scan.grid_coords
                         h = coords[0][[x, y, i][dim_order.index(0)]]
                         k = coords[1][[x, y, i][dim_order.index(1)]]
                         l = coords[2][[x, y, i][dim_order.index(2)]]

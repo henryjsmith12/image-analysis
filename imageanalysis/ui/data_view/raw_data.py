@@ -66,7 +66,7 @@ class RawDataController(QtWidgets.QWidget):
         self.image_tool = image_tool
         self.scan = scan
 
-        self.data = scan.raw_image_data
+        self.data = scan.raw_data
         self.slice_index = 0
 
         # Child widgets

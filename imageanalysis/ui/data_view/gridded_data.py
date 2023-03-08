@@ -69,8 +69,8 @@ class GriddedDataController(QtWidgets.QWidget):
         self.parent = parent
         self.image_tool = image_tool
         self.scan = scan
-        self.data = scan.gridded_image_data
-        self.coords = scan.gridded_image_coords
+        self.data = scan.grid_data
+        self.coords = scan.grid_coords
         self.dim_order = (0, 1, 2)
         self.slice_index = 0
 

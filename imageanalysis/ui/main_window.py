@@ -57,17 +57,17 @@ class MainWindow(QtWidgets.QWidget):
             hideTitle=True,
             closable=False
         )
-        self.plot_view_dock = Dock(
+        '''self.plot_view_dock = Dock(
             name="CurveView",
             size=(5, 5),
             widget=self.plot_view,
             hideTitle=True,
             closable=False
-        )
+        )'''
         self.project_selection_dock.setMaximumWidth(300)
         self.scan_selection_dock.setMaximumWidth(300)
         self.data_view_dock.setStretch(5, 5)
-        self.plot_view_dock.setStretch(2.5, 5)
+        #self.plot_view_dock.setStretch(2.5, 5)
         self.dock_area.addDock(self.project_selection_dock)
         self.dock_area.addDock(
             self.scan_selection_dock,
@@ -89,11 +89,11 @@ class MainWindow(QtWidgets.QWidget):
             "top",
             self.scan_selection_dock
         )
-        self.dock_area.addDock(
+        '''self.dock_area.addDock(
             self.plot_view_dock,
             "right",
             self.data_view_dock
-        )
+        )'''
 
         # Layout
         self.layout = QtWidgets.QGridLayout()
