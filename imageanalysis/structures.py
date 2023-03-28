@@ -8,6 +8,8 @@ import numpy as np
 import os
 from PIL import Image
 from spec2nexus import spec
+from rsMap3D.datasource.InstForXrayutilitiesReader import \
+    InstForXrayutilitiesReader
 
 from imageanalysis.gridding import gridScan
 from imageanalysis.mapping import mapScan
@@ -249,8 +251,11 @@ class Scan:
     ) -> np.ndarray:
         """Normalizes raw image with SPEC values."""
 
-        monitor_norm_factor = self.spec_scan.data["Ion_Ch_2"][point] / 200000
-        filter_norm_factor = self.spec_scan.data["transm"][point]
+        instrument_reader = InstForXrayutilitiesReader(self.project.instrument_path)
+        
+
+        monitor_norm_factor = self.spec_scan.data["Ion_Ch_2"][point] * instrument_reader.getMonitorScaleFactor()
+        filter_norm_factor = self.spec_scan.data["transm"][point] * instrument_reader.getFilterScaleFactor()
         norm_factor = monitor_norm_factor * filter_norm_factor
         norm_image = image * norm_factor
 

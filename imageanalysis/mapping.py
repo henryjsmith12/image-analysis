@@ -35,6 +35,7 @@ def mapScan(
     detector_circle_names = instrument_reader.getDetectorCircleNames()
     angle_names = sample_circle_names + detector_circle_names
 
+    
     # Adds each angle to RSM parameters dictionary
     for angle in angle_names:
         rsm_params.update({angle: 0})
